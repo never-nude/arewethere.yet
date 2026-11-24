@@ -1,0 +1,51 @@
+.overview-home {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 70% 500px at 90% 3%, #251e36 0%, transparent 85%), var(--page);
+}
+.home-wrap { width: min(1152px, calc(100% - clamp(32px, 8vw, 108px))); margin-inline: auto; }
+.home-header, .home-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.home-header { padding-block: 16px; flex-wrap: wrap; }
+.home-hero { display: grid; grid-template-columns: 1.08fr 1fr; gap: clamp(28px, 6vw, 88px); align-items: center; padding-block: clamp(35px, 6.5vw, 84px); }
+.home-intro h1 { margin: 0; font-size: clamp(39px, 5.7vw, 78px); font-weight: 650; letter-spacing: -.066em; line-height: .99; text-wrap: balance; }
+.home-intro h1 span { color: #cbb7fb; }
+.home-intro > p { max-width: 41ch; margin-top: 21px; color: #d0c6df; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.52; }
+.home-intro .home-answer { padding-left: 13px; border-left: 2px solid var(--teal); color: #e6def1; font-size: 14px; }
+.home-instrument { min-width: 0; padding: clamp(20px, 3vw, 34px); border: 1px solid #4b3c61; border-radius: 18px; background: radial-gradient(ellipse at 100% 0, #322640, transparent 65%), #1b1627; }
+.home-instrument h2 { color: #e2d6f1; font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
+.home-number { display: flex; align-items: baseline; gap: 7px; margin: 7px 0 13px; font-variant-numeric: tabular-nums; }
+.home-number output { color: #f6f1fa; font-size: clamp(55px, 6.8vw, 90px); line-height: 1; letter-spacing: -.075em; font-weight: 640; }
+.home-number > span { color: #c5b8d5; font: 400 16px var(--mono); }
+.home-scale, .home-meter > span { display: block; height: 7px; border-radius: 8px; overflow: hidden; background: #3c324e; }
+.home-scale > i, .home-meter i { display: block; width: 0; height: 100%; border-radius: inherit; background: #bda2f3; }
+.home-scale > i { background: linear-gradient(90deg, #a58bd6, #d3bcff); }
+.home-instrument > p { margin-top: 14px; color: #d2c8df; font-size: 14px; line-height: 1.5; }
+.home-freshness { display: grid; gap: 5px; margin-top: 17px; padding-top: 13px; border-top: 1px solid #40344f; font-size: 12px; line-height: 1.45; color: #b9abc9; }
+.home-freshness b, .home-freshness div span { display: block; }
+.home-freshness b { font-size: 13px; color: #e4dae9; font-weight: 580; }
+.home-milestones { padding-top: 27px; border-top: 1px solid var(--border); }
+.home-section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 20px; }
+.home-section-heading h2 { font-size: clamp(26px, 3.3vw, 39px); font-weight: 620; letter-spacing: -.052em; line-height: 1.12; }
+.home-section-heading p { max-width: 65ch; margin-top: 7px; color: #c9bed7; font-size: 14px; line-height: 1.5; }
+.home-detail-link, .home-footer a, .home-fallback a { color: #cebbf6; text-decoration: underline; text-underline-offset: 3px; font-size: 13px; }
+.home-detail-link, .home-footer a { display: inline-flex; align-items: center; min-height: 44px; gap: 6px; }
+.home-milestone-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block: 20px 34px; }
+.home-milestone-grid article { display: grid; grid-template-rows: auto 1fr auto; gap: 8px; border: 1px solid #3d334c; border-radius: 12px; padding: 18px 20px; background: #1a1625; }
+.home-milestone-grid h3 { font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -.045em; line-height: 1.2; font-weight: 610; }
+.home-milestone-grid abbr { color: #baaecb; text-decoration: none; white-space: nowrap; font: 400 12px var(--mono); letter-spacing: 0; margin-left: 3px; }
+.home-milestone-grid p { color: #c5bad3; font-size: 14px; line-height: 1.45; }
+.home-meter { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.home-meter > span { height: 5px; flex: 1; }
+.home-meter output { min-width: 7ch; text-align: right; color: #decaf7; font: 400 12px var(--mono); }
+.home-milestone-grid [data-milestone="rsi"] .home-meter i, .home-milestone-grid [data-milestone="singularity"] .home-meter i { background: var(--teal); }
+.home-footer { border-top: 1px solid var(--border); padding-block: 7px 19px; }
+.home-fallback { padding: 12px 0; }
+@media (max-width: 740px) {
+  .home-hero { grid-template-columns: 1fr; gap: 20px; }
+  .home-intro h1 { max-width: 15ch; }
+  .home-intro > p { max-width: 55ch; margin-top: 15px; }
+}
+@media (max-width: 570px) {
+  .home-milestone-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
+  .home-milestone-grid article { padding: 15px 16px; }
+  .home-header { padding-block: 10px; }
+}

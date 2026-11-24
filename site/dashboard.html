@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#100e1a">
+  <meta name="description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
+  <title>Full dashboard · Singularity Watch</title>
+  <link rel="canonical" href="https://arewethereyet.now/dashboard.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Singularity Watch">
+  <meta property="og:title" content="Full dashboard · Singularity Watch">
+  <meta property="og:description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
+  <meta property="og:url" content="https://arewethereyet.now/dashboard.html">
+  <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Are we there yet? A violet wireframe hourglass narrows to a single mint point. Singularity Watch tracks milestones toward the singularity.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Full dashboard · Singularity Watch">
+  <meta name="twitter:description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
+  <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png">
+  <meta name="twitter:image:alt" content="Are we there yet? A violet wireframe hourglass narrows to a single mint point.">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://arewethereyet.now/assets/watch-touch.png">
+  <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./view-switch.css">
+  <link rel="stylesheet" href="./language-menu.css">
+  <script type="module" src="./language-menu.js"></script>
+  <link rel="stylesheet" href="./glossary.css">
+  <link rel="stylesheet" href="./terrain.css">
+  <link rel="stylesheet" href="./relationship-map.css">
+  <link rel="stylesheet" href="./agi-trajectory.css">
+  <link rel="stylesheet" href="./evidence-library.css">
+  <link rel="stylesheet" href="./milestone-progress.css">
+  <link rel="stylesheet" href="./organization-signals.css">
+  <link rel="stylesheet" href="./organization-forecast.css">
+  <link rel="stylesheet" href="./origins.css">
+  <link rel="stylesheet" href="./atlas-fullscreen.css">
+  <link rel="stylesheet" href="./watchtower.css">
+  <link rel="stylesheet" href="./watch-history.css">
+  <link rel="stylesheet" href="./labs.css">
+  <script>if (location.protocol === 'file:') document.documentElement.dataset.filePreview = '';</script>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="topbar">
+    <div class="wrap header-inner dashboard-header">
+      <a href="./" class="wordmark"><img class="wordmark-icon" src="./favicon.svg?v=3" width="30" height="30" alt=""> Singularity Watch</a>
+      <div class="page-tools">
+        <nav class="view-switch" aria-label="Site views">
+          <a href="./">Overview</a><a href="./dashboard.html" aria-current="page">Full dashboard</a>
+        </nav>
+        <site-language-menu></site-language-menu>
+      </div>
+      <nav class="top-nav" aria-label="Dashboard sections">
+        <a href="#atlas">Milestone Map</a>
+        <a href="#watchdog">Watchdog</a>
+        <a href="#leaders">Leaders</a>
+        <a href="#history">History</a>
+        <a href="#scenario">Scenarios</a>
+        <a href="#signals">Signals</a>
+        <a class="evidence-jump" href="#evidence">References</a>
+      </nav>
+      <button type="button" class="freshness" id="refresh" title="Check for a newer dataset"><span id="source-status" class="status-dot"></span><span id="source-time">Checking data</span><span aria-hidden="true">↻</span></button>
+    </div>
+  </header>
+
+  <p class="file-preview">This copy is open directly from disk. <a href="https://arewethereyet.now/dashboard.html">Open the live dashboard</a> for the chart, evidence score, and countdown.</p>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <section class="overview-panel" aria-labelledby="overview-heading">
+      <header class="overview-title">
+        <h1 id="overview-heading">What does the evidence show?</h1>
+      </header>
+      <section class="overview-index" aria-labelledby="evidence-index-heading">
+        <h2 id="evidence-index-heading" class="reading-label">Evidence index</h2>
+        <div class="reading-value"><output id="current-score" aria-describedby="index-score-meaning" data-waiting>Loading score…</output><span> / 100</span></div>
+        <p class="reading-explainer" id="index-score-meaning">Eight weighted indicators track what AI can do and how it helps build better AI. We schedule four source checks each day. The score can rise, fall, or hold steady. The risk and timing of a catastrophe fall outside its scope.</p>
+        <div class="reading-meta"><span id="current-delta" class="change"></span><a href="#methodology">How it works ↗</a><a href="#public-sources">Last source check ↓</a></div>
+        <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-describedby="index-watch-meaning" aria-valuemin="0" aria-valuemax="100">
+          <span class="index-meter-fill" id="index-fill"></span>
+          <span class="watch-tick" id="watch-tick"></span>
+        </div>
+        <div class="meter-scale" aria-hidden="true"><span>0</span><span>100 points</span></div>
+        <div class="meter-key"><span id="score-coverage">Source coverage pending</span><a id="watch-line-label" href="#watch-line">75-point watch line</a></div>
+        <p class="reading-explainer reading-watch" id="index-watch-meaning"><strong>The vertical mark means take a closer look.</strong> We chose 75 points because reaching it requires points for both AI skills and AI research. Confirming the Singularity takes separate, independent evidence. <span id="index-gap"></span></p>
+      </section>
+      <section class="score-panel" aria-labelledby="readout-heading">
+        <div class="score-content">
+          <h2 id="readout-heading">What the score measures</h2>
+          <p class="lede" id="definition">Tests of what AI can do and whether it helps build better AI carry the most weight. Below are the points earned in each category and the maximum each can contribute.</p>
+          <p class="index-explainer">The Singularity would mean that AI helps build better successors so effectively that development keeps speeding up across generations.</p>
+          <ul id="index-breakdown" class="index-breakdown" aria-label="Points by evidence category"></ul>
+          <p class="threshold-state"><span class="threshold-light" aria-hidden="true"></span><span id="observed">Checking evidence gates</span></p>
+          <div class="score-actions">
+            <a href="#milestone-progress">See the four milestone scores ↓</a>
+            <a id="watchdog-today" href="#watchdog">See what changed today ↓</a>
+            <a href="#watch-clock">Explore the 75-point scenario ↓</a>
+          </div>
+          <p class="term-help">Hover or tap a dotted term for a definition.</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="atlas" class="atlas-panel" aria-labelledby="atlas-heading">
+      <div class="panel-heading atlas-heading">
+        <h2 id="atlas-heading">Milestone map</h2>
+        <a class="agi-jump" id="agi-jump" href="#agi" hidden>AGI trajectory ↓</a>
+      </div>
+      <div class="atlas-controls">
+        <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
+          <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">2D map</button>
+          <button type="button" data-view="routes" aria-controls="terrain-stage terrain" aria-pressed="false">3D map</button>
+        </div>
+        <button type="button" id="atlas-fullscreen" class="chart-fullscreen" aria-controls="atlas" aria-pressed="false">Full screen</button>
+      </div>
+      <div class="atlas-visual">
+        <div id="relationships"><p class="placeholder">Loading milestone relationships…</p></div>
+        <div id="terrain-stage" hidden><p class="placeholder">Loading the 3D milestone map…</p></div>
+      </div>
+      <div id="terrain" aria-label="Milestone evidence and possible routes" hidden></div>
+      <section id="milestone-order" class="milestone-order" aria-labelledby="milestone-order-title">
+        <h3 id="milestone-order-title">Which milestones can come first?</h3>
+        <p><strong>ASI would also meet the AGI bar.</strong> Under the Watch’s definitions, AGI performs at least as well as skilled people across many kinds of unfamiliar work. ASI consistently beats leading experts across that same range. The first evidence for AGI could come earlier or in the same evaluation. <sup class="evidence-citations"><a href="#ref-6" aria-label="Reference 6">[6]</a></sup></p>
+        <p><strong>Recursive self-improvement can start at different times.</strong> Even a specialist could help build a stronger successor that then helps improve the next model. That loop could start before AGI, between AGI and ASI, or after ASI. <sup class="evidence-citations"><a href="#ref-9" aria-label="Reference 9">[9]</a></sup></p>
+        <details>
+          <summary>Compare three possible orders</summary>
+          <ul>
+            <li><strong>AGI → ASI → RSI.</strong> Engineers build broadly superhuman AI, then use it to help develop stronger successors.</li>
+            <li><strong>AGI → RSI → ASI.</strong> A broadly capable AI starts helping to build successors while people still outperform it on expert tasks. Later improvements could clear the higher bar.</li>
+            <li><strong>RSI → AGI → ASI.</strong> A research specialist starts a feedback loop first. Later systems could become broadly capable if those gains carry over to other kinds of work.</li>
+          </ul>
+        </details>
+        <p><strong>The Singularity would require the loop to keep speeding up.</strong> It could level off if resources or testing become bottlenecks. The <a href="#evidence-gates">three evidence checks</a> concern reliable autonomy, repeated research, and accelerating gains attributable to AI. The Watch can assess them independently of the AGI and ASI labels.</p>
+      </section>
+      <section id="agi" class="agi-panel" aria-labelledby="agi-title" hidden>
+        <div class="agi-heading">
+          <div>
+            <h3 id="agi-title">AGI trajectory</h3>
+            <p>How broadly measured AI capabilities are changing.</p>
+          </div>
+          <a class="agi-benchmark" href="https://epoch.ai/eci" target="_blank" rel="noopener noreferrer">Epoch benchmark ↗</a>
+        </div>
+        <div class="agi-readings"><p>Loading measured progress…</p></div>
+        <div class="agi-chart" hidden></div>
+        <div class="agi-chart-key" hidden><span>Measured frontier</span><span>Conditional projection</span></div>
+        <p class="agi-method"></p>
+        <p class="evidence-sidenote">Benchmark evidence <sup class="evidence-citations"><a href="#ref-1" aria-label="Reference 1">[1]</a><a href="#ref-2" aria-label="Reference 2">[2]</a></sup> · Market rules <sup class="evidence-citations"><a href="#ref-5" aria-label="Reference 5">[5]</a></sup> <a class="evidence-jump" href="#evidence">View all references ↓</a></p>
+        <div class="agi-market"><span>Loading market reading…</span></div>
+        <p class="agi-context">Researchers use different definitions of AGI. <a href="https://arxiv.org/abs/2311.02462" target="_blank" rel="noopener noreferrer">See how one framework distinguishes breadth, performance, and autonomy ↗</a></p>
+        <details class="agi-news">
+          <summary>Recent news</summary>
+          <ul class="agi-news-list"><li>Loading articles…</li></ul>
+          <p class="agi-next">For a result that could affect your work or community, check the independent evaluation and its limitations. Bring a concrete question about oversight to the people making deployment decisions, and revisit it as more evidence arrives.</p>
+        </details>
+      </section>
+    </section>
+
+    <div class="watch-clock" id="watch-clock">
+      <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
+        <h2 id="forecast-disclaimer">What would it take to reach 75 points?</h2>
+        <p>We chose 75 as a signal to review the evidence. The countdown asks when the index would reach that mark <strong>if it gained one point per month.</strong> That pace is an assumption you can change in the scenarios below.</p>
+        <p>The Watch uses evidence available through <span id="countdown-evidence-date">its latest data check</span>. The date of a singularity remains unknown. Confirming one would require independent evidence that AI keeps speeding up research across generations.</p>
+      </aside>
+      <details id="countdown">
+        <summary><span class="watch-clock-show">Show the countdown at one point per month</span><span class="watch-clock-hide">Hide the countdown</span></summary>
+        <div class="watch-clock-body">
+          <div class="watch-clock-reading">
+            <p class="watch-clock-value" id="countdown-value" hidden><output id="countdown-days" aria-label="Days until the index would reach the review threshold under this assumption"></output><span>days</span></p>
+            <p class="watch-clock-target"><span id="countdown-state">Waiting for evidence</span><time id="countdown-date" hidden></time></p>
+          </div>
+          <p class="watch-clock-note" id="countdown-note">The watch line marks when to look more closely at the evidence.</p>
+          <div class="watch-clock-footer">
+            <p>The days remaining roll over at midnight UTC. The evidence follows the <a href="#public-sources">source-check schedule</a>.</p><a href="#scenario">Scenarios ↗</a>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <section id="milestone-progress" class="section panel" aria-label="Evidence for four AI milestones"></section>
+
+    <div class="tape-shell" aria-label="Current signal ticker">
+      <div class="tape-heading"><span class="status-dot" aria-hidden="true"></span> SIGNALS</div>
+      <div id="tape" class="tape" tabindex="0"><p class="placeholder">Loading measurements…</p></div>
+    </div>
+
+    <section id="watchdog" class="section panel watchdog-panel" aria-labelledby="watchdog-heading">
+      <div class="section-heading">
+        <div><h2 id="watchdog-heading">AI watchdog</h2><p>Zoom in on a date to see measured changes, new models, and service incidents.</p></div>
+        <a class="evidence-jump" href="#watch">Acceleration watch ↓</a>
+      </div>
+      <div id="watchdog-board"><p class="placeholder">Loading the daily record…</p></div>
+      <p class="small-note">The watchdog uses peer-reviewed research and independent evaluations for measurements, official records for service incidents, and vetted reporting for context. <a class="evidence-jump" href="#evidence">See the source standards ↓</a></p>
+    </section>
+
+    <section id="watch" class="section panel" aria-label="Acceleration watch">
+      <div id="watchtower"><p class="placeholder">Checking acceleration signals…</p></div>
+      <p class="evidence-sidenote">Research assessments and methods <sup class="evidence-citations"><a href="#ref-8" aria-label="Reference 8">[8]</a><a href="#ref-9" aria-label="Reference 9">[9]</a><a href="#ref-10" aria-label="Reference 10">[10]</a><a href="#ref-11" aria-label="Reference 11">[11]</a></sup></p>
+    </section>
+
+    <section id="history" class="section" aria-labelledby="history-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index. <sup class="evidence-citations"><a href="#ref-12" aria-label="Reference 12">[12]</a><a href="#ref-13" aria-label="Reference 13">[13]</a><a href="#ref-14" aria-label="Reference 14">[14]</a></sup> <a id="foundations-jump" class="evidence-jump" href="#foundations">Before AI ↗</a></p></div>
+      </div>
+      <div id="origins" class="panel history-origins"></div>
+      <div class="history-grid">
+        <div class="panel graph-panel">
+          <div class="panel-heading">
+            <div><h3>Evidence index</h3><p id="history-caption">Select a date to inspect the reading.</p></div>
+            <div id="range-buttons" class="segmented" role="group" aria-label="History range">
+              <button type="button" data-days="30" aria-pressed="false">30D</button>
+              <button type="button" data-days="90" aria-pressed="true">90D</button>
+              <button type="button" data-days="180" aria-pressed="false">180D</button>
+            </div>
+          </div>
+          <div id="history-chart" class="plot" aria-label="Historical evidence index chart"></div>
+          <div class="replay-controls">
+            <button id="replay-back" class="calendar-step" aria-label="Previous day" type="button">‹</button>
+            <input id="replay" aria-label="Replay date" type="range" min="0" max="0" value="0" disabled>
+            <button id="replay-forward" class="calendar-step" aria-label="Next day" type="button">›</button>
+            <button id="replay-latest" class="calendar-step latest" type="button">Latest</button>
+          </div>
+          <p class="small-note">Between observations, the index carries forward the latest eligible evidence. Backfilled model scores are plotted by model release date.</p>
+        </div>
+
+        <section class="panel replay-panel" aria-labelledby="replay-title">
+          <div class="panel-heading"><div><h3 id="replay-title">Reading for the day</h3><p id="replay-date">Waiting for source data</p></div></div>
+          <div id="replay-readout" class="replay-reading" aria-live="polite"></div>
+          <ul id="replay-factors" class="replay-list"></ul>
+          <div id="replay-events" class="replay-events"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="labs" class="section" aria-labelledby="labs-heading">
+      <div class="section-heading">
+        <div><h2 id="labs-heading">Who’s moving the frontier?</h2><p>Compare developers’ strongest recent models and see how labs use AI to build AI.</p></div>
+      </div>
+      <div id="leaders" class="panel leader-board" aria-label="Organization rankings by milestone"></div>
+      <section id="projected-leaders" class="panel leader-board" aria-label="Projected rankings and illustrative milestone timeline">
+        <div class="scenario-control leader-pace">
+          <label for="leader-scenario-pace">Assumed index points per month</label>
+          <output id="leader-scenario-rate" for="leader-scenario-pace">+1</output>
+          <input id="leader-scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
+        </div>
+        <div id="organization-forecast"></div>
+        <div id="dependency-timeline" class="dependency-timeline"></div>
+      </section>
+      <div id="labs-board"></div>
+    </section>
+
+    <section id="scenario" class="section" aria-labelledby="scenario-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">WHAT IF</p><h2 id="scenario-heading">When would the index reach 75?</h2><p>Choose a pace for the evidence index. The chart shows when the score would reach our review threshold at that pace.</p></div>
+      </div>
+      <div class="scenario-grid">
+        <div class="panel graph-panel">
+          <div class="panel-heading">
+            <div><h3>Conditional path</h3><p id="scenario-caption">The watch line is a score threshold. The gates require independent evidence.</p></div>
+            <div id="scenario-presets" class="segmented" role="group" aria-label="Scenario pace presets">
+              <button type="button" data-pace="-0.5" aria-pressed="false">Regression</button>
+              <button type="button" data-pace="1" aria-pressed="true">Steady</button>
+              <button type="button" data-pace="2.5" aria-pressed="false">Fast</button>
+            </div>
+          </div>
+          <div id="scenario-chart" class="plot scenario-chart" aria-label="Conditional index scenario"></div>
+          <div class="scenario-control">
+            <label for="scenario-pace">Assumed index points per month</label>
+            <output id="scenario-rate" for="scenario-pace">+1.0</output>
+            <input id="scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
+          </div>
+          <p class="small-note">This scenario starts on the latest check date and looks up to five years ahead. The countdown above keeps its one-point monthly pace and its starting date while the score holds steady.</p>
+        </div>
+        <section class="panel gates-panel" aria-labelledby="gates-heading">
+          <div class="panel-heading"><div><h3 id="gates-heading">Evidence for the singularity</h3><p>Our working definition requires sustained AI-led acceleration across generations.</p></div></div>
+          <ol id="evidence-gates" class="gate-list"></ol>
+          <p class="small-note" id="gates-note">A score crossing prompts a closer look at the public evidence.</p>
+        </section>
+      </div>
+    </section>
+
+    <section id="signals" class="section" aria-labelledby="signals-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">THE DATA</p><h2 id="signals-heading">Every signal, on the record</h2><p>Click a signal to see how it contributes, when it changed, and where it came from.</p></div>
+      </div>
+      <div class="signal-grid">
+        <section class="panel factor-panel" aria-label="Factors and weights">
+          <div class="factor-columns" aria-hidden="true"><span>Signal</span><span>Reading</span><span>Weight</span></div>
+          <div id="factors"></div>
+        </section>
+        <section class="panel news-panel" aria-labelledby="news-heading">
+          <div class="panel-heading"><div><h3 id="news-heading">News and measurements</h3><p>Release announcements and published evidence</p></div></div>
+          <div id="news-filters" class="news-filters" role="group" aria-label="Filter updates">
+            <button type="button" data-category="All" aria-pressed="true">All</button>
+          </div>
+          <ul id="news-list" class="news-list"></ul>
+          <button id="more-news" type="button" class="calendar-step" hidden>Show more</button>
+        </section>
+      </div>
+    </section>
+
+    <section id="methodology" class="section panel methodology" aria-labelledby="methodology-heading">
+      <div class="section-heading"><div><h2 id="methodology-heading">How this works</h2></div></div>
+      <div class="method-grid">
+        <div>
+          <h3>Evidence, scenarios, and labels</h3>
+          <p>The index totals weighted evidence points. We choose the weights and reference targets. Missing readings leave their points unfilled and lower source coverage. The 75-point watch line flags a score to investigate.</p>
+          <p>Two indicators can rise together for several reasons. For example, a higher benchmark score and a shorter research cycle could both reflect more computing power. To confirm a singularity, independent researchers would need to show that AI’s contribution caused successive generations to improve faster.</p>
+          <p>AGI and ASI both require broad skills on this Watch. ASI sets a higher performance bar. Recursive self-improvement describes how one AI generation helps improve the next. <a href="#milestone-order">See which milestones can come first ↑</a></p>
+          <a href="https://deepmind.google/research/publications/66938/" target="_blank" rel="noopener noreferrer">DeepMind’s AGI framework ↗</a>
+          <div class="watch-line-explainer" id="watch-line">
+            <h3>The 75-point watch line</h3>
+            <p>The dashboard uses 75 out of 100 as a cue to check the evidence more closely. At that point, we’d look for researchers outside the AI companies to verify that AI can handle longer tasks, do whole research projects, and keep speeding up the next round of AI improvements.</p>
+            <p>Even if all the other signals earned full points, reaching 75 would still require at least 25 points for what AI can do and 10 points for its role in AI research.</p>
+          </div>
+          <div class="watch-line-explainer" id="human-evidence">
+            <h3>Social behavior in evaluations</h3>
+            <p>In a broad capability test, independent raters can check whether an AI recognizes a concern and responds appropriately in unfamiliar situations. Studies of how people use accurate or mistaken advice answer a different question. <sup class="evidence-citations"><a href="#ref-20" aria-label="Reference 20">[20]</a><a href="#ref-21" aria-label="Reference 21">[21]</a></sup></p>
+            <p>The self-improvement milestone calls for repeatable experiments that show what the AI contributed. <a href="#evidence-human">Related research and methods ↓</a></p>
+          </div>
+        </div>
+        <div>
+          <h3 id="public-sources">Public sources and update times</h3>
+          <ul id="sources-list" class="source-list"></ul>
+          <p id="data-freshness" class="small-note">Last source check pending.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="evidence" class="section panel evidence-library" aria-labelledby="evidence-heading">
+      <div class="section-heading"><div><h2 id="evidence-heading">References</h2><p>Read the studies, data, and reporting behind each claim. Numbered links throughout the site jump to the citation and explain what the source contributes.</p></div></div>
+      <div class="evidence-policy">
+        <h3>How sources are selected</h3>
+        <p>We check the author, publisher, editorial oversight, and relevance to the claim. We use peer-reviewed research and evaluations from qualified institutions for technical evidence. Primary records provide their own dated measurements, statements, or historical accounts.</p>
+        <p>For interpretation, we prefer bylined independent reporting that identifies its evidence and distinguishes reporting from opinion. Interviews and viewpoints are labeled. We apply the same standards across editorial perspectives. <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources" target="_blank" rel="noopener noreferrer">Wikipedia’s reliable-source guidance ↗</a> · <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources" target="_blank" rel="noopener noreferrer">Perennial source guidance ↗</a></p>
+        <p>We exclude the New York Post, Newsmax, bot accounts, AI-generated articles, and unattributed advocacy. The benchmark data, journal papers, and reporting link to their original sources.</p>
+      </div>
+      <aside class="readiness" aria-label="How to stay ready">
+        <blockquote>“Stay ready so you don’t have to get ready.”</blockquote>
+        <p>When a headline sounds alarming, check what was measured and where the finding applies. Look for independent follow-up. At work or in your community, ask who reviews AI-assisted decisions and what would trigger a change in practice.</p>
+      </aside>
+      <nav class="evidence-contents" aria-label="Reference topics">
+        <a href="#evidence-capability">Capability</a>
+        <a href="#evidence-agi-timing">AGI timing</a>
+        <a href="#evidence-acceleration">Research acceleration</a>
+        <a href="#evidence-history">Origins</a>
+        <a href="#evidence-journalism">Reporting and perspectives</a>
+        <a href="#evidence-human">Empathy and trust</a>
+      </nav>
+      <div class="evidence-grid">
+        <article class="evidence-card" id="evidence-capability"></article>
+        <article class="evidence-card" id="evidence-agi-timing"></article>
+        <article class="evidence-card" id="evidence-acceleration"></article>
+        <article class="evidence-card" id="evidence-history"></article>
+        <article class="evidence-card" id="evidence-journalism"></article>
+        <article class="evidence-card" id="evidence-human"></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer"><a href="#main">Singularity Watch ↑</a><a href="https://github.com/never-nude/arewethere.yet" target="_blank" rel="noopener noreferrer">Source code ↗</a></footer>
+</body>
+</html>

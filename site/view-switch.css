@@ -1,0 +1,31 @@
+.page-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem .85rem;
+}
+.view-switch {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 3px;
+  border: 1px solid #574968;
+  border-radius: .65rem;
+  background: #191421;
+  font: 550 .85rem/1.25 Geist, system-ui, sans-serif;
+}
+.view-switch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .6em .86em;
+  border-radius: .4rem;
+  color: #d7cce7;
+  text-decoration: none;
+  text-align: center;
+}
+.view-switch a:hover { background: #30273e; color: #fff; }
+.view-switch a[aria-current="page"] { color: #f7f0ff; background: #49385f; }
+.view-switch a:focus-visible { outline: 2px solid #83e6cb; outline-offset: 1px; }
+@media (pointer: coarse) {
+  .view-switch a { min-height: 42px; }
+}

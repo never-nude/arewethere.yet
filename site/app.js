@@ -135,7 +135,7 @@ function renderCountdown() {
   const conditional = status === 'conditional';
   byId('countdown-evidence-date').textContent = date(index.date) || 'its latest data check';
   const labels = {
-    conditional: 'Estimated watch-line date',
+    conditional: 'Scenario date for reaching the review threshold',
     elapsed: 'Scenario date reached',
     'at-line': 'Watch line reached',
     observed: 'Singularity evidence verified',
@@ -239,7 +239,7 @@ function renderScenario() {
   let description = 'No watch-line crossing at this pace within five years.';
   if (result.status === 'at-line') description = 'The index is already at or above the watch line.';
   else if (result.status === 'no-reading') description = 'A current index reading is needed to plot this illustration.';
-  else if (result.date && result.days <= 60 * 30.4375) description = 'Under this assumption, the score crosses on ' + date(result.date) + '.';
+  else if (result.date && result.days <= 60 * 30.4375) description = 'At this pace, the index would reach ' + num(result.target) + ' points on ' + date(result.date) + '.';
   byId('scenario-caption').textContent = description;
   const milestones = measureMilestoneProgress(index);
   renderOrganizationForecast(byId('organization-forecast'), {
