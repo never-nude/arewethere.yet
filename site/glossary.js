@@ -1,7 +1,7 @@
 const entries = [
   ['ECI|Epoch Capabilities Index', 'Epoch Capabilities Index', 'Epoch AI combines results from many tests into a shared scale for comparing models. ECI is measured in points.'],
-  ['AGI|artificial general intelligence', 'Artificial general intelligence', 'Here, AI that can perform at the level of skilled people across many kinds of unfamiliar work.'],
-  ['ASI|artificial superintelligence', 'Artificial superintelligence', 'Here, AI that consistently outperforms leading human experts across many important fields.'],
+  ['AGI|artificial general intelligence', 'Artificial general intelligence', 'Here, AI that can perform at least as well as skilled people across many kinds of unfamiliar work.'],
+  ['ASI|artificial superintelligence', 'Artificial superintelligence', 'Here, AI that consistently beats leading human experts across many kinds of unfamiliar work. It also meets the AGI bar.'],
   ['RSI|recursive self-improvement', 'Recursive self-improvement', 'AI helps make a better successor, which in turn helps improve the next generation.'],
   ['technological singularity', 'Technological Singularity', 'Here, sustained acceleration in AI development caused by successive AI systems improving the process of building better AI.'],
   ['AI R&D|R&D|research and development', 'Research and development', 'The work of discovering, testing, and applying improvements. AI research and development includes experiments to build and evaluate AI systems.'],
@@ -42,7 +42,7 @@ const terms = [...aliasLookup.keys()]
 const glossaryPattern = new RegExp(`\\b(?:${terms.join('|')})\\b`, 'gi');
 const termSelector = '.glossary-term';
 const controls = 'a[href], button, summary, label, [role="button"], [role="tab"], [role="option"], [role="slider"]';
-const excluded = `${termSelector}, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
+const excluded = `${termSelector}, .glossary-popup, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
 
 function glossaryTerm(target) {
   return target instanceof Element ? target.closest(termSelector) : null;
@@ -212,6 +212,10 @@ export function installGlossary(root) {
   });
   owner.addEventListener('pointerdown', (event) => {
     if (active && active !== glossaryTerm(event.target) && !popup.contains(event.target)) hide();
+  });
+  owner.addEventListener('fullscreenchange', () => {
+    hide();
+    (owner.fullscreenElement ?? owner.body).append(popup);
   });
   popup.addEventListener('pointerenter', () => view.clearTimeout(hideTimer));
   popup.addEventListener('pointerleave', dismissUnlessFocused);

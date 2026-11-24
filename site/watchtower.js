@@ -1,3 +1,5 @@
+import { modelReleaseUrl, organizationSites } from './model-links.js';
+
 const dayMs = 86_400_000;
 const readings = [
   { id: 'reliability', label: 'Autonomous task horizon', family: 'Capability', publisher: 'METR', threshold: 1.5 },
@@ -84,6 +86,23 @@ function assessWindow(metrics, asOf, days) {
   return { days, state, signals, gains, comparable: comparable.length };
 }
 
+function rankAccess(metric, breadth, label, asOf, events) {
+  const groupPoints = metric?.observations ?? metric?.history ?? [];
+  const allPoints = breadth?.observations ?? breadth?.history ?? [];
+  const points = groupPoints.length ? groupPoints : allPoints.filter((point) => point.access === label);
+  const ordered = observations(metric ?? breadth, points)
+    .filter((point) => point.label && (!Number.isFinite(asOf) || point.time <= asOf))
+    .sort((a, b) => b.value - a.value || b.time - a.time || a.label.localeCompare(b.label));
+  const ranked = new Map();
+  for (const point of ordered) {
+    const key = `${point.organization ?? ''}\n${point.label}`;
+    if (ranked.has(key)) continue;
+    ranked.set(key, { ...point, releaseUrl: modelReleaseUrl(point.label, point.date, events) });
+    if (ranked.size === 3) break;
+  }
+  return { label, models: [...ranked.values()], sourceUrl: metric?.sourceUrl ?? breadth?.sourceUrl };
+}
+
 export function assessAcceleration(payload = {}, { asOf = payload.checkedAt } = {}) {
   const snapshotDay = day(asOf);
   const metrics = new Map((payload.metrics ?? []).map((metric) => [metric.id, metric]));
@@ -94,12 +113,8 @@ export function assessAcceleration(payload = {}, { asOf = payload.checkedAt } = 
     windows,
     asOf: Number.isFinite(snapshotDay) ? snapshotDay : null,
     pendingReport: payload.sources?.find((source) => source.pendingReport)?.pendingReport,
-    access: ['open-breadth', 'closed-breadth'].map((id) => {
-      const metric = metrics.get(id);
-      if (!metric || !Number.isFinite(metric.value)) return null;
-      return { label: id === 'open-breadth' ? 'Open weights' : 'Closed weights', model: metric.model,
-        value: metric.value, date: day(metric.modelDate ?? metric.asOf), url: metric.sourceUrl };
-    }),
+    access: [['open-breadth', 'Open weights'], ['closed-breadth', 'Closed weights']].map(([id, label]) =>
+      rankAccess(metrics.get(id), metrics.get('breadth'), label, snapshotDay, payload.releaseEvents ?? [])),
   };
 }
 
@@ -151,23 +166,42 @@ function renderReasons(window) {
 }
 
 function renderAccess(access) {
-  if (!access.some(Boolean)) return null;
   const block = element('section', 'sw-watch__access');
-  block.append(element('h3', '', 'Open and closed model weights'));
+  block.id = 'model-leaders';
+  block.setAttribute('aria-labelledby', 'model-leaders-title');
+  const title = element('h3', '', 'Top models by weight access');
+  title.id = 'model-leaders-title';
+  block.append(title);
+  const source = element('p', 'sw-watch__method', 'Ranked by published ECI scores in the current benchmark snapshot. ');
+  source.append(sourceLink(access.find(({ sourceUrl }) => sourceUrl)?.sourceUrl ?? 'https://epoch.ai/eci', 'Epoch AI leaderboard'));
+  block.append(source);
   const grid = element('ul', 'sw-watch__access-grid');
-  for (const [i, record] of access.entries()) {
+  for (const { label, models } of access) {
     const card = element('li', 'sw-watch__access-card');
-    card.append(element('span', 'sw-watch__lookback', record?.label ?? (i === 0 ? 'Open weights' : 'Closed weights')),
-      element('strong', '', record ? integer.format(record.value) + ' ECI' : 'Awaiting data'));
-    if (record) {
-      const model = record.model ?? 'Epoch AI';
-      card.append(sourceLink(record.url, Number.isFinite(record.date) ? model + ' · ' + shortDate.format(new Date(record.date)) : model));
+    card.append(element('h4', '', `Top 3 ${label === 'Open weights' ? 'open-weight' : 'closed-weight'} models`));
+    const ranking = element('ol', 'sw-watch__model-ranking');
+    for (const record of models) {
+      const row = element('li', 'sw-watch__model');
+      const model = element('div', 'sw-watch__model-name');
+      model.append(sourceLink(record.releaseUrl ?? record.url, record.label + (record.releaseUrl ? '' : ' · benchmark')),
+        element('strong', '', `${integer.format(record.value)} ECI`));
+      const metadata = element('p', 'sw-watch__model-meta');
+      for (const [position, developer] of organizationSites(record.organization).entries()) {
+        if (position) metadata.append(' · ');
+        metadata.append(sourceLink(developer.url, developer.label));
+      }
+      if (metadata.childNodes.length) metadata.append(' · ');
+      metadata.append(`Released ${shortDate.format(new Date(record.time))}`);
+      row.append(model, metadata);
+      ranking.append(row);
     }
+    if (models.length) card.append(ranking);
+    if (models.length < 3) card.append(element('p', 'sw-watch__method', models.length ? 'Fewer than three scores available.' : 'Awaiting published scores.'));
     grid.append(card);
   }
   block.append(grid);
-  if (access.every(Boolean)) {
-    const margin = access[1].value - access[0].value;
+  if (access.every(({ models }) => models.length)) {
+    const margin = access[1].models[0].value - access[0].models[0].value;
     if (margin !== 0) {
       block.append(element('p', 'sw-watch__access-gap',
         (margin > 0 ? 'Closed' : 'Open') + ' group leads by ' + integer.format(Math.abs(margin)) + ' ECI points.'));
@@ -223,6 +257,5 @@ export function renderWatchtower(container, { index, payload } = {}) {
   if (result.pendingReport?.url) {
     notes.append(' ', sourceLink(result.pendingReport.url, 'New METR report needs a comparability review.'));
   }
-  const access = renderAccess(result.access);
-  container.replaceChildren(head, windows, ...(gains.length ? [findings] : []), details, notes, ...(access ? [access] : []));
+  container.replaceChildren(head, windows, ...(gains.length ? [findings] : []), details, notes, renderAccess(result.access));
 }

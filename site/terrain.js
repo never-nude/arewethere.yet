@@ -3,8 +3,8 @@ const concepts = {
     label: 'AGI',
     title: 'Artificial general intelligence',
     color: '#59e0c9',
-    description: 'An AI system that performs competently across many kinds of tasks, including unfamiliar ones. Researchers disagree on where to draw the line.',
-    implication: 'Breadth and depth can grow at different rates. An AI can be useful across many fields while specialists still outperform it in each.',
+    description: 'An AI system that consistently performs at least as well as skilled people across a wide, representative range of unfamiliar tasks.',
+    implication: 'Across the same broad range of tasks, a system that outperforms leading experts also meets the skilled-human standard for AGI. One evaluation could establish both milestones together.',
     example: 'Imagine one assistant that can help with a lease, tutor a teenager, plan an accessible trip, and pick up a new kind of task from a few instructions.',
     daily: 'More people could hand off routine paperwork, planning, and basic troubleshooting to one tool. Teachers, clinicians, and other specialists would still be responsible for consequential decisions.',
     source: 'https://research.google/pubs/levels-of-agi-operationalizing-progress-on-the-path-to-agi/',
@@ -14,8 +14,8 @@ const concepts = {
     label: 'ASI',
     title: 'Artificial superintelligence',
     color: '#b69bff',
-    description: 'AI that substantially exceeds the strongest human performance across many important cognitive domains.',
-    implication: 'ASI refers to performance. Self-awareness is a separate question. Human-led engineering could produce superintelligence, as could repeated AI-led improvements.',
+    description: 'An AI system that consistently outperforms leading human experts across a wide, representative range of unfamiliar tasks.',
+    implication: 'A chess win establishes superhuman performance on one task. Establishing ASI would require similarly strong results across many fields. Human-led engineering or repeated AI-led improvements could help achieve that. Self-awareness is a separate question.',
     example: 'Imagine a system that consistently beats specialist teams at designing better batteries, finding errors in complex software, and reasoning through new scientific problems.',
     daily: 'Many effects would likely arrive through products and services we already use. Medicine, energy, and software could improve faster, with adoption depending on testing, cost, and access.',
     source: 'https://research.google/pubs/levels-of-agi-operationalizing-progress-on-the-path-to-agi/',
@@ -26,7 +26,7 @@ const concepts = {
     title: 'Recursive self-improvement',
     color: '#ffcb8c',
     description: 'An AI system helps make a more capable version or successor, which can in turn make further improvements. Research teams can supervise the loop.',
-    implication: 'A narrow AI research specialist could contribute to this loop before broad AGI. Each round still depends on usable ideas, compute, evaluation, and other resources.',
+    implication: 'The loop could start with a research specialist before AGI, with a broadly capable system before ASI, or after ASI. Each round depends on usable ideas, computing power, and ways to check that the changes worked.',
     example: 'A coding assistant helps developers build and test a better coding assistant. The successor then does more of the work on the next version.',
     daily: 'The earliest visible effect could be shorter gaps between useful upgrades to apps and assistants. Teams would also have to review and adapt to changes more often.',
     source: 'https://metr.org/blog/2026-10-14-ai-rd-acceleration-assessment-proposal/',
@@ -37,7 +37,7 @@ const concepts = {
     title: 'The technological singularity',
     color: '#f595ce',
     description: 'In this observatory, the singularity is the point where AI-led research makes successive AI systems better at research, driving sustained acceleration across generations.',
-    implication: 'The evidence would need to connect gains in AI research ability to increasingly fast improvements over multiple generations. Progress could plateau before this happens.',
+    implication: 'The watch requires evidence of reliable workday-length autonomy, repeated end-to-end research, and accelerating gains across AI generations that can be traced to AI-led research. Those tests apply regardless of when AGI or ASI is confirmed.',
     example: 'Imagine a workshop whose tools help make better tools so reliably that each generation takes less time to design and delivers a bigger improvement.',
     daily: 'If this happened, one likely early effect would be rapid changes to software and work routines. Physical services such as health care, transport, and housing would still depend on infrastructure, testing, and institutions.',
     source: 'https://vtechworks.lib.vt.edu/items/5085379d-b24c-424e-8861-e70a47b4b2fb',
@@ -49,25 +49,25 @@ const compounding = {
   from: 'rsi',
   to: 'singularity',
   required: true,
-  detail: 'The feedback loop has to keep accelerating AI research across generations. A loop can also hit limits and plateau.',
+  detail: 'The feedback loop must make successive AI generations improve faster. A loop can keep producing better systems at a steady or slowing pace and still fall short of this milestone.',
   example: 'A tool improves the next version, and each new version saves the team more time than the one before it.',
 };
 
 const paths = {
   breadth: {
     label: 'Broad skills first',
-    intro: 'AI gets good at many kinds of work, then helps build stronger AI.',
-    detail: 'Broadly superhuman performance includes broad general ability under these definitions. A single system could demonstrate both together.',
+    intro: 'Broadly capable AI reaches ASI before it starts improving its successors.',
+    detail: 'In this example, AI reaches skilled human performance across many fields, then outperforms leading experts before a repeatable research loop starts. Evidence for AGI and ASI could arrive together, and the loop could also start between them.',
     legs: [
-      { from: 'agi', to: 'asi', detail: 'Broad competence could deepen until the system outperforms top human experts across many fields.', example: 'A versatile assistant goes from helping you understand an electricity bill to consistently designing more efficient appliances than expert teams.' },
+      { from: 'agi', to: 'asi', detail: 'Across the same broad range of tasks, ASI meets the skilled-human threshold for AGI and exceeds the level of leading human experts. A single evaluation could establish both thresholds together.', example: 'A versatile assistant might first match skilled workers at a broad mix of tasks and later outperform leading experts at that same mix.' },
       { from: 'asi', to: 'rsi', detail: 'Teams could use a broadly superhuman system to build successors if it can do the research and has access to tools, compute, and testing.', example: 'A software team uses its strongest AI to find and test changes that make the next version of that AI more useful.' },
       compounding,
     ],
   },
   research: {
     label: 'Research specialist first',
-    intro: 'AI starts building stronger AI while its other skills are still narrow.',
-    detail: 'A specialized research system could start the feedback loop before broad AGI or ASI. Broader abilities could emerge later if research gains transfer to other domains.',
+    intro: 'AI starts improving its successors while its other skills are still narrow.',
+    detail: 'A research specialist could start a loop that improves successive AI systems before reaching AGI. The loop could stay narrow. Reaching AGI and ASI along this route would require gains that carry over to many kinds of work.',
     legs: [compounding],
   },
 };
@@ -100,23 +100,16 @@ function node(tag, name, content) {
 function sceneMarkup() {
   return `
     <div class="sw-terrain__toolbar">
-      <div class="sw-terrain__confidence-head"><h3>Path confidence</h3><span class="sw-terrain__confidence-status">Waiting for evidence</span></div>
-      <div class="sw-terrain__path-buttons" role="group" aria-label="Choose a possible sequence">
+      <div class="sw-terrain__confidence-head"><h3>Evidence for two example routes</h3><span class="sw-terrain__confidence-status">Waiting for evidence</span></div>
+      <div class="sw-terrain__path-buttons" role="group" aria-label="Choose an example sequence">
         ${Object.entries(paths).map(([id, path]) => `<button type="button" data-path="${id}" aria-pressed="false"><span><b>${path.label}</b><span class="sw-terrain__route-intro">${path.intro}</span><small class="sw-terrain__coverage"></small></span><strong><span data-route-score="${id}">—</span><small> / 100</small></strong></button>`).join('')}
       </div>
-      <p class="sw-terrain__route-note">These are two possible starting points. Either could reach the same feedback loop if gains keep accelerating. Scores summarize public evidence for each scenario.</p>
-      <div class="sw-terrain__legend" id="terrain-legend">
-        <ul class="sw-terrain__axes" aria-label="Graph axes, 0 to 100 percent of available evidence credit">
-          ${axes.map(({ id, label, color }) => `<li style="--axis-color:${color}"><b>${id.toUpperCase()}</b> ${label}</li>`).join('')}
-        </ul>
-        <p>Each axis shows how many of its available points the evidence earned, from 0% to 100%. The supporting tests differ by milestone. Points on the floor still await independent confirmation.</p>
-        <p>Positions and distances reflect evidence credit. Arrows show possible sequences and fill to their support scores. Select a milestone to see its calculations.</p>
-        <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span><span><i class="sw-terrain__filled" aria-hidden="true"></i>Evidence score</span></div>
-      </div>
+      <p class="sw-terrain__route-note">Each score totals weighted evidence points for the example shown. <a class="evidence-jump" href="#milestone-order">See which milestones can happen first.</a></p>
     </div>
     <div class="sw-terrain__stage" data-waiting>
       <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating 3D milestone evidence graph. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
       <p class="sw-terrain__scene-message">Waiting for measured evidence</p>
+      <button type="button" class="sw-terrain__orbit" data-camera="orbit">Start orbit</button>
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
         ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
       </div>
@@ -126,6 +119,14 @@ function sceneMarkup() {
         <button type="button" data-camera="close" aria-label="Zoom in" title="Zoom in">+</button>
         <button type="button" data-camera="reset" class="sw-terrain__reset" aria-label="Reset view" title="Reset view">Reset</button>
       </div>
+    </div>
+    <div class="sw-terrain__legend" id="terrain-legend">
+      <ul class="sw-terrain__axes" aria-label="Graph axes, 0 to 100 percent of available evidence credit">
+        ${axes.map(({ id, label, color }) => `<li style="--axis-color:${color}"><b>${id.toUpperCase()}</b> ${label}</li>`).join('')}
+      </ul>
+      <p>Each axis shows the share of available points the evidence earned. The supporting tests differ by milestone. Points at the base still await independent confirmation.</p>
+      <p>Select a milestone to see its calculations. Curved arrows illustrate a sequence, and their filled length shows the step’s evidence score.</p>
+      <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span><span><i class="sw-terrain__filled" aria-hidden="true"></i>Evidence score</span></div>
     </div>
     <div class="sw-terrain__readout">
       <div class="sw-terrain__paths">
@@ -163,7 +164,6 @@ function sceneMarkup() {
     </div>`;
 }
 
-const floor = [lowerCorner, [plotEdge, -plotEdge, -plotEdge], [plotEdge, -plotEdge, plotEdge], [-plotEdge, -plotEdge, plotEdge]];
 const terrainLines = ticks.flatMap((tick) => {
   const position = plotValue(tick);
   return [
@@ -172,11 +172,12 @@ const terrainLines = ticks.flatMap((tick) => {
   ];
 });
 
-const stars = Array.from({ length: 118 }, (_, index) => ({
+const stars = Array.from({ length: 96 }, (_, index) => ({
   x: ((index * 73 + 23) % 193) / 193,
   y: ((index * 107 + 19) % 179) / 179,
-  size: index % 17 === 0 ? 1.15 : .45,
-  opacity: .08 + (index % 9) * .027,
+  size: index % 17 === 0 ? 1.2 : .55,
+  color: index % 7 === 0 ? '#84f7df' : '#cbb9f0',
+  opacity: .09 + (index % 9) * .033,
 }));
 
 function createProjector(camera, width, height) {
@@ -184,9 +185,9 @@ function createProjector(camera, width, height) {
   const sinYaw = Math.sin(camera.yaw);
   const cosPitch = Math.cos(camera.pitch);
   const sinPitch = Math.sin(camera.pitch);
-  const scale = Math.min(width * .185, height * .19) * camera.zoom;
+  const scale = Math.min(width * .196, height * .215) * camera.zoom;
   const originX = width * .51 + camera.panX;
-  const originY = height * .44 + camera.panY;
+  const originY = height * .43 + camera.panY;
 
   return ([x, y, z]) => {
     const horizontal = x * cosYaw - z * sinYaw;
@@ -198,21 +199,17 @@ function createProjector(camera, width, height) {
   };
 }
 
-function paintBackground(ctx, width, height) {
-  ctx.fillStyle = '#0d0b17';
-  ctx.fillRect(0, 0, width, height);
-  const fog = ctx.createRadialGradient(width * .59, height * .49, 8, width * .59, height * .49, width * .59);
-  fog.addColorStop(0, 'rgba(87, 56, 147, .40)');
-  fog.addColorStop(.5, 'rgba(53, 35, 105, .21)');
-  fog.addColorStop(1, 'rgba(13, 11, 23, 0)');
-  ctx.fillStyle = fog;
-  ctx.fillRect(0, 0, width, height);
+function paintBackground(ctx, width, height, yaw) {
+  ctx.clearRect(0, 0, width, height);
+  ctx.save();
   for (const star of stars) {
-    ctx.fillStyle = `rgba(217, 204, 255, ${star.opacity})`;
+    ctx.fillStyle = star.color;
+    ctx.globalAlpha = star.opacity;
     ctx.beginPath();
-    ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2);
+    ctx.arc(star.x * width + Math.sin(yaw + star.y * 2) * 11, star.y * height, star.size, 0, Math.PI * 2);
     ctx.fill();
   }
+  ctx.restore();
 }
 
 function trace(ctx, points) {
@@ -223,43 +220,27 @@ function trace(ctx, points) {
   });
 }
 
-function paintGround(ctx, project, width, height) {
-  trace(ctx, floor.map(project));
-  ctx.closePath();
-  const gradient = ctx.createLinearGradient(0, height * .3, width, height);
-  gradient.addColorStop(0, 'rgba(35, 153, 165, .14)');
-  gradient.addColorStop(.48, 'rgba(142, 98, 252, .18)');
-  gradient.addColorStop(1, 'rgba(73, 37, 110, .09)');
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  const mesh = ctx.createLinearGradient(width * .09, 0, width * .88, height);
-  mesh.addColorStop(0, 'rgba(87, 205, 193, .18)');
-  mesh.addColorStop(.52, 'rgba(166, 126, 252, .25)');
-  mesh.addColorStop(1, 'rgba(126, 92, 195, .10)');
-  ctx.strokeStyle = mesh;
-  ctx.lineWidth = .65;
+function paintGround(ctx, project) {
+  ctx.save();
+  ctx.lineWidth = .9;
+  ctx.setLineDash([2, 4]);
   for (const line of terrainLines) {
-    trace(ctx, line.map(project));
+    const points = line.map(project);
+    const [from, to] = points;
+    const mesh = ctx.createLinearGradient(from[0], from[1], to[0], to[1]);
+    mesh.addColorStop(0, '#a88dec00');
+    mesh.addColorStop(.32, '#9db3f16d');
+    mesh.addColorStop(.68, '#7ad8ca62');
+    mesh.addColorStop(1, '#7ad8ca00');
+    ctx.strokeStyle = mesh;
+    trace(ctx, points);
     ctx.stroke();
   }
+  ctx.restore();
 }
 
 function paintAxes(ctx, project, width) {
   ctx.save();
-  const ceiling = floor.map(([x, , z]) => [x, plotEdge, z]);
-  ctx.strokeStyle = '#c6a8ee61';
-  ctx.lineWidth = .8;
-  for (const corners of [floor, ceiling]) {
-    trace(ctx, corners.map(project));
-    ctx.closePath();
-    ctx.stroke();
-  }
-  for (const [index, corner] of floor.entries()) {
-    trace(ctx, [project(corner), project(ceiling[index])]);
-    ctx.stroke();
-  }
-
   const [originX, originY] = project(lowerCorner);
   ctx.font = '11px ui-monospace, monospace';
   ctx.textBaseline = 'middle';
@@ -311,48 +292,87 @@ function paintAxes(ctx, project, width) {
   ctx.restore();
 }
 
+function routeCurve([startX, startY], [endX, endY], required) {
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const distance = Math.hypot(dx, dy);
+  const lift = (required ? 53 : 28) + Math.min(distance * .22, 20);
+  const spread = Math.max(0, 19 - distance * .6);
+  const a = [startX, startY];
+  const b = [startX + dx * .29 - spread, startY + dy * .20 - lift];
+  const c = [endX - dx * .29 + spread, endY - dy * .20 - lift];
+  const d = [endX, endY];
+  return Array.from({ length: 33 }, (_, index) => {
+    const t = index / 32;
+    const u = 1 - t;
+    return a.map((value, axis) => u ** 3 * value + 3 * u ** 2 * t * b[axis] + 3 * u * t ** 2 * c[axis] + t ** 3 * d[axis]);
+  });
+}
+
+function pathDistance(a, b) {
+  return Math.hypot(b[0] - a[0], b[1] - a[1]);
+}
+
+function pathSlice(points, distance) {
+  const result = [points[0]];
+  for (let index = 1; index < points.length && distance > 0; index += 1) {
+    const before = points[index - 1];
+    const after = points[index];
+    const span = pathDistance(before, after);
+    const ratio = span ? Math.min(1, distance / span) : 1;
+    result.push(before.map((value, axis) => value + (after[axis] - value) * ratio));
+    distance -= span;
+  }
+  return result;
+}
+
 function paintLeg(ctx, { from: start, to: end, required }, positions, project, active, score) {
   if (!positions.has(start) || !positions.has(end)) return;
   const [a, b] = [concepts[start], concepts[end]];
   const startPoint = project(positions.get(start));
   const endPoint = project(positions.get(end));
   const [startX, startY] = startPoint;
-  const [endX, endY] = endPoint;
-  const length = Math.hypot(endX - startX, endY - startY);
-  if (length < 3) return;
-  const at = (fraction) => [startX + (endX - startX) * fraction, startY + (endY - startY) * fraction];
+  const points = routeCurve(startPoint, endPoint, required);
+  const length = points.slice(1).reduce((sum, point, index) => sum + pathDistance(points[index], point), 0);
 
   ctx.save();
-  ctx.strokeStyle = '#a99cba';
-  ctx.globalAlpha = active ? .52 : .36;
-  ctx.lineWidth = required ? 1.65 : 1.4;
+  ctx.strokeStyle = required ? '#ded2f3' : '#c0b1d6';
+  ctx.globalAlpha = active ? .79 : .56;
+  ctx.lineWidth = required ? 1.8 : 1.4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   if (!required) ctx.setLineDash([4, 5]);
-  trace(ctx, [startPoint, endPoint]);
+  trace(ctx, points);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  if (length > 16) {
-    const [x, y] = at(.66);
-    const angle = Math.atan2(endY - startY, endX - startX);
-    trace(ctx, [[x - 5 * Math.cos(angle - .55), y - 5 * Math.sin(angle - .55)], [x, y],
-      [x - 5 * Math.cos(angle + .55), y - 5 * Math.sin(angle + .55)]]);
-    ctx.stroke();
-  }
-
   const fraction = Number.isFinite(score) ? clamp(score / 100, 0, 1) : 0;
   if (fraction > 0) {
-    const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+    const highlight = pathSlice(points, length * fraction);
+    const [highlightX, highlightY] = highlight.at(-1);
+    const gradient = ctx.createLinearGradient(startX, startY, highlightX === startX && highlightY === startY ? startX + 1 : highlightX, highlightY);
     gradient.addColorStop(0, a.color);
     gradient.addColorStop(1, b.color);
     ctx.strokeStyle = gradient;
-    ctx.globalAlpha = active ? .19 : .1;
-    ctx.lineWidth = 7;
-    trace(ctx, [startPoint, at(fraction)]);
+    ctx.globalAlpha = active ? .25 : .15;
+    ctx.lineWidth = 8;
+    trace(ctx, highlight);
     ctx.stroke();
     ctx.globalAlpha = active ? 1 : .85;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2.8;
     ctx.stroke();
   }
+
+  const arrow = pathSlice(points, length * .72);
+  const [x, y] = arrow.at(-1);
+  const [beforeX, beforeY] = arrow.at(-2);
+  const angle = Math.atan2(y - beforeY, x - beforeX);
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = b.color;
+  ctx.lineWidth = 1.7;
+  trace(ctx, [[x - 6 * Math.cos(angle - .5), y - 6 * Math.sin(angle - .5)], [x, y],
+    [x - 6 * Math.cos(angle + .5), y - 6 * Math.sin(angle + .5)]]);
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -394,7 +414,7 @@ function positionMarkers(ctx, positions, markers, width, height) {
     const step = buttonHeight + spacing;
     const place = (dx, dy) => {
       const x = clamp(point.x + dx, halfWidth + spacing, width - halfWidth - spacing);
-      const bottom = clamp(point.y + dy, buttonHeight + 10, height - 49);
+      const bottom = clamp(point.y + dy, buttonHeight + 49, height - 56);
       return { x, left: x - halfWidth, right: x + halfWidth, top: bottom - buttonHeight, bottom };
     };
     const candidates = [place(0, -13), place(halfWidth + 16, -3), place(-halfWidth - 16, -3), place(0, buttonHeight + 13)];
@@ -420,9 +440,11 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
   container.innerHTML = sceneMarkup();
   const stage = container.querySelector('.sw-terrain__stage');
   const canvas = stage.querySelector('canvas');
-  const ctx = canvas.getContext('2d', { alpha: false });
+  const ctx = canvas.getContext('2d');
   const markerButtons = new Map([...stage.querySelectorAll('[data-concept]')].map((button) => [button.dataset.concept, button]));
   const cameraButtons = stage.querySelectorAll('[data-camera]');
+  const orbitButton = stage.querySelector('[data-camera="orbit"]');
+  const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   const pathButtons = container.querySelectorAll('[data-path]');
   const guide = stage.querySelector('.sw-terrain__guide');
   const explanation = container.querySelector('.sw-terrain__concept');
@@ -446,19 +468,34 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
   const scenePoints = new Map();
   let contributionKey;
   let coordinateKey;
+  let orbitEnabled = false;
+  let lastOrbitFrame = null;
+  let hoveredMarker = null;
+  let inView = typeof IntersectionObserver !== 'function';
 
   function refreshScene() {
     if (!ctx) return;
     if (!frame) frame = requestAnimationFrame(draw);
   }
 
-  function draw() {
+  function draw(timestamp) {
     frame = 0;
     if (!width || !height) return;
+    const orbiting = orbitEnabled && inView && !document.hidden && !hoveredMarker;
+    if (orbiting && lastOrbitFrame != null) {
+      const elapsed = timestamp - lastOrbitFrame;
+      if (elapsed < 32) {
+        refreshScene();
+        return;
+      }
+      camera.yaw = (camera.yaw + Math.min(elapsed, 50) * .00024) % (Math.PI * 2);
+    }
+    lastOrbitFrame = orbiting ? timestamp : null;
     const project = createProjector(camera, width, height);
-    paintBackground(ctx, width, height);
-    paintGround(ctx, project, width, height);
+    paintBackground(ctx, width, height, camera.yaw);
+    paintGround(ctx, project);
     paintAxes(ctx, project, width);
+    if (orbiting) refreshScene();
     if (!scenePoints.size) return;
     const steps = scores?.[pathId]?.steps ?? [];
     for (const leg of paths[pathId].legs) {
@@ -470,6 +507,14 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     for (const { id, screen } of projected) paintConcept(ctx, concepts[id], screen, id === selected);
     const labels = projected.reverse().map(({ id, screen: [x, y] }) => ({ id, x, y }));
     positionMarkers(ctx, labels, markerButtons, width, height);
+  }
+
+  function setOrbit(enabled) {
+    orbitEnabled = enabled;
+    lastOrbitFrame = null;
+    orbitButton.textContent = enabled ? 'Pause orbit' : 'Start orbit';
+    orbitButton.toggleAttribute('data-active', enabled);
+    refreshScene();
   }
 
   function resize() {
@@ -669,10 +714,33 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
 
   const controls = new AbortController();
   const listener = { signal: controls.signal };
-  for (const [id, button] of markerButtons) button.addEventListener('click', () => select(id), listener);
+  for (const [id, button] of markerButtons) {
+    button.addEventListener('click', () => {
+      if (ctx) setOrbit(false);
+      select(id);
+    }, listener);
+    button.addEventListener('pointerenter', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      hoveredMarker = button;
+      refreshScene();
+    }, listener);
+    button.addEventListener('pointerleave', () => {
+      if (hoveredMarker !== button) return;
+      hoveredMarker = null;
+      refreshScene();
+    }, listener);
+    button.addEventListener('focus', () => {
+      if (ctx && orbitEnabled) setOrbit(false);
+    }, listener);
+  }
   for (const button of pathButtons) button.addEventListener('click', () => setPath(button.dataset.path), listener);
   for (const button of cameraButtons) {
     button.addEventListener('click', () => {
+      if (button.dataset.camera === 'orbit') {
+        setOrbit(!orbitEnabled);
+        return;
+      }
+      setOrbit(false);
       if (button.dataset.camera === 'reset') resetCamera();
       else zoomBy(button.dataset.camera === 'close' ? 1.2 : 1 / 1.2);
     }, listener);
@@ -682,6 +750,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     canvas.addEventListener('pointerdown', (event) => {
       const mouseButton = event.pointerType === 'mouse' ? event.button : null;
       if (mouseButton !== null && mouseButton !== 0 && mouseButton !== 2) return;
+      setOrbit(false);
       canvas.setPointerCapture(event.pointerId);
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, mouseButton });
       stage.setAttribute('data-dragging', '');
@@ -721,6 +790,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     canvas.addEventListener('wheel', (event) => {
       if (document.activeElement !== canvas || event.ctrlKey) return;
       event.preventDefault();
+      setOrbit(false);
       zoomBy(Math.exp(-event.deltaY * .0015));
     }, { ...listener, passive: false });
 
@@ -738,17 +808,33 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
       else if (event.key === '-') zoomBy(1 / 1.16);
       else if (event.key === 'Home') resetCamera();
       else return;
+      setOrbit(false);
       event.preventDefault();
     }, listener);
 
+    motionPreference.addEventListener('change', (event) => {
+      if (event.matches) setOrbit(false);
+    }, listener);
+    document.addEventListener('visibilitychange', () => {
+      lastOrbitFrame = null;
+      refreshScene();
+    }, listener);
     if (matchMedia('(pointer: coarse)').matches) guide.textContent = 'Swipe sideways to rotate';
+    setOrbit(!motionPreference.matches);
   } else {
     stage.setAttribute('data-fallback', '');
     canvas.hidden = true;
     stage.querySelector('.sw-terrain__camera').hidden = true;
+    orbitButton.hidden = true;
     guide.textContent = 'Choose a concept to explore';
   }
 
+  const viewObserver = ctx && typeof IntersectionObserver === 'function' ? new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    lastOrbitFrame = null;
+    refreshScene();
+  }) : null;
+  if (viewObserver) viewObserver.observe(stage);
   const sizeObserver = ctx && typeof ResizeObserver === 'function' ? new ResizeObserver(resize) : null;
   if (sizeObserver) sizeObserver.observe(stage);
   else if (ctx) window.addEventListener('resize', resize, listener);
@@ -762,6 +848,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     updateConfidence,
     destroy() {
       controls.abort();
+      viewObserver?.disconnect();
       sizeObserver?.disconnect();
       cancelAnimationFrame(frame);
       container.replaceChildren();

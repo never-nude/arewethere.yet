@@ -52,6 +52,7 @@
   line-height: 1.55;
 }
 .organization-signals__source { color: var(--teal); text-decoration: underline; text-underline-offset: .15em; }
+.organization-signals__organization a { color: inherit; }
 .organization-signals__readouts, .organization-signals__scans {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(135px, 100%), 1fr));

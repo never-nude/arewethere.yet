@@ -6,7 +6,7 @@ const rubrics = [
     id: 'agi',
     name: 'AGI',
     title: 'Artificial general intelligence',
-    target: 'Matches skilled human performance across a representative range of unfamiliar tasks.',
+    target: 'Performs at least as well as skilled people across a representative range of unfamiliar tasks.',
     example: 'One assistant could explain a lease, troubleshoot a home network, and tutor a student through a new problem.',
     evidence: [
       { id: 'breadth', weight: 35 },
@@ -16,15 +16,15 @@ const rubrics = [
       ids: ['agi'],
       label: 'Independent evidence of broad transfer at skilled human level',
       weight: 50,
-      context: 'Independent tests would need to establish skilled human performance on unfamiliar tasks across varied domains.',
+      context: 'Independent tests would need to establish at least skilled human performance on unfamiliar tasks across varied domains.',
     },
-    links: [['Capability evidence', '#evidence-capability'], ['Definitions of AGI', '#evidence-agi-timing']],
+    links: [['Capability evidence', '#evidence-capability'], ['How AGI and ASI relate', '#milestone-order']],
   },
   {
     id: 'asi',
     name: 'ASI',
     title: 'Artificial superintelligence',
-    target: 'Consistently exceeds leading human experts across many important domains.',
+    target: 'Consistently exceeds leading human experts across a representative range of unfamiliar tasks.',
     example: 'A system could design longer-lasting batteries that expert teams missed and also outperform specialists in other fields.',
     evidence: [
       { id: 'breadth', weight: 25 },
@@ -34,9 +34,9 @@ const rubrics = [
       ids: ['asi'],
       label: 'Independent evidence of sustained superhuman breadth',
       weight: 60,
-      context: 'Independent tests would need to show reproducible performance above the strongest human experts across many domains.',
+      context: 'Independent tests would need to show reproducible performance above leading experts across a broad range of unfamiliar tasks. That result would also clear the AGI bar.',
     },
-    links: [['Capability evidence', '#evidence-capability'], ['Definitions of AI capability', '#evidence-agi-timing']],
+    links: [['Capability evidence', '#evidence-capability'], ['How AGI and ASI relate', '#milestone-order']],
   },
   {
     id: 'rsi',
@@ -70,12 +70,12 @@ const factorById = new Map(factorDefinitions.map((factor) => [factor.id, factor]
 const verdictCriteria = {
   agi: {
     limits: 'A benchmark composite and selected long tasks provide evidence of capability on the tasks they cover.',
-    change: 'Independent evaluations would need to show skilled human performance across a representative range of unfamiliar tasks.',
+    change: 'Independent evaluations would need to show at least skilled human performance across a representative range of unfamiliar tasks.',
     humanContext: 'A broad evaluation can include unfamiliar conversations, with people rating whether the AI acknowledges concerns and responds appropriately.',
   },
   asi: {
     limits: 'These benchmarks describe performance on selected tasks. The comparison required here is against top human experts across fields.',
-    change: 'Independent evaluations would need to show consistent performance above leading human experts across many important domains.',
+    change: 'Independent evaluations would need to show consistent performance above leading human experts across a representative range of unfamiliar tasks.',
     humanContext: 'A claim of superhuman social judgment would need independent comparisons with leading human experts in realistic situations.',
   },
   rsi: {

@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./organization-signals.css">
   <link rel="stylesheet" href="./organization-forecast.css">
   <link rel="stylesheet" href="./origins.css">
+  <link rel="stylesheet" href="./atlas-fullscreen.css">
   <link rel="stylesheet" href="./watchtower.css">
   <link rel="stylesheet" href="./watch-history.css">
   <link rel="stylesheet" href="./labs.css">
@@ -92,9 +93,26 @@
           <div><p class="eyebrow">THE CONCEPTS</p><h2 id="atlas-heading">Milestone map</h2><p>What changes, what can happen in parallel, and what the Singularity would require.</p></div>
           <a class="agi-jump" id="agi-jump" href="#agi" hidden>AGI trajectory ↓</a>
         </div>
-        <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
-          <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">2D relationships</button>
-          <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D evidence</button>
+        <section id="milestone-order" class="milestone-order" aria-labelledby="milestone-order-title">
+          <h3 id="milestone-order-title">Which milestones can come first?</h3>
+          <p><strong>ASI would also meet the AGI bar.</strong> Under the Watch’s definitions, AGI performs at least as well as skilled people across many kinds of unfamiliar work. ASI consistently beats leading experts across that same range. The first evidence for AGI could come earlier or in the same evaluation. <sup class="evidence-citations"><a href="#ref-6" aria-label="Reference 6">[6]</a></sup></p>
+          <p><strong>Recursive self-improvement can start at different times.</strong> Even a specialist could help build a stronger successor that then helps improve the next model. That loop could start before AGI, between AGI and ASI, or after ASI. <sup class="evidence-citations"><a href="#ref-9" aria-label="Reference 9">[9]</a></sup></p>
+          <details>
+            <summary>Compare three possible orders</summary>
+            <ul>
+              <li><strong>AGI → ASI → RSI.</strong> Engineers build broadly superhuman AI, then use it to help develop stronger successors.</li>
+              <li><strong>AGI → RSI → ASI.</strong> A broadly capable AI starts helping to build successors while people still outperform it on expert tasks. Later improvements could clear the higher bar.</li>
+              <li><strong>RSI → AGI → ASI.</strong> A research specialist starts a feedback loop first. Later systems could become broadly capable if those gains carry over to other kinds of work.</li>
+            </ul>
+          </details>
+          <p><strong>The Singularity would require the loop to keep speeding up.</strong> It could level off if resources or testing become bottlenecks. The <a href="#evidence-gates">three evidence checks</a> concern reliable autonomy, repeated research, and accelerating gains attributable to AI. The Watch can assess them independently of the AGI and ASI labels.</p>
+        </section>
+        <div class="atlas-controls">
+          <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
+            <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">2D relationships</button>
+            <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D evidence</button>
+          </div>
+          <button type="button" id="atlas-fullscreen" class="chart-fullscreen" aria-controls="atlas" aria-pressed="false">Full screen</button>
         </div>
         <div id="relationships">
           <p class="placeholder">Loading milestone relationships…</p>
@@ -186,7 +204,7 @@
         <div><h2 id="labs-heading">Who’s moving the frontier?</h2><p>Compare developers’ strongest recent models and see how labs use AI to build AI.</p></div>
       </div>
       <div id="leaders" class="panel leader-board" aria-label="Organization rankings by milestone"></div>
-      <section id="projected-leaders" class="panel leader-board" aria-label="Projected rankings and milestone dates">
+      <section id="projected-leaders" class="panel leader-board" aria-label="Projected rankings and illustrative milestone timeline">
         <div class="scenario-control leader-pace">
           <label for="leader-scenario-pace">Assumed index points per month</label>
           <output id="leader-scenario-rate" for="leader-scenario-pace">+1</output>
@@ -255,7 +273,7 @@
           <h3>Evidence, scenarios, and labels</h3>
           <p>The index totals weighted evidence points. We choose the weights and reference targets. Missing readings leave their points unfilled and lower source coverage. The 75-point watch line flags a score to investigate.</p>
           <p>Confirming the singularity calls for documented, independently assessed evidence that holds up across multiple generations.</p>
-          <p>AGI describes breadth, superintelligence describes depth of performance across domains, and recursive self-improvement describes a process. Narrow AI research can accelerate before broad AGI. The map shows possible orders.</p>
+          <p>AGI and ASI both require broad skills on this Watch. ASI sets a higher performance bar. Recursive self-improvement describes how one AI generation helps improve the next. <a href="#milestone-order">See which milestones can come first ↑</a></p>
           <a href="https://deepmind.google/research/publications/66938/" target="_blank" rel="noopener noreferrer">DeepMind’s AGI framework ↗</a>
           <div class="watch-line-explainer" id="watch-line">
             <h3>The 75-point watch line</h3>

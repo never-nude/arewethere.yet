@@ -1,4 +1,5 @@
 import { assessAcceleration } from './watchtower.js';
+import { modelReleaseUrl, organizationSites } from './model-links.js';
 
 const DAY = 86_400_000;
 const PERIODS = [30, 120, 365];
@@ -44,6 +45,15 @@ function link(label, url) {
     element.rel = 'noopener noreferrer';
   }
   return element;
+}
+
+function organizationName(tag, name) {
+  const label = node(tag, 'organization-signals__organization');
+  for (const [position, site] of organizationSites(name).entries()) {
+    if (position) label.append(', ');
+    label.append(site.url ? link(site.label, site.url) : site.label);
+  }
+  return label;
 }
 
 function sourceName(point) {
@@ -207,11 +217,19 @@ function renderRanking(panel, state, lane, end, metric, observations) {
   for (const [index, point] of rows.entries()) {
     const entry = node('li', 'organization-signals__entry');
     const details = node('div', 'organization-signals__model');
-    const meta = [point.label, dated(point.date), point.access].filter(Boolean);
+    const meta = [dated(point.date), point.access].filter(Boolean);
     if (Number.isFinite(point.low) && Number.isFinite(point.high)) {
       meta.push('interval ' + number.format(point.low) + '–' + number.format(point.high) + ' ' + lane.unit);
     }
-    details.append(node('strong', '', point.organization), node('small', '', meta.join(' · ')));
+    const model = node('small', '');
+    const release = modelReleaseUrl(point.label, point.date, state.payload?.releaseEvents);
+    if (point.label) {
+      const modelLink = release ?? metric?.sourceUrl;
+      const modelLabel = point.label + (modelLink && !release ? ' · benchmark' : '');
+      model.append(modelLink ? link(modelLabel, modelLink) : modelLabel, ' · ');
+    }
+    model.append(meta.join(' · '));
+    details.append(organizationName('strong', point.organization), model);
     const reading = node('div', 'organization-signals__score');
     reading.append(node('strong', '', number.format(point.value) + ' ' + lane.unit),
       node('small', '', index === 0 ? 'Leader' : leader.value === point.value ? 'Tied with leader'
@@ -246,7 +264,7 @@ function renderResearch(panel, state, end, records) {
   const list = node('ul', 'organization-signals__records');
   for (const record of rows) {
     const entry = node('li', '');
-    entry.append(node('h5', '', record.name), node('small', '', record.kind + ' · published ' + dated(record.date)),
+    entry.append(organizationName('h5', record.name), node('small', '', record.kind + ' · published ' + dated(record.date)),
       node('p', '', record.reading + ' ' + record.measure + '. ' + record.detail));
     if (record.url) entry.append(link('Read the report', record.url));
     list.append(entry);
@@ -389,7 +407,9 @@ function init(container) {
   state.sliderDate = sliderDate;
   state.panel = node('div', 'organization-signals__panel');
   state.corroboration = node('aside', 'organization-signals__corroboration');
-  container.replaceChildren(node('h3', '', 'Organization leaderboards'), tabs, controls, state.panel, state.corroboration);
+  const shortcuts = node('p', 'organization-signals__note');
+  shortcuts.append(link('Top open- and closed-weight models ↑', '#model-leaders'));
+  container.replaceChildren(node('h3', '', 'Organization leaderboards'), shortcuts, tabs, controls, state.panel, state.corroboration);
   states.set(container, state);
   return state;
 }

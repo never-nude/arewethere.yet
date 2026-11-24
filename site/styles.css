@@ -125,7 +125,15 @@ h1 { margin-top: 8px; font-size: clamp(36px, 4.35vw, 65px); font-weight: 690; li
 .atlas-panel { overflow: clip; background: linear-gradient(160deg, #201a33, #171325 75%); }
 .atlas-heading { padding: 18px 20px 10px; }
 .atlas-heading h2 { margin-top: 1px; font-size: 26px; letter-spacing: -.052em; line-height: 1.15; }
-.atlas-modes { width: max-content; margin: 0 20px 10px; }
+.milestone-order { display: grid; gap: 8px; margin: 0 20px 12px; padding: 12px 14px; border: 1px solid #504365; border-radius: 10px; background: #251d36; }
+.milestone-order h3 { font-size: 17px; line-height: 1.25; }
+.milestone-order p, .milestone-order li { color: #e0d5ee; font-size: 13px; line-height: 1.5; }
+.milestone-order strong { color: var(--ink); }
+.milestone-order summary { width: fit-content; color: #dfc9ff; font-size: 13px; font-weight: 650; cursor: pointer; }
+.milestone-order ul { display: grid; gap: 6px; padding-left: 18px; margin-top: 7px; }
+.milestone-order a { color: #dfc9ff; text-decoration: underline; text-underline-offset: 3px; }
+.atlas-controls { display: flex; align-items: center; justify-content: space-between; gap: 7px; flex-wrap: wrap; padding: 0 20px 10px; }
+.atlas-modes { width: max-content; }
 .atlas-modes button { min-height: 40px; font-size: 12px; }
 .placeholder { color: var(--dim); font-size: 13px; padding: 14px 17px; }
 
@@ -292,7 +300,8 @@ input[type=range] { min-width: 0; cursor: pointer; accent-color: #c0a9ff; }
   .lede { margin-top: 10px; }
   .index-reading { margin-top: 20px; }
   .atlas-heading { padding: 12px 12px 8px; }
-  .atlas-modes { margin-inline: 12px; }
+  .milestone-order { margin-inline: 12px; }
+  .atlas-controls { padding-inline: 12px; }
   .tape-shell { margin-top: 9px; }
   .tape-heading { padding-inline: 8px; }
   .tape-signal { padding-inline: 9px; }

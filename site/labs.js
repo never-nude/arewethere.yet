@@ -1,3 +1,5 @@
+import { modelReleaseUrl, organizationSites } from './model-links.js';
+
 const windowDays = 120;
 const day = 86_400_000;
 const initialLimit = 7;
@@ -209,14 +211,20 @@ function rowFor(developer, rank, state) {
   for (const point of timeline) {
     const model = element('li');
     const info = element('div');
-    info.append(element('strong', point.label), element('p', prettyDate(point.date) + ' · ' + accessLabel(point)));
+    const modelUrl = modelReleaseUrl(point.label);
+    info.append(modelUrl ? externalLink(point.label, modelUrl) : element('strong', point.label),
+      element('p', prettyDate(point.date) + ' · ' + accessLabel(point)));
     const result = element('div', '', 'labs-model-score');
     result.append(element('strong', number.format(point.value) + ' ECI'));
     if (uncertainty(point)) result.append(element('p', uncertainty(point)));
     model.append(info, result);
     modelsList.append(model);
   }
-  detail.append(summary, modelsList);
+  const sites = element('div', '', 'labs-developer-sites');
+  sites.append(...organizationSites(organization).filter(({ url }) => url).map(({ label, url }) => externalLink(label, url)));
+  detail.append(summary);
+  if (sites.children.length) detail.append(sites);
+  detail.append(modelsList);
   item.append(detail);
   return item;
 }

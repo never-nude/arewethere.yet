@@ -4,6 +4,7 @@ import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
 import { measureTerrainEvidence } from './terrain-evidence.js';
 import { renderRelationshipMap } from './relationship-map.js';
+import { mountAtlasFullscreen } from './atlas-fullscreen.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
 import { renderEvidenceLibrary } from './evidence-library.js';
 import { getMilestoneVerdicts, measureMilestoneProgress, renderMilestoneProgress } from './milestone-progress.js';
@@ -424,6 +425,7 @@ async function reload() {
     if (!Array.isArray(next.metrics) || !Array.isArray(next.sources) || !Array.isArray(next.events)) throw new Error('Unexpected dataset');
     if (next.checkedAt !== dataset?.checkedAt || !index) {
       const atLatest = !index || selectedDate === index.date;
+      const showModelLeaders = !index && window.location.hash === '#model-leaders';
       dataset = next;
       index = buildIndex(dataset);
       milestoneVerdicts = getMilestoneVerdicts(index);
@@ -444,6 +446,9 @@ async function reload() {
       renderLabs(byId('labs-board'), { index, payload: dataset });
       renderOrganizationSignals(byId('leaders'), { index, payload: dataset });
       renderPathConfidence();
+      if (showModelLeaders && window.location.hash === '#model-leaders') {
+        byId('model-leaders')?.scrollIntoView({ behavior: 'instant' });
+      }
     }
     renderSources();
   } catch (error) {
@@ -548,6 +553,7 @@ byId('atlas-modes').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-view]');
   if (button) setMapView(button.dataset.view);
 });
+mountAtlasFullscreen(byId('atlas'), byId('atlas-fullscreen'));
 byId('foundations-jump').addEventListener('click', () => setMapView('relationships'));
 
 function openLinkedMapDetail() {
@@ -562,7 +568,8 @@ function openLinkedMapDetail() {
   } else {
     return;
   }
-  requestAnimationFrame(() => byId(hash.slice(1)).scrollIntoView());
+  const anchor = hash === '#terrain' ? 'atlas-modes' : hash.slice(1);
+  requestAnimationFrame(() => byId(anchor).scrollIntoView({ behavior: 'instant' }));
 }
 window.addEventListener('hashchange', openLinkedMapDetail);
 openLinkedMapDetail();

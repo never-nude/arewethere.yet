@@ -1,4 +1,5 @@
 import { mountHistoricTerrain } from './historic-terrain.js';
+import { mountAtlasFullscreen } from './atlas-fullscreen.js';
 
 const milestones = [
   {
@@ -196,7 +197,10 @@ function mount(container) {
         <h3>From 1958 to today</h3>
         <p>Move through the history of the idea and the evidence that followed.</p>
       </div>
-      <output class="origins-date" for="origins-year"></output>
+      <div class="origins-fullscreen-controls">
+        <output class="origins-date" for="origins-year"></output>
+        <button type="button" class="chart-fullscreen" aria-controls="origins" aria-pressed="false">Full screen</button>
+      </div>
     </div>
     <div class="hist-plot"></div>
     <div class="origins-control">
@@ -233,6 +237,7 @@ function mount(container) {
     </div>`;
 
   const $ = (selector) => container.querySelector(selector);
+  mountAtlasFullscreen(container, $('.chart-fullscreen'));
   const state = {
     slider: $('#origins-year'),
     date: $('.origins-date'),

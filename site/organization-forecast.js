@@ -1,3 +1,5 @@
+import { organizationSites } from './model-links.js';
+
 const dayMs = 86_400_000;
 const lookback = 365;
 const latestLimit = 120;
@@ -97,7 +99,14 @@ function listItem(row, position, model) {
   const rank = element('span', 'org-forecast__rank', String(position + 1));
   const identity = element('div', 'org-forecast__identity');
   const caption = [row.latest.model, 'released ' + dateFormat.format(row.latest.time), row.months + ' measured months'].filter(Boolean);
-  identity.append(element('strong', '', row.organization),
+  const site = organizationSites(row.organization).find(({ url }) => url);
+  const organization = element(site ? 'a' : 'strong', '', row.organization);
+  if (site) {
+    organization.href = site.url;
+    organization.target = '_blank';
+    organization.rel = 'noopener noreferrer';
+  }
+  identity.append(organization,
     element('span', '', 'Latest monthly high ' + number.format(row.latest.value) + ' ECI · ' + caption.join(' · ')));
   const reading = element('strong', 'org-forecast__estimated', number.format(row.score));
   reading.append(element('span', 'org-forecast__unit', ' ECI'));
@@ -166,7 +175,7 @@ function configureSlider(state, projection, previousDate) {
   }
   const last = dateFormat.format(model.asOf + maximum * dayMs);
   const start = dateFormat.format(model.asOf);
-  end.textContent = crossing ? 'Horizon ends ' + last + ' at the scenario’s Singularity watch-line crossing.'
+  end.textContent = crossing ? 'Horizon ends ' + last + ' at the scenario’s 75-point watch line.'
     : 'Horizon covers 180 days through ' + last + '.';
   state.ticks.replaceChildren(element('span', '', start), element('span', '', '+' + Math.floor(maximum / 2) + ' days'), element('span', '', last));
 }
@@ -195,7 +204,7 @@ function mount(container) {
     </details>
     <nav class="org-forecast__links" aria-label="Related scenarios">
       <a href="#agi">AGI benchmark trajectory ↗</a>
-      <a href="#scenario">Hypothetical Singularity index dates ↗</a>
+      <a href="#scenario">Evidence index scenario ↗</a>
     </nav>`;
   const state = {
     slider: container.querySelector('input'),

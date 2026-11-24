@@ -91,7 +91,8 @@
   display: grid;
   gap: 2px;
 }
-.org-forecast__identity strong { color: var(--ink); font-size: 12px; }
+.org-forecast__identity :is(strong, a) { color: var(--ink); font-size: 12px; font-weight: 700; }
+.org-forecast__identity a { width: fit-content; text-decoration: underline; text-underline-offset: 3px; }
 .org-forecast__identity span {
   color: var(--subtle);
   font-size: 10px;

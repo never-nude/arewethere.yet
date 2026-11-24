@@ -39,35 +39,38 @@ function node(tag, text, name) {
 
 export function renderDependencyTimeline(container, index, projection, milestones, selectedDay = 0) {
   const sequence = planDependencies(index, projection, milestones);
-  const title = node('h3', 'Milestone dates in the broad-skills-first scenario');
+  const title = node('h3', 'An example milestone order');
+  const explanation = node('p',
+    'This example assumes AGI, then ASI, then recursive self-improvement. The example dates are spaced by how much evidence is still missing. A research feedback loop could start before either capability milestone. ', 'small-note');
+  const map = node('a', 'See other possible orders.');
+  map.href = '#milestone-order';
+  explanation.append(map);
   if (!sequence.length) {
     let detail = 'This scenario has no future crossing date. The benchmark slider remains available.';
     if (projection?.status === 'at-line') detail = 'The current index is already at the watch line. This scenario has no new crossing to schedule.';
-    else if (projection?.status === 'conditional') detail = 'The crossing leaves fewer than four days for separate milestones.';
-    container.replaceChildren(title, node('p', detail, 'small-note'));
+    else if (projection?.status === 'conditional') detail = 'The score scenario reaches the watch line too soon to show separate example dates.';
+    container.replaceChildren(title, explanation, node('p', detail, 'small-note'));
     return;
   }
 
   const selected = Date.parse(index.date) + selectedDay * dayMs;
+  const exampleMilestones = sequence.slice(0, -1);
   const summary = node('p',
-    'At ' + dateFormat.format(selected) + ', ' + sequence.filter((step) => step.day <= selectedDay).length
-    + ' of 4 steps are reached in this scenario.', 'dependency-selection');
+    'By ' + dateFormat.format(selected) + ', ' + exampleMilestones.filter((step) => step.day <= selectedDay).length
+    + ' of ' + exampleMilestones.length + ' example milestone dates have passed.', 'dependency-selection');
   const items = node('ol', '', 'dependency-steps');
-  for (const [position, step] of sequence.entries()) {
+  for (const step of sequence) {
     const row = node('li');
-    const status = step.day <= selectedDay ? 'Reached in scenario'
-      : position && sequence[position - 1].day > selectedDay ? 'Waits for ' + sequence[position - 1].label
-        : 'Next in scenario';
+    const passed = step.day <= selectedDay;
+    const status = passed ? 'At or before selected date' : 'After selected date';
+    const label = step.id === 'singularity' ? 'Projected watch-line crossing' : step.label;
     const time = node('time', dateFormat.format(new Date(step.date)));
     time.dateTime = step.date;
-    row.dataset.reached = String(step.day <= selectedDay);
-    row.append(node('strong', step.label), time, node('small', status));
+    row.dataset.reached = String(passed);
+    row.append(node('strong', label), time, node('small', status));
     items.append(row);
   }
   const note = node('p',
-    'Move the slider to see when each step is reached in this example. Each step waits for the one before it. Steps with more evidence still missing get more time. An observed Singularity would require independent evidence of sustained AI-driven acceleration across generations. ', 'small-note');
-  const map = node('a', 'See where the research-first path differs.');
-  map.href = '#atlas';
-  note.append(map);
-  container.replaceChildren(title, summary, items, note);
+    'The final date projects when the index would reach the watch line at the selected pace. Confirming the Singularity requires independent evidence of sustained AI-driven acceleration across generations.', 'small-note');
+  container.replaceChildren(title, explanation, summary, items, note);
 }

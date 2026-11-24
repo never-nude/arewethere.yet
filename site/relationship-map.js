@@ -11,7 +11,7 @@ const milestones = {
     title: 'Artificial general intelligence',
     role: 'Capability milestone',
     short: 'Skilled across many kinds of tasks',
-    summary: 'An AI system consistently matches skilled people across a wide range of unfamiliar tasks.',
+    summary: 'An AI system performs at least as well as skilled people across a wide, representative range of unfamiliar tasks.',
     importance: 'Broad skills could make an AI useful across more kinds of research. A specialized tool can already improve individual steps in AI research.',
     example: 'The same assistant could tutor a student through an unfamiliar problem, help understand a lease and troubleshoot a home network.',
     sources: [capabilityFramework, ['AGI trajectory and reporting', '#agi'], humanEvidence],
@@ -21,8 +21,8 @@ const milestones = {
     title: 'Artificial superintelligence',
     role: 'Capability milestone',
     short: 'Outperforms experts across fields',
-    summary: 'An AI system consistently outperforms leading human experts across many important fields.',
-    importance: 'Under this definition ASI includes the breadth AGI requires and adds stronger performance. Evidence could establish both in the same period. The research loop can develop alongside this capability.',
+    summary: 'An AI system consistently outperforms leading human experts across a wide, representative range of unfamiliar tasks.',
+    importance: 'That higher level of performance also clears the AGI bar. One evaluation could establish both. A system that exceeds human skill at a single task, such as chess, has demonstrated an exceptional skill in that domain.',
     example: 'A system might design more durable batteries than leading teams can design and also outperform experts on problems in mathematics and logistics.',
     context: 'Sentience asks whether a system has subjective experience. This map tracks demonstrated capabilities and research gains.',
     sources: [capabilityFramework, ['Butlin et al., research on AI and consciousness', 'https://arxiv.org/abs/2308.08708'], ['Capability evidence', '#evidence-capability'], humanEvidence],
@@ -53,7 +53,7 @@ const milestones = {
     role: 'Required feedback loop',
     short: 'Successors help improve successors',
     summary: 'An AI system helps make a stronger successor, and that stronger system improves the generation after it.',
-    importance: 'The watch requires this repeatable loop as part of its Singularity definition. The pace can still level off if compute, verification or other inputs become bottlenecks.',
+    importance: 'This loop could begin with a research specialist or with an AI that already has broad skills. The Watch looks for gains that keep accelerating across generations. Computing resources and the time needed to verify results can slow the loop.',
     example: 'An assistant helps make a better version of itself. That version then makes a measurable contribution to building the next one.',
     sources: [['I. J. Good, original 1965 essay', 'https://vtechworks.lib.vt.edu/items/5085379d-b24c-424e-8861-e70a47b4b2fb'], attributionMethod, humanEvidence],
   },
@@ -154,9 +154,9 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   autonomy.append(make('h3', 'srm__lane-title', 'How reliably AI can act'), buttonFor('autonomy'));
   const capability = make('section', 'srm__lane srm__lane--capability');
   const capabilityChain = make('div', 'srm__chain srm__chain--capability');
-  capabilityChain.append(buttonFor('agi'), connector('possible', 'May lead to'), buttonFor('asi'));
+  capabilityChain.append(buttonFor('agi'), connector('possible', 'Can improve'), buttonFor('asi'));
   capability.append(make('h3', 'srm__lane-title', 'What AI can do'), capabilityChain,
-    make('p', 'srm__lane-note', 'AGI describes breadth. ASI adds exceptional performance across fields. Evidence for both could arrive together.'));
+    make('p', 'srm__lane-note', 'Both levels require broad skills. ASI clears the AGI bar and sets a higher performance standard across the same kinds of tasks.'));
   top.append(autonomy, capability);
 
   const bridges = make('div', 'srm__bridges');
@@ -164,8 +164,8 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   autonomyBridge.append(connector('enabling', 'Autonomy → research'),
     make('p', '', 'Reliable execution helps AI handle research tasks. Specialized systems can contribute before AGI.'));
   const capabilityBridge = make('div', 'srm__bridge');
-  capabilityBridge.append(connector('enabling', 'Broad skills → RSI'),
-    make('p', '', 'Broad skills could help an AI combine different research tasks into a repeatable loop.'));
+  capabilityBridge.append(connector('enabling', 'Broad skills and RSI'),
+    make('p', '', 'Broad skills can help with AI research. A research loop could also improve broad skills if its gains carry over to other tasks.'));
   bridges.append(autonomyBridge, capabilityBridge);
 
   const research = make('section', 'srm__lane srm__lane--research');
