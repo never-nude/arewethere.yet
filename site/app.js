@@ -128,6 +128,7 @@ function renderCountdown() {
   if (!index) return;
   const { status, daysRemaining, date: targetDate, target, monthlyPoints, anchorDate } = getCountdown(index);
   const conditional = status === 'conditional';
+  byId('countdown-evidence-date').textContent = date(index.date) || 'its latest data check';
   const labels = {
     conditional: 'Estimated watch-line date',
     elapsed: 'Scenario date reached',
@@ -136,7 +137,7 @@ function renderCountdown() {
     'no-reading': 'Waiting for an evidence reading',
   };
   const notes = {
-    conditional: `Starting from the ${date(anchorDate, true)} reading, the score would reach ${target} at +${num(monthlyPoints)} index point per month. That’s when we take a closer look at the evidence.`,
+    conditional: `Starting from the ${date(anchorDate, true)} reading, the score would reach ${target} at +${num(monthlyPoints)} index point per month.`,
     elapsed: `The score is still below ${target}. This scenario assumed a steady gain of +${num(monthlyPoints)} index point per month.`,
     'at-line': 'The watch line calls for a closer look. Confirming the Singularity requires independent evidence across successive AI generations.',
     observed: 'The watch’s independent evidence criteria have been met.',

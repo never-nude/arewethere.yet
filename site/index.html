@@ -47,18 +47,26 @@
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
           <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The site watches for public evidence of that change.</p>
-          <section class="watch-clock" id="countdown" aria-labelledby="countdown-heading">
-            <div class="watch-clock-heading">
-              <h2 id="countdown-heading">Countdown to the watch line</h2>
-              <a href="#scenario">Scenarios ↗</a>
-            </div>
-            <div class="watch-clock-reading">
-              <p class="watch-clock-value" id="countdown-value" hidden><output id="countdown-days" aria-label="Days to projected watch line"></output><span>days</span></p>
-              <p class="watch-clock-target"><span id="countdown-state">Waiting for evidence</span><time id="countdown-date" hidden></time></p>
-            </div>
-            <p class="watch-clock-note" id="countdown-note">The watch line marks when to look more closely at the evidence.</p>
-            <p class="watch-clock-cadence">Updates daily at midnight UTC. New evidence can move the date.</p>
-          </section>
+          <div class="watch-clock">
+            <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
+              <h2 id="forecast-disclaimer">How to read the predictions</h2>
+              <p><strong>The timing of the Singularity is unknown.</strong> The watch uses public evidence available through <span id="countdown-evidence-date">its latest data check</span>. Projected dates are theoretical and can change as evidence or assumptions change.</p>
+              <p><strong>75 points means take a closer look.</strong> Confirming the Singularity requires independent evidence across successive AI generations.</p>
+            </aside>
+            <details id="countdown">
+              <summary><span class="watch-clock-show">Show watch-line countdown</span><span class="watch-clock-hide">Hide watch-line countdown</span></summary>
+              <div class="watch-clock-body">
+                <div class="watch-clock-reading">
+                  <p class="watch-clock-value" id="countdown-value" hidden><output id="countdown-days" aria-label="Days to projected watch line"></output><span>days</span></p>
+                  <p class="watch-clock-target"><span id="countdown-state">Waiting for evidence</span><time id="countdown-date" hidden></time></p>
+                </div>
+                <p class="watch-clock-note" id="countdown-note">The watch line marks when to look more closely at the evidence.</p>
+                <div class="watch-clock-footer">
+                  <p>Updates daily at midnight UTC.</p><a href="#scenario">Scenarios ↗</a>
+                </div>
+              </div>
+            </details>
+          </div>
           <div class="index-reading">
             <div class="reading-label"><span>EVIDENCE INDEX</span><a href="#methodology">How it works ↗</a></div>
             <p class="index-explainer">Think of this as a report card for the evidence. Eight signals earn points. Tests of what AI can do and whether it helps build better AI count the most.</p>
