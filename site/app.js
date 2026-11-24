@@ -1,6 +1,7 @@
 import { buildIndex, projectThreshold } from './index-model.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
+import { renderRelationshipMap } from './relationship-map.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
 import { renderEvidenceLibrary } from './evidence-library.js';
 import { getMilestoneVerdicts, measureMilestoneProgress, renderMilestoneProgress } from './milestone-progress.js';
@@ -387,6 +388,7 @@ async function reload() {
       dataset = next;
       index = buildIndex(dataset);
       milestoneVerdicts = getMilestoneVerdicts(index);
+      relationships.update({ index, verdicts: milestoneVerdicts });
       if (atLatest) selectedDate = index.date;
       renderReading();
       renderMilestoneProgress(byId('milestone-progress'), index);
@@ -464,19 +466,62 @@ const plots = new ResizeObserver(() => {
 plots.observe(byId('history-chart'));
 plots.observe(byId('scenario-chart'));
 
+const terrainConcepts = new Set(['agi', 'asi', 'rsi', 'singularity']);
+const mapSelection = { relationships: 'singularity', routes: 'singularity' };
+let mapView = 'relationships';
+
+function updateAgiVisibility() {
+  const show = mapSelection[mapView] === 'agi';
+  byId('agi').hidden = !show;
+  byId('agi-jump').hidden = !show;
+}
+
 const terrain = renderTerrain(byId('terrain'), {
-  onSelect: (id) => {
-    byId('agi').hidden = id !== 'agi';
-    byId('agi-jump').hidden = id !== 'agi';
+  onSelect(id) {
+    mapSelection.routes = id;
+    mapSelection.relationships = id;
+    relationships.select(id, { notify: false });
+    updateAgiVisibility();
   },
 });
-function openLinkedAgi() {
-  if (window.location.hash !== '#agi') return;
-  terrain.select('agi');
-  requestAnimationFrame(() => byId('agi').scrollIntoView());
+const relationships = renderRelationshipMap(byId('relationships'), {
+  onSelect(id) {
+    mapSelection.relationships = id;
+    if (terrainConcepts.has(id)) {
+      mapSelection.routes = id;
+      terrain.select(id, false);
+    }
+    updateAgiVisibility();
+  },
+});
+function setMapView(view) {
+  mapView = view;
+  setPressed('atlas-modes', 'view', mapView);
+  byId('relationships').hidden = mapView !== 'relationships';
+  byId('terrain').hidden = mapView !== 'routes';
+  updateAgiVisibility();
 }
-window.addEventListener('hashchange', openLinkedAgi);
-openLinkedAgi();
+
+byId('atlas-modes').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-view]');
+  if (button) setMapView(button.dataset.view);
+});
+byId('foundations-jump').addEventListener('click', () => setMapView('relationships'));
+
+function openLinkedMapDetail() {
+  const hash = window.location.hash;
+  if (hash === '#agi') {
+    const activeMap = mapView === 'relationships' ? relationships : terrain;
+    activeMap.select('agi');
+  } else if (hash === '#foundations') {
+    setMapView('relationships');
+  } else {
+    return;
+  }
+  requestAnimationFrame(() => byId(hash.slice(1)).scrollIntoView());
+}
+window.addEventListener('hashchange', openLinkedMapDetail);
+openLinkedMapDetail();
 renderEvidenceLibrary(byId('evidence'));
 renderMilestoneProgress(byId('milestone-progress'));
 renderOrigins(byId('origins'));

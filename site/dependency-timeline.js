@@ -39,7 +39,7 @@ function node(tag, text, name) {
 
 export function renderDependencyTimeline(container, index, projection, milestones, selectedDay = 0) {
   const sequence = planDependencies(index, projection, milestones);
-  const title = node('h3', 'Milestone sequence in this scenario');
+  const title = node('h3', 'Milestone dates in the broad-skills-first scenario');
   if (!sequence.length) {
     let detail = 'This scenario has no future crossing date. The benchmark slider remains available.';
     if (projection?.status === 'at-line') detail = 'The current index is already at the watch line. This scenario has no new crossing to schedule.';
@@ -64,6 +64,10 @@ export function renderDependencyTimeline(container, index, projection, milestone
     row.append(node('strong', step.label), time, node('small', status));
     items.append(row);
   }
-  container.replaceChildren(title, summary, items, node('p',
-    'Move the slider to see what would have happened by that day in this example. Each step waits for the one before it. We give more time to steps with more evidence still missing. To say the Singularity had happened, independent researchers would need to verify that AI kept making faster improvements across generations.', 'small-note'));
+  const note = node('p',
+    'Move the slider to see when each step is reached in this example. Each step waits for the one before it. Steps with more evidence still missing get more time. An observed Singularity would require independent evidence of sustained AI-driven acceleration across generations. ', 'small-note');
+  const map = node('a', 'See where the research-first path differs.');
+  map.href = '#atlas';
+  note.append(map);
+  container.replaceChildren(title, summary, items, note);
 }

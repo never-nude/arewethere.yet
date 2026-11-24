@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
-  <meta name="description" content="Explore the evidence for self-accelerating AI through a signal index, historical replay, 3D concept map, and interactive scenarios.">
+  <meta name="description" content="Explore the evidence for self-accelerating AI through a milestone map, historical replay, signal index, and interactive scenarios.">
   <title>Singularity Watch</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./terrain.css">
+  <link rel="stylesheet" href="./relationship-map.css">
   <link rel="stylesheet" href="./agi-trajectory.css">
   <link rel="stylesheet" href="./evidence-library.css">
   <link rel="stylesheet" href="./milestone-progress.css">
@@ -27,7 +28,7 @@
     <div class="wrap header-inner">
       <a href="#main" class="wordmark"><span class="wordmark-icon" aria-hidden="true">✧</span> Singularity Watch</a>
       <nav class="top-nav" aria-label="Main navigation">
-        <a href="#atlas">3D Map</a>
+        <a href="#atlas">Milestone Map</a>
         <a href="#watch">Watch</a>
         <a href="#leaders">Leaders</a>
         <a href="#history">History</a>
@@ -64,10 +65,17 @@
       </section>
       <section id="atlas" class="atlas-panel" aria-labelledby="atlas-heading">
         <div class="panel-heading atlas-heading">
-          <div><p class="eyebrow">THE CONCEPTS</p><h2 id="atlas-heading">The 3D map</h2><p>Possible paths and their assumptions <sup class="evidence-citations"><a href="#ref-6" aria-label="Reference 6">[6]</a><a href="#ref-13" aria-label="Reference 13">[13]</a></sup></p></div>
+          <div><p class="eyebrow">THE CONCEPTS</p><h2 id="atlas-heading">Milestone map</h2><p>What changes, what can happen in parallel, and what the Singularity would require.</p></div>
           <a class="agi-jump" id="agi-jump" href="#agi" hidden>AGI trajectory ↓</a>
         </div>
-        <div id="terrain" aria-label="Interactive map of AGI, superintelligence, recursive self-improvement, and singularity">
+        <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
+          <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">Relationships</button>
+          <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D routes</button>
+        </div>
+        <div id="relationships">
+          <p class="placeholder">Loading milestone relationships…</p>
+        </div>
+        <div id="terrain" aria-label="Interactive 3D routes to the Singularity" hidden>
           <p class="placeholder">Loading the concept map…</p>
         </div>
         <section id="agi" class="agi-panel" aria-labelledby="agi-title" hidden>
@@ -108,7 +116,7 @@
 
     <section id="history" class="section" aria-labelledby="history-heading">
       <div class="section-heading">
-        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index. <sup class="evidence-citations"><a href="#ref-12" aria-label="Reference 12">[12]</a><a href="#ref-13" aria-label="Reference 13">[13]</a><a href="#ref-14" aria-label="Reference 14">[14]</a></sup></p></div>
+        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index. <sup class="evidence-citations"><a href="#ref-12" aria-label="Reference 12">[12]</a><a href="#ref-13" aria-label="Reference 13">[13]</a><a href="#ref-14" aria-label="Reference 14">[14]</a></sup> <a id="foundations-jump" class="evidence-jump" href="#foundations">Before AI ↗</a></p></div>
       </div>
       <div id="origins" class="panel history-origins"></div>
       <div class="history-grid">

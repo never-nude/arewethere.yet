@@ -101,6 +101,8 @@ h1 { margin-top: 8px; font-size: clamp(36px, 4.35vw, 65px); font-weight: 690; li
 .atlas-panel { overflow: clip; background: linear-gradient(160deg, #201a33, #171325 75%); }
 .atlas-heading { padding: 18px 20px 10px; }
 .atlas-heading h2 { margin-top: 1px; font-size: 26px; letter-spacing: -.052em; line-height: 1.15; }
+.atlas-modes { width: max-content; margin: 0 20px 10px; }
+.atlas-modes button { min-height: 34px; }
 .placeholder { color: var(--dim); font-size: 13px; padding: 14px 17px; }
 
 .tape-shell { display: flex; align-items: center; min-width: 0; border: 1px solid var(--border); background: #171321; border-radius: 10px; margin-top: 13px; }
@@ -123,6 +125,7 @@ h1 { margin-top: 8px; font-size: clamp(36px, 4.35vw, 65px); font-weight: 690; li
 .leader-pace { max-width: 360px; margin: 0 0 15px; }
 .dependency-timeline { border-top: 1px solid #3c314d; margin-top: 15px; padding-top: 12px; }
 .dependency-timeline h3 { font-size: 17px; letter-spacing: -.025em; }
+.dependency-timeline a { color: var(--violet); text-decoration: underline; text-underline-offset: 3px; }
 .dependency-selection { margin: 3px 0 8px; color: var(--dim); font-size: 12px; }
 .dependency-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; list-style: none; padding: 0; }
 .dependency-steps li { display: grid; align-content: start; gap: 4px; padding: 7px 9px; border: 1px solid #463956; border-radius: 6px; font-size: 12px; }
@@ -256,6 +259,7 @@ input[type=range] { min-width: 0; cursor: pointer; accent-color: #c0a9ff; }
   .lede { margin-top: 10px; }
   .index-reading { margin-top: 20px; }
   .atlas-heading { padding: 12px 12px 8px; }
+  .atlas-modes { margin-inline: 12px; }
   .tape-shell { margin-top: 9px; }
   .tape-heading { padding-inline: 8px; }
   .tape-signal { padding-inline: 9px; }
