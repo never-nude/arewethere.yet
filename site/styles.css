@@ -73,6 +73,17 @@ a:hover { color: var(--violet); }
 .eyebrow { color: var(--violet); }
 h1 { margin-top: 8px; font-size: clamp(36px, 4.35vw, 65px); font-weight: 690; line-height: .97; letter-spacing: -.072em; text-wrap: balance; }
 .lede { max-width: 34ch; margin-top: 18px; font-size: clamp(13px, 1.1vw, 15px); line-height: 1.54; color: #d4cce2; }
+.watch-clock { margin-top: 18px; padding: 11px 12px; border: 1px solid #655080; border-radius: 10px; background: linear-gradient(135deg, #342245, #1e2639); }
+.watch-clock-heading, .watch-clock-reading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 10px; }
+.watch-clock-heading h2 { color: #f2e7ff; font-size: 13px; font-weight: 650; }
+.watch-clock-heading a { color: #dbc7fa; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+.watch-clock-reading { align-items: center; margin-top: 7px; }
+.watch-clock-value { display: flex; align-items: baseline; gap: 5px; color: #e2cdf9; font: 400 11px/1.2 var(--mono); }
+.watch-clock-value output { color: #f8e9ff; font: 660 clamp(32px, 4.1vw, 51px)/.95 Geist, system-ui, sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -.07em; }
+.watch-clock-target { display: grid; gap: 2px; color: #ddcee9; font-size: 11px; }
+.watch-clock-target time { color: #f3eafa; font-size: 13px; font-weight: 640; }
+.watch-clock-note { margin-top: 7px; color: #e1d5eb; font-size: 11px; line-height: 1.35; }
+.watch-clock-cadence { margin-top: 4px; color: #c1b4d0; font-size: 10px; line-height: 1.35; }
 .index-reading { margin-top: clamp(18px, 2.1vw, 29px); }
 .reading-label { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; color: #d4c1ff; }
 .reading-label a { letter-spacing: normal; color: #d0c7df; white-space: nowrap; }

@@ -47,6 +47,18 @@
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
           <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The site watches for public evidence of that change.</p>
+          <section class="watch-clock" id="countdown" aria-labelledby="countdown-heading">
+            <div class="watch-clock-heading">
+              <h2 id="countdown-heading">Countdown to the watch line</h2>
+              <a href="#scenario">Scenarios ↗</a>
+            </div>
+            <div class="watch-clock-reading">
+              <p class="watch-clock-value" id="countdown-value" hidden><output id="countdown-days" aria-label="Days to projected watch line"></output><span>days</span></p>
+              <p class="watch-clock-target"><span id="countdown-state">Waiting for evidence</span><time id="countdown-date" hidden></time></p>
+            </div>
+            <p class="watch-clock-note" id="countdown-note">The watch line marks when to look more closely at the evidence.</p>
+            <p class="watch-clock-cadence">Updates daily at midnight UTC. New evidence can move the date.</p>
+          </section>
           <div class="index-reading">
             <div class="reading-label"><span>EVIDENCE INDEX</span><a href="#methodology">How it works ↗</a></div>
             <p class="index-explainer">Think of this as a report card for the evidence. Eight signals earn points. Tests of what AI can do and whether it helps build better AI count the most.</p>
@@ -185,7 +197,7 @@
             <output id="scenario-rate" for="scenario-pace">+1.0</output>
             <input id="scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
           </div>
-          <p class="small-note">Illustration for the next five years at a constant pace. The inputs are adjustable assumptions.</p>
+          <p class="small-note">These scenarios start from the latest reading and look up to five years ahead. The headline countdown keeps its starting date while the score holds steady.</p>
         </div>
         <section class="panel gates-panel" aria-labelledby="gates-heading">
           <div class="panel-heading"><div><h3 id="gates-heading">Evidence for the singularity</h3><p>Our working definition requires sustained AI-led acceleration across generations.</p></div></div>

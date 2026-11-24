@@ -1,4 +1,5 @@
 import { buildIndex, projectThreshold } from './index-model.js';
+import { getCountdown } from './countdown.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
 import { renderRelationshipMap } from './relationship-map.js';
@@ -121,6 +122,39 @@ function renderReading() {
     item.append(element('span', '', label), element('strong', '', points + ' / ' + weight));
     return item;
   }));
+}
+
+function renderCountdown() {
+  if (!index) return;
+  const { status, daysRemaining, date: targetDate, target, monthlyPoints, anchorDate } = getCountdown(index);
+  const conditional = status === 'conditional';
+  const labels = {
+    conditional: 'Estimated watch-line date',
+    elapsed: 'Scenario date reached',
+    'at-line': 'Watch line reached',
+    observed: 'Singularity evidence verified',
+    'no-reading': 'Waiting for an evidence reading',
+  };
+  const notes = {
+    conditional: `Starting from the ${date(anchorDate, true)} reading, the score would reach ${target} at +${num(monthlyPoints)} index point per month. That’s when we take a closer look at the evidence.`,
+    elapsed: `The score is still below ${target}. This scenario assumed a steady gain of +${num(monthlyPoints)} index point per month.`,
+    'at-line': 'The watch line calls for a closer look. Confirming the Singularity requires independent evidence across successive AI generations.',
+    observed: 'The watch’s independent evidence criteria have been met.',
+    'no-reading': 'The countdown needs a current evidence index reading.',
+  };
+  byId('countdown-value').hidden = !conditional;
+  byId('countdown-days').value = conditional ? num(daysRemaining) : '';
+  byId('countdown-state').textContent = labels[status];
+  byId('countdown-note').textContent = notes[status];
+  const time = byId('countdown-date');
+  time.hidden = !targetDate;
+  time.dateTime = targetDate ?? '';
+  time.textContent = date(targetDate);
+}
+
+function tickCountdown() {
+  renderCountdown();
+  setTimeout(tickCountdown, dayMs - Date.now() % dayMs);
 }
 
 function renderTicker() {
@@ -391,6 +425,7 @@ async function reload() {
       relationships.update({ index, verdicts: milestoneVerdicts });
       if (atLatest) selectedDate = index.date;
       renderReading();
+      renderCountdown();
       renderMilestoneProgress(byId('milestone-progress'), index);
       renderTicker();
       renderReplay();
@@ -530,7 +565,10 @@ renderLabs(byId('labs-board'));
 renderOrganizationSignals(byId('leaders'));
 renderOrganizationForecast(byId('organization-forecast'));
 reload();
+tickCountdown();
 setInterval(() => { if (!document.hidden) reload(); }, 60_000);
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && Date.now() - lastAttempt >= 60_000) reload();
+  if (document.hidden) return;
+  renderCountdown();
+  if (Date.now() - lastAttempt >= 60_000) reload();
 });
