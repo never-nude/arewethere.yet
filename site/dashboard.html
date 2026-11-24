@@ -6,11 +6,11 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
   <meta name="description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
-  <title>Full dashboard · Singularity Watch</title>
+  <title>What eight indicators tell us about an AI singularity · Singularity Watch</title>
   <link rel="canonical" href="https://arewethereyet.now/dashboard.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="Full dashboard · Singularity Watch">
+  <meta property="og:title" content="What eight indicators tell us about an AI singularity">
   <meta property="og:description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
   <meta property="og:url" content="https://arewethereyet.now/dashboard.html">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png">
@@ -19,7 +19,7 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Are we there yet? A violet wireframe hourglass narrows to a single mint point. Singularity Watch tracks milestones toward the singularity.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Full dashboard · Singularity Watch">
+  <meta name="twitter:title" content="What eight indicators tell us about an AI singularity">
   <meta name="twitter:description" content="Explore the eight indicators behind the Singularity Watch evidence gauge, compare AI milestones, and test what happens when the pace changes.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png">
   <meta name="twitter:image:alt" content="Are we there yet? A violet wireframe hourglass narrows to a single mint point.">
@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
-  <script type="module" src="./language-menu.js?v=2"></script>
+  <script type="module" src="./language-menu.js?v=3"></script>
   <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./terrain.css">
   <link rel="stylesheet" href="./relationship-map.css">
@@ -45,6 +45,7 @@
   <link rel="stylesheet" href="./watch-history.css">
   <link rel="stylesheet" href="./labs.css">
   <script>if (location.protocol === 'file:') document.documentElement.dataset.filePreview = '';</script>
+  <script type="module" src="./section-menu.js"></script>
   <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -58,14 +59,19 @@
         </nav>
         <site-language-menu></site-language-menu>
       </div>
-      <nav class="top-nav" aria-label="Dashboard sections">
-        <a href="#atlas">Milestone Map</a>
-        <a href="#watchdog">Watchdog</a>
-        <a href="#leaders">Leaders</a>
-        <a href="#history">History</a>
-        <a href="#scenario">Scenarios</a>
-        <a href="#signals">Signals</a>
-        <a class="evidence-jump" href="#evidence">References</a>
+      <nav class="dashboard-nav" aria-label="Dashboard sections">
+        <details id="section-menu" open>
+          <summary>On this page</summary>
+          <div class="top-nav">
+            <a href="#atlas">AI milestones</a>
+            <a href="#watchdog">Daily changes</a>
+            <a href="#leaders">AI labs</a>
+            <a href="#history">History</a>
+            <a href="#scenario">What-if scenarios</a>
+            <a href="#signals">Measurements</a>
+            <a href="#evidence">References</a>
+          </div>
+        </details>
       </nav>
       <button type="button" class="freshness" id="refresh" title="Check for a newer dataset"><span id="source-status" class="status-dot"></span><span id="source-time">Checking data</span><span aria-hidden="true">↻</span></button>
     </div>
@@ -76,12 +82,13 @@
   <main id="main" class="wrap" tabindex="-1">
     <section class="overview-panel" aria-labelledby="overview-heading">
       <header class="overview-title">
-        <h1 id="overview-heading">What does the evidence show?</h1>
+        <h1 id="overview-heading">What eight indicators tell us about an AI singularity</h1>
       </header>
       <section class="overview-index" aria-labelledby="evidence-index-heading">
         <h2 id="evidence-index-heading" class="reading-label">Evidence index</h2>
         <div class="reading-value"><output id="current-score" aria-describedby="index-score-meaning" data-waiting>Loading score…</output><span> / 100</span></div>
-        <p class="reading-explainer" id="index-score-meaning">Eight weighted indicators track what AI can do and how it helps build better AI. We schedule four source checks each day. The score can rise, fall, or hold steady. The risk and timing of a catastrophe fall outside its scope.</p>
+        <p class="reading-explainer daily-reading" id="index-daily-reading"></p>
+        <p class="reading-explainer" id="index-score-meaning">Eight indicators track what AI can do, how it contributes to research, and what people expect. We check sources four times a day. Risks and dates require separate evidence.</p>
         <div class="reading-meta"><span id="current-delta" class="change"></span><a href="#methodology">How it works ↗</a><a href="#public-sources">Last source check ↓</a></div>
         <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-describedby="index-watch-meaning" aria-valuemin="0" aria-valuemax="100">
           <span class="index-meter-fill" id="index-fill"></span>
@@ -313,6 +320,7 @@
           <p>The index totals weighted evidence points. We choose the weights and reference targets. Missing readings leave their points unfilled and lower source coverage. The 75-point watch line flags a score to investigate.</p>
           <p>Two indicators can rise together for several reasons. For example, a higher benchmark score and a shorter research cycle could both reflect more computing power. To confirm a singularity, independent researchers would need to show that AI’s contribution caused successive generations to improve faster.</p>
           <p>AGI and ASI both require broad skills on this Watch. ASI sets a higher performance bar. Recursive self-improvement describes how one AI generation helps improve the next. <a href="#milestone-order">See which milestones can come first ↑</a></p>
+          <p>The automated readings can contribute up to 50 of the 100 points for AGI and 40 for ASI. The remaining points require an independent evaluation and editorial review. A scheduled source check can carry forward an older finding.</p>
           <a href="https://deepmind.google/research/publications/66938/" target="_blank" rel="noopener noreferrer">DeepMind’s AGI framework ↗</a>
           <div class="watch-line-explainer" id="watch-line">
             <h3>The 75-point watch line</h3>

@@ -29,6 +29,16 @@ const milestones = {
     context: 'Sentience asks whether a system has subjective experience. This map tracks demonstrated capabilities and research gains.',
     sources: [capabilityFramework, ['Butlin et al., research on AI and consciousness', 'https://arxiv.org/abs/2308.08708'], ['Capability evidence', '#evidence-capability'], humanEvidence],
   },
+  breadth: {
+    label: 'Skills across unfamiliar tasks',
+    title: 'Skills across unfamiliar tasks',
+    role: 'AGI evidence',
+    short: 'Compare the same system with skilled people across fields',
+    summary: 'Give one system unfamiliar tasks from several fields and compare its results with those of skilled people doing the same work.',
+    importance: 'The AGI threshold requires broad transfer. Epoch’s Capabilities Index summarizes several tests. Confirming AGI takes independent evaluations on a representative range of real tasks.',
+    example: 'An evaluator might ask the same system to plan a delivery route, interpret a graph, and diagnose an unfamiliar software problem, then check how reliably it succeeds.',
+    sources: [capabilityFramework, ['Epoch Capabilities Index', 'https://epoch.ai/eci'], ['Capability evidence', '#evidence-capability']],
+  },
   autonomy: {
     label: 'Reliable autonomy',
     title: 'Reliable autonomy',
@@ -78,6 +88,8 @@ const connectors = {
 };
 
 const edges = [
+  { from: 'breadth', to: 'agi', kind: 'required', detail: 'AGI requires skilled human-level performance across a representative range of unfamiliar tasks.' },
+  { from: 'autonomy', to: 'agi', kind: 'enabling', detail: 'Reliable independent work on longer tasks supplies one part of the Watch’s AGI evidence checklist.' },
   { from: 'agi', to: 'asi', kind: 'possible', detail: 'A system that meets the ASI standard also meets the AGI standard. One evaluation could establish both.' },
   { from: 'agi', to: 'rsi', kind: 'enabling', detail: 'Broad skills can help with AI research. A research specialist could start the loop before AGI.' },
   { from: 'rsi', to: 'singularity', kind: 'required', detail: 'The Singularity requires independent evidence that successors keep improving later generations at a faster pace.' },
@@ -160,12 +172,21 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
     return group;
   }
   graph.append(
-    evidenceGroup('What can AI do?', ['agi', 'asi'], 'AGI matches skilled people across many tasks. ASI would also clear that bar and outperform leading experts.'),
-    evidenceGroup('Can AI speed up its own development?', ['rsi', 'singularity'], 'RSI can start before AGI, when a specialist AI helps build a successor that can repeat the process. The Singularity would require those gains to keep speeding up across generations.'),
+    evidenceGroup('The outcome', ['singularity'], 'The Watch would confirm the Singularity only with independent evidence that AI-led improvements keep accelerating across generations.'),
+    evidenceGroup('Research and capability milestones', ['rsi', 'asi'], 'Recursive self-improvement (RSI) is the feedback loop the Singularity requires. Artificial superintelligence (ASI) could help researchers, but a specialist could start a loop before reaching AGI.'),
+    evidenceGroup('General capability', ['agi'], 'Artificial general intelligence (AGI) would match skilled people across a wide range of unfamiliar tasks. ASI would also meet this standard and surpass leading experts.'),
   );
 
-  const support = make('div', 'srm__support');
-  support.append(make('h3', 'srm__lane-title', 'Evidence that can help explain progress'), buttonFor('autonomy'), buttonFor('ai-research'));
+  const support = make('section', 'srm__group srm__inputs');
+  support.append(make('h4', 'srm__group-title', 'Evidence leading toward AGI'));
+  const inputs = make('div', 'srm__pair');
+  inputs.append(buttonFor('breadth'), buttonFor('autonomy'));
+  const inputReadings = make('p', 'srm__relationship');
+  support.append(inputs, inputReadings);
+  graph.append(support);
+
+  const research = make('div', 'srm__support');
+  research.append(make('h3', 'srm__lane-title', 'Evidence for a research feedback loop'), buttonFor('ai-research'));
 
   const history = make('section', 'srm__history');
   history.id = 'foundations';
@@ -179,7 +200,7 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   detail.setAttribute('aria-label', 'Selected milestone details');
   const announcement = make('span', 'srm__screen-reader');
   announcement.setAttribute('role', 'status');
-  map.append(graph, support, detail, history, announcement);
+  map.append(graph, detail, research, history, announcement);
   container.replaceChildren(map);
 
   function updateReadings() {
@@ -187,7 +208,10 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
     snapshotTitle.textContent = Number.isFinite(timestamp)
       ? 'Evidence snapshot · ' + snapshotDate.format(timestamp)
       : 'Evidence snapshot';
-    for (const { id, score } of measureMilestoneProgress(currentIndex)) {
+    const progress = measureMilestoneProgress(currentIndex);
+    const inputs = progress.find(({ id }) => id === 'agi').contributions;
+    inputReadings.textContent = describeAgiInputs(inputs);
+    for (const { id, score } of progress) {
       const button = buttons.get(id);
       const scored = Number.isFinite(score);
       const amount = scored ? formatReading.format(score) + '%' : 'Awaiting evidence';
@@ -195,8 +219,7 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       button.style.setProperty('--srm-progress', scored ? score + '%' : '0%');
       button.querySelector('.srm__reading-score').textContent = amount;
       const { label, title } = milestones[id];
-      const name = id === 'singularity' ? title : label + ' (' + title + ')';
-      button.setAttribute('aria-label', name + ', ' + amount + (scored ? ' of evidence points earned' : ''));
+      button.setAttribute('aria-label', label + ' ' + amount + (scored ? ' of evidence points earned' : '') + '. ' + title);
     }
   }
 
@@ -270,13 +293,15 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       if (verdict.humanContext) evidence.append(make('p', '', verdict.humanContext));
       return;
     }
-    const factorId = { autonomy: 'reliability', 'ai-research': 'research-acceleration' }[activeId];
+    const factorId = { breadth: 'breadth', autonomy: 'reliability', 'ai-research': 'research-acceleration' }[activeId];
     const factor = factorId && currentIndex?.factors?.find(({ id }) => id === factorId);
     if (Number.isFinite(factor?.value)) {
       const value = formatReading.format(factor.value);
-      const reading = activeId === 'autonomy'
-        ? `METR estimates an 80% success rate on selected tasks that take human experts about ${value} hours.`
-        : `METR estimates that model capability gains at one lab ran at ${value} times the earlier pace. Attribution across successive generations remains open.`;
+      const reading = {
+        breadth: `The recent frontier on Epoch’s Capabilities Index is ${value} points. The index combines results across multiple benchmarks.`,
+        autonomy: `METR estimates an 80% success rate on selected tasks that take human experts about ${value} hours.`,
+        'ai-research': `METR estimates that model capability gains at one lab ran at ${value} times the earlier pace. Attribution across successive generations remains open.`,
+      }[activeId];
       evidence.replaceChildren(info('Current evidence', reading));
     } else {
       evidence.replaceChildren();
@@ -309,4 +334,12 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   updateReadings();
   select(activeId, { notify: false });
   return { select, update };
+}
+
+export function describeAgiInputs(criteria) {
+  const breadth = criteria.find(({ id }) => id === 'breadth')?.rawValue;
+  const reliability = criteria.find(({ id }) => id === 'reliability')?.rawValue;
+  const frontier = Number.isFinite(breadth) ? ' (' + formatReading.format(breadth) + ' ECI points)' : '';
+  const horizon = Number.isFinite(reliability) ? ' (' + formatReading.format(reliability) + ' hours)' : '';
+  return 'Epoch tracks performance across benchmarks' + frontier + '. METR measures how long selected tasks take skilled people when AI completes them with 80% success' + horizon + '.';
 }

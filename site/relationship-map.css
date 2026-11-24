@@ -54,6 +54,10 @@
   gap: clamp(6px, 1.2vw, 12px);
 }
 
+.srm__pair:has(> :only-child) {
+  grid-template-columns: minmax(0, calc((100% - clamp(6px, 1.2vw, 12px)) / 2));
+  justify-content: center;
+}
 .srm__reading {
   --srm-accent: #c7b0f8;
   display: grid;
@@ -105,7 +109,7 @@
 }
 .srm__reading[data-available="false"] .srm__track { visibility: hidden; }
 
-.srm__support { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.srm__support { display: grid; gap: 5px; }
 .srm__support h3 { grid-column: 1 / -1; }
 .srm__lane-title {
   font-size: 12px;
@@ -190,8 +194,12 @@
 .srm__graph-heading a,
 .srm__history-heading a,
 .srm__references a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 2px 4px;
   color: #d0bbf6;
-  font-size: 11px;
+  font-size: 12px;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -273,6 +281,7 @@
 }
 
 .srm__related { align-items: baseline; }
+.srm__references { gap: 6px 12px; }
 .srm__connection-list { display: grid; gap: 4px; list-style: none; padding: 0; }
 .srm__connection-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
 .srm__connection-list button,
@@ -321,5 +330,6 @@
 
 @media (max-width: 520px) {
   .srm { padding-inline: 12px; }
+  .srm__graph-heading a, .srm__history-heading a, .srm__references a { min-height: 44px; }
   .srm__connection-list button, .srm__related button { min-height: 44px; }
 }

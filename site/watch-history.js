@@ -296,10 +296,11 @@ function reframe(state) {
   const activeDates = state.frames.filter((frame) => state.events.get(frame.date).length || state.anomalies.has(frame.date)).reverse();
   const focused = state.list.contains(document.activeElement) ? document.activeElement.value : null;
   state.list.replaceChildren(...activeDates.map((frame) => {
-    const button = item('button', dayLabel(frame.date, monthDay));
+    const label = dayLabel(frame.date, monthDay);
+    const button = item('button', label);
     button.type = 'button';
     button.value = frame.date;
-    button.setAttribute('aria-label', `${dayLabel(frame.date)}, ${state.events.get(frame.date).length} daily records${state.anomalies.has(frame.date) ? ', unusual index move' : ''}`);
+    button.setAttribute('aria-label', `${label}, ${frame.date.slice(0, 4)}, ${state.events.get(frame.date).length} daily records${state.anomalies.has(frame.date) ? ', unusual index move' : ''}`);
     button.addEventListener('click', () => selectDay(state, state.frames.indexOf(frame)));
     return button;
   }));

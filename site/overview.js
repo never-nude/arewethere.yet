@@ -1,9 +1,11 @@
 import { buildIndex } from './index-model.js';
+import { installGlossary } from './glossary.js';
 import { measureMilestoneProgress } from './milestone-progress.js';
+import { dailyReading } from './reading-brief.js';
 
 const numbers = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
-const dates = new Intl.DateTimeFormat('en-US', {
-  dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York',
+const dates = new Intl.DateTimeFormat(undefined, {
+  year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
 });
 const feedUrl = new URL('./data/signals.json', import.meta.url);
 const lastCheck = document.getElementById('home-last-check');
@@ -19,8 +21,9 @@ function displayLatest(payload) {
   const answer = document.getElementById('home-answer');
   answer.hidden = !measured;
   answer.textContent = index.threshold.observed
-    ? 'The Watch’s independent evidence checks for sustained acceleration have been met.'
-    : 'So far, the evidence falls short of confirming that AI keeps speeding up its own development.';
+    ? 'Independent evidence now meets the Watch’s three tests for sustained acceleration across generations.'
+    : 'The evidence so far falls short of showing that AI can sustain that cycle.';
+  document.getElementById('home-daily-reading').textContent = dailyReading(index);
 
   for (const { id, score } of measureMilestoneProgress(index)) {
     const row = document.querySelector('[data-milestone="' + id + '"]');
@@ -43,16 +46,17 @@ async function refresh() {
       displayLatest(payload);
       checkedAt = payload.checkedAt;
     }
-    lastCheck.textContent = 'Last source check ' + dates.format(new Date(checkedAt)) + ' Eastern.';
+    lastCheck.textContent = 'Last source check ' + dates.format(new Date(checkedAt)) + '.';
   } catch {
     lastCheck.textContent = checkedAt
-      ? 'Latest check unavailable. Showing the reading from ' + dates.format(new Date(checkedAt)) + ' Eastern.'
+      ? 'Latest check unavailable. Showing the reading from ' + dates.format(new Date(checkedAt)) + '.'
       : 'Reading unavailable. We’ll try again in a minute.';
   } finally {
     loading = false;
   }
 }
 
+installGlossary(document.getElementById('main'));
 refresh();
 document.addEventListener('visibilitychange', refresh);
 window.setInterval(refresh, 60_000);

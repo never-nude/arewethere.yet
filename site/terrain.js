@@ -1,3 +1,5 @@
+import { describeAgiInputs } from './relationship-map.js';
+
 const concepts = {
   agi: {
     label: 'AGI',
@@ -72,21 +74,21 @@ const paths = {
   },
 };
 
-const conceptEntries = Object.entries(concepts);
-const initialCamera = { yaw: .68, pitch: .39, zoom: 1, panX: 0, panY: 0 };
+const conceptEntries = ['singularity', 'rsi', 'asi', 'agi'].map((id) => [id, concepts[id]]);
+const initialCamera = { yaw: -.85, pitch: .35, zoom: 1, panX: 0, panY: 0 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const confidenceNumber = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 const axes = [
   { id: 'x', label: 'Range of skills', endLabel: 'Many fields', levels: ['No minimum', 'Many kinds of work'], color: '#82dbe5' },
-  { id: 'y', label: 'Skill vs. people', endLabel: 'Above experts', levels: ['No minimum', 'Matches skilled people', 'Beats leading experts'], color: '#d1b2ff' },
-  { id: 'z', label: 'AI builds better AI', endLabel: 'Faster each round', levels: ['No loop required', 'Repeated improvement', 'Faster gains each generation'], color: '#ffc78f' },
+  { id: 'y', label: 'AI builds better AI', endLabel: 'Faster each round', levels: ['No loop required', 'Repeated improvement', 'Faster gains each generation'], color: '#ffc78f' },
+  { id: 'z', label: 'Skill vs. people', endLabel: 'Above experts', levels: ['No minimum', 'Matches skilled people', 'Beats leading experts'], color: '#d1b2ff' },
 ];
 // Requirements on the three shared scales, in X, Y, Z order.
 const requirements = {
-  agi: [1, 1, 0],
-  asi: [1, 2, 0],
-  rsi: [0, 0, 1],
-  singularity: [0, 0, 2],
+  agi: [1, 0, 1],
+  asi: [1, 0, 2],
+  rsi: [0, 1, 0],
+  singularity: [0, 2, 0],
 };
 const relationships = {
   agi: 'AGI and ASI both cover many kinds of work. AGI sets the bar at skilled human performance.',
@@ -119,10 +121,10 @@ function sceneMarkup() {
       <p class="sw-terrain__route-note">Each score totals weighted evidence points for the example shown. <a class="evidence-jump" href="#milestone-order">See which milestones can happen first.</a></p>
     </div>
     <div class="sw-terrain__stage">
-      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-position-key terrain-arrow-key" aria-label="Rotating 3D milestone requirements map. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
+      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-position-key terrain-arrow-key" aria-label="Interactive 3D map of milestone requirements. Height shows the research feedback loop required. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
       <button type="button" class="sw-terrain__orbit" data-camera="orbit">Start orbit</button>
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
-        ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
+        ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.label}, ${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
       </div>
       <div class="sw-terrain__guide"><span>Left-drag to rotate · Right-drag or Shift-drag to pan</span><span class="sw-terrain__touch-guide">Swipe across to rotate. Use two fingers to pan or zoom.</span></div>
       <div class="sw-terrain__camera" role="group" aria-label="View controls">
@@ -131,10 +133,11 @@ function sceneMarkup() {
         <button type="button" data-camera="reset" class="sw-terrain__reset" aria-label="Reset view" title="Reset view">Reset</button>
       </div>
     </div>
+    <div class="sw-terrain__base-note"><h3>At the base · Evidence leading toward AGI</h3><p>Look for skilled human-level results on unfamiliar tasks across many fields, alongside reliable independent work.</p><p data-agi-inputs>${describeAgiInputs([])}</p><a href="#agi">Inspect AGI evidence</a></div>
     <div class="sw-terrain__chart-key">
       <div class="sw-terrain__position-key">
         <h2>What <span data-selected-concept>the Singularity</span> requires</h2>
-        <p id="terrain-position-key">Dots close together have similar requirements. Each axis shows a different requirement, from the lowest bar at the base to the highest at the end.</p>
+        <p id="terrain-position-key">Height shows the research loop each milestone requires. AGI and ASI sit at the base because either could be achieved through human-led research. The floor axes show the breadth and skill each requires. The Singularity sits highest because it requires sustained acceleration.</p>
         <dl class="sw-terrain__axis-readings" aria-live="polite" aria-atomic="true">
           ${axes.map(({ id, label, color }) => `<div data-axis="${id}" style="--axis-color:${color}"><dt><b>${id.toUpperCase()}</b> ${label}</dt><dd></dd></div>`).join('')}
         </dl>
@@ -210,7 +213,7 @@ function createProjector(camera, width, height) {
   const sinPitch = Math.sin(camera.pitch);
   const scale = Math.min(width * .196, height * .215) * camera.zoom;
   const originX = width * .51 + camera.panX;
-  const originY = height * .43 + camera.panY;
+  const originY = height * .48 + camera.panY;
 
   return ([x, y, z]) => {
     const horizontal = x * cosYaw - z * sinYaw;
@@ -289,8 +292,9 @@ function paintAxes(ctx, project, width, height) {
       ctx.stroke();
     }
     ctx.font = '600 11px system-ui, sans-serif';
-    const name = `${axis.id.toUpperCase()} · ${axis.label}`;
-    const textWidth = Math.max(ctx.measureText(name).width, ctx.measureText(axis.endLabel).width);
+    const compact = width < 520;
+    const name = compact ? ['Range', 'Research loop', 'Skill'][index] : `${axis.id.toUpperCase()} · ${axis.label}`;
+    const textWidth = compact ? ctx.measureText(name).width : Math.max(ctx.measureText(name).width, ctx.measureText(axis.endLabel).width);
     const labelX = endX + side * (textWidth / 2 + 14);
     const boundedX = clamp(index === 1 ? endX : labelX, textWidth / 2 + 8, width - textWidth / 2 - 8);
     if (endX >= 0 && endX <= width && endY >= 0 && endY <= height) {
@@ -300,10 +304,12 @@ function paintAxes(ctx, project, width, height) {
       ctx.lineJoin = 'round';
       ctx.strokeText(name, boundedX, labelY);
       ctx.fillText(name, boundedX, labelY);
-      ctx.font = '11px system-ui, sans-serif';
-      ctx.strokeText(axis.endLabel, boundedX, labelY + 13);
-      ctx.fillText(axis.endLabel, boundedX, labelY + 13);
-      labelBounds.push({ left: boundedX - textWidth / 2, right: boundedX + textWidth / 2, top: labelY - 7, bottom: labelY + 20 });
+      if (!compact) {
+        ctx.font = '11px system-ui, sans-serif';
+        ctx.strokeText(axis.endLabel, boundedX, labelY + 13);
+        ctx.fillText(axis.endLabel, boundedX, labelY + 13);
+      }
+      labelBounds.push({ left: boundedX - textWidth / 2, right: boundedX + textWidth / 2, top: labelY - 7, bottom: labelY + (compact ? 7 : 20) });
     }
   }
 
@@ -452,22 +458,38 @@ function paintConcept(ctx, concept, [centerX, centerY, perspective], selected) {
 function positionMarkers(ctx, positions, markers, width, height, axisLabels) {
   const spacing = 6;
   const occupied = [...axisLabels];
+  let previousTop = -Infinity;
   for (const point of positions) {
     const button = markers.get(point.id);
     const buttonWidth = button.offsetWidth;
     const buttonHeight = button.offsetHeight;
     const halfWidth = buttonWidth / 2;
-    const step = buttonHeight + spacing;
     const place = (dx, dy) => {
       const x = clamp(point.x + dx, halfWidth + spacing, width - halfWidth - spacing);
       const bottom = clamp(point.y + dy, buttonHeight + 49, height - 56);
       return { x, left: x - halfWidth, right: x + halfWidth, top: bottom - buttonHeight, bottom };
     };
-    const candidates = [place(0, -13), place(halfWidth + 16, -3), place(-halfWidth - 16, -3), place(0, buttonHeight + 13)];
-    for (let repeat = 1; repeat <= markers.size; repeat += 1) candidates.push(place(0, -13 - step * repeat), place(0, buttonHeight + 13 + step * repeat));
-    const label = candidates.find((candidate) => occupied.every((other) =>
+    const below = point === positions.at(-1) && point.y > height / 2;
+    const near = below ? buttonHeight + 13 : -13;
+    const far = below ? -13 : buttonHeight + 13;
+    const clear = (candidate) => occupied.every((other) =>
       candidate.right + spacing < other.left || candidate.left - spacing > other.right ||
-      candidate.bottom + spacing <= other.top || candidate.top - spacing >= other.bottom)) ?? candidates[0];
+      candidate.bottom + spacing <= other.top || candidate.top - spacing >= other.bottom);
+    const baseline = place(0, near);
+    let label = null;
+    let bestCost = Infinity;
+    for (const dy of [near, far, near - 12, near + 12, near - 28, near + 28, near - 52, near + 52, near - 92, near + 92]) {
+      for (const dx of [0, -12, 12, -28, 28, -halfWidth - 16, halfWidth + 16, -buttonWidth, buttonWidth]) {
+        const candidate = place(dx, dy);
+        const cost = Math.hypot(candidate.x - baseline.x, candidate.top - baseline.top) + (candidate.top < previousTop + 10 ? height : 0);
+        if (cost < bestCost && clear(candidate)) {
+          bestCost = cost;
+          label = candidate;
+        }
+      }
+    }
+    label ??= baseline;
+    previousTop = label.top;
     button.style.left = `${label.x}px`;
     button.style.top = `${label.bottom}px`;
     occupied.push(label);
@@ -486,9 +508,10 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
   container.innerHTML = sceneMarkup();
   const stage = container.querySelector('.sw-terrain__stage');
   const chartKey = container.querySelector('.sw-terrain__chart-key');
+  const baseNote = container.querySelector('.sw-terrain__base-note');
   if (stageMount) {
     stageMount.classList.add('sw-terrain');
-    stageMount.replaceChildren(stage, chartKey);
+    stageMount.replaceChildren(stage, baseNote, chartKey);
   }
   const axisReadings = [...chartKey.querySelectorAll('[data-axis] dd')];
   const arrowReadings = chartKey.querySelector('.sw-terrain__arrow-readings');
@@ -560,7 +583,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     const projected = [...scenePoints].map(([id, point]) => ({ id, screen: project(point) }));
     projected.sort((a, b) => Number(a.id === selected) - Number(b.id === selected) || a.screen[2] - b.screen[2]);
     for (const { id, screen } of projected) paintConcept(ctx, concepts[id], screen, id === selected);
-    const labels = projected.reverse().map(({ id, screen: [x, y] }) => ({ id, x, y }));
+    const labels = projected.map(({ id, screen: [x, y] }) => ({ id, x, y })).sort((a, b) => a.y - b.y);
     positionMarkers(ctx, labels, markerButtons, width, height, axisLabels);
   }
 
@@ -729,6 +752,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     scores = nextScores;
     if (evidence && evidence !== milestoneEvidence) {
       milestoneEvidence = evidence;
+      baseNote.querySelector('[data-agi-inputs]').textContent = describeAgiInputs(evidence.agi ?? []);
       renderMeasurements();
     }
     if (verdicts && verdicts !== milestoneVerdicts) {
@@ -883,7 +907,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
       refreshScene();
     }, listener);
     if (matchMedia('(pointer: coarse)').matches) guide.textContent = 'Swipe sideways to rotate';
-    setOrbit(!motionPreference.matches);
+    setOrbit(false);
   } else {
     stage.setAttribute('data-fallback', '');
     canvas.hidden = true;
@@ -916,6 +940,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
       cancelAnimationFrame(frame);
       if (stageMount) {
         stage.remove();
+        baseNote.remove();
         chartKey.remove();
         stageMount.classList.remove('sw-terrain');
       }

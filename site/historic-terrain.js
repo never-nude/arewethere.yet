@@ -377,7 +377,7 @@ export function mountHistoricTerrain(container, onSelect) {
         }
         button.firstChild.textContent = point.label;
         button.title = point.title;
-        button.setAttribute('aria-label', point.title + ', ' + point.when + ', ' + point.count + ' documented landmarks');
+        button.setAttribute('aria-label', point.label + '. ' + point.title + ', ' + point.when + ', ' + point.count + ' documented landmarks');
         button.setAttribute('aria-pressed', String(point.id === selected?.id));
         button.dataset.latest = String(point.lane === 'latest');
       }

@@ -188,15 +188,21 @@
 }
 .sw-terrain__orbit[data-active] { color: #d4ffff; border-color: #79d7c96e; }
 
-.sw-terrain__stage[data-fallback] { min-height: 11rem; }
+.sw-terrain__base-note {
+  margin: 8px 12px 0;
+  color: #d0c5df;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sw-terrain__base-note h3 { color: #ede5fa; font-size: 14px; }
+.sw-terrain__base-note a { display: inline-flex; align-items: center; min-height: 32px; color: #d0bbf6; text-underline-offset: 3px; text-decoration: underline; }
+.sw-terrain__stage[data-fallback] { min-height: 16rem; }
 .sw-terrain__stage[data-fallback] :is(.sw-terrain__camera, .sw-terrain__canvas, .sw-terrain__orbit) { display: none; }
 .sw-terrain__stage[data-fallback] .sw-terrain__markers {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+  display: grid;
+  gap: 5px;
+  justify-items: center;
   align-content: center;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 .sw-terrain__stage[data-fallback] .sw-terrain__marker { position: relative; transform: none; }
 

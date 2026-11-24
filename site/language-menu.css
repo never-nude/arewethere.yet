@@ -5,3 +5,19 @@ site-language-menu select { width: 8.25rem; max-width: 34vw; padding: .35rem .3r
 @media (pointer: coarse) {
   site-language-menu select { min-height: 44px; }
 }
+
+@media (max-width: 570px) {
+  .page-tools, .dashboard-header .page-tools {
+    width: 100%; display: grid; grid-template-columns: minmax(0, max-content) minmax(5rem, 1fr);
+    justify-content: start; gap: 8px; align-items: center;
+  }
+  .page-tools .view-switch { min-width: 0; }
+  .page-tools .view-switch a { min-width: 0; min-height: 44px; overflow-wrap: anywhere; }
+  .page-tools site-language-menu label { display: block; font-size: 0; line-height: 0; }
+  .page-tools site-language-menu select { width: 100%; max-width: 8.25rem; min-height: 44px; }
+}
+
+/* Chart coordinates and numerical fractions use a fixed left-to-right scale. */
+html[dir="rtl"] :is(.home-number, .reading-value, .index-meter, .meter-scale) { direction: ltr; }
+html[dir="rtl"] .reading-watch { text-align: start; }
+html[dir="rtl"] .home-intro .home-answer { border-left: 0; padding-left: 0; border-inline-start: 2px solid var(--teal); padding-inline-start: 13px; }

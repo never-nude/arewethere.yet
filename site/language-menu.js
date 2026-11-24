@@ -48,6 +48,8 @@ class SiteLanguageMenu extends HTMLElement {
     select.translate = false;
     select.className = 'notranslate';
     const active = currentLanguage();
+    const script = new Intl.Locale(providerLanguage[active] ?? active).maximize().script;
+    document.documentElement.dir = ['Arab', 'Hebr', 'Nkoo', 'Thaa'].includes(script) ? 'rtl' : 'ltr';
     const original = new Option(translationLanguages.en, 'en');
     original.lang = 'en';
     select.append(original);

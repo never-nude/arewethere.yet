@@ -10,8 +10,8 @@ const entries = [
   ['TH2', 'METR Time Horizon 2', 'A newer set of tasks METR uses to estimate how often AI succeeds at work of different difficulty levels.'],
   ['TH1.1', 'METR Time Horizon 1.1', 'An earlier set of tasks METR uses to estimate how often AI succeeds at work of different difficulty levels.'],
   ['task horizon|task horizons|task-completion time horizon', 'Task horizon', 'How long a human expert would take on tasks that an AI is estimated to complete at a stated success rate. The time refers to the human expert.'],
-  ['open weights|open-weight|open-weights', 'Open weights', 'A model’s learned settings are available to download. Its license determines how people can run, share, or modify it.'],
-  ['closed weights|closed-weight|closed-weights', 'Closed weights', 'The developer keeps the model’s learned settings private. People usually use the model through a website or an application interface.'],
+  ['open weight|open weights|open-weight|open-weights|downloadable weights', 'Open weights', 'You can download the numbers the model learned during training. The license sets the rules for using, changing, or sharing them. The training code and data may still be private.'],
+  ['closed weight|closed weights|closed-weight|closed-weights', 'Closed weights', 'The developer keeps the model’s learned numbers out of public downloads. You may still be able to use the model through a website or an app, sometimes for free.'],
   ['benchmark|benchmarks', 'Benchmark', 'A standard test used to compare different systems under the same conditions.'],
   ['rubric|rubrics', 'Scoring rubric', 'A set of rules that explains what counts as evidence and how many points each finding can earn.'],
   ['evidence credit', 'Evidence credit', 'The points a measured result earns under the watch’s published scoring rules.'],
@@ -29,6 +29,8 @@ const entries = [
   ['API', 'Application programming interface', 'A way for software to request a service, such as asking a model for an answer.'],
   ['UTC', 'Coordinated Universal Time', 'The common time standard used to compare dates and times across time zones.'],
   ['latency', 'Response time', 'How long a service takes to respond after receiving a request.'],
+  ['model weights', 'Model weights', 'The numbers a model learns from examples during training. They help determine how the model responds to new input.'],
+  ['weight access|weight availability|open- and closed-weight|open- and closed-weights|open and closed weights|open or closed weights', 'Model weight access', 'This tells you whether people can download the numbers a model learned. A model’s price, the license for using it, and whether its training code or data are public are separate questions.'],
 ];
 
 const aliasLookup = new Map();
@@ -38,15 +40,11 @@ for (const [index, [aliases, name, description]] of entries.entries()) {
 }
 const terms = [...aliasLookup.keys()]
   .sort((a, b) => b.length - a.length)
-  .map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  .map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll('-', '[-‐‑]').replaceAll(' ', '\\s+'));
 const glossaryPattern = new RegExp(`\\b(?:${terms.join('|')})\\b`, 'gi');
 const termSelector = '.glossary-term';
 const controls = 'a[href], button, summary, label, [role="button"], [role="tab"], [role="option"], [role="slider"]';
 const excluded = `${termSelector}, .glossary-popup, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
-
-function glossaryTerm(target) {
-  return target instanceof Element ? target.closest(termSelector) : null;
-}
 
 export function installGlossary(root) {
   const owner = root.ownerDocument;
@@ -70,6 +68,57 @@ export function installGlossary(root) {
   popup.append(title, body);
   owner.body.append(meanings, popup);
 
+  // A filter whose entire label is a term can explain itself and keep its normal action.
+  function termFor(target) {
+    if (!(target instanceof Element)) return null;
+    const mark = target.closest(termSelector);
+    if (mark) return mark;
+    const control = target.closest(controls);
+    const label = control?.querySelector(termSelector);
+    return label && control.textContent.trim() === label.textContent ? label : null;
+  }
+
+  const changedControls = new Set();
+  let tabFrame;
+  function isVisible(mark) {
+    if (mark.checkVisibility) return mark.checkVisibility({ visibilityProperty: true });
+    return !mark.closest('details:not([open])') && mark.getClientRects().length > 0;
+  }
+
+  // Keep one keyboard stop per meaning in each section. Repeats still work on tap or hover.
+  function scheduleTabStops() {
+    if (tabFrame) return;
+    tabFrame = view.requestAnimationFrame(() => {
+      tabFrame = null;
+      const sections = new Map();
+      const updates = [];
+      for (const mark of root.querySelectorAll('.glossary-term[role="button"]')) {
+        const section = mark.closest('section, article, details, [role="tabpanel"]') ?? root;
+        if (!sections.has(section)) sections.set(section, new Set());
+        const seen = sections.get(section);
+        const id = mark.dataset.glossaryMeaning;
+        const firstVisible = !seen.has(id) && isVisible(mark);
+        const tabIndex = firstVisible ? 0 : -1;
+        if (mark.tabIndex !== tabIndex) updates.push([mark, tabIndex]);
+        if (firstVisible) seen.add(id);
+      }
+      for (const [mark, tabIndex] of updates) mark.tabIndex = tabIndex;
+    });
+  }
+
+  function syncControlDescriptions() {
+    for (const control of changedControls) {
+      const existing = control.getAttribute('aria-describedby') ?? '';
+      const ids = existing.split(/\s+/).filter(id => id && !glossaryById.has(id));
+      for (const mark of control.querySelectorAll(termSelector)) ids.push(mark.dataset.glossaryMeaning);
+      const description = [...new Set(ids)].join(' ');
+      if (description === existing) continue;
+      if (description) control.setAttribute('aria-describedby', description);
+      else control.removeAttribute('aria-describedby');
+    }
+    changedControls.clear();
+  }
+
   function annotateText(text) {
     const host = text.parentElement;
     if (!host || host.closest(excluded)) return;
@@ -81,7 +130,7 @@ export function installGlossary(root) {
     let end = 0;
     for (const match of matches) {
       const [label] = match;
-      const term = aliasLookup.get(label.toLowerCase());
+      const term = aliasLookup.get(label.toLowerCase().replace(/[‐‑]/g, '-').replace(/\s+/g, ' '));
       if (match.index > end) fragment.append(text.data.slice(end, match.index));
       const mark = owner.createElement('span');
       mark.className = 'glossary-term';
@@ -98,6 +147,8 @@ export function installGlossary(root) {
     }
     if (end < text.length) fragment.append(text.data.slice(end));
     text.replaceWith(fragment);
+    if (control) changedControls.add(control);
+    scheduleTabStops();
   }
 
   function annotate(node) {
@@ -128,7 +179,7 @@ export function installGlossary(root) {
     const width = owner.documentElement.clientWidth;
     const height = view.innerHeight;
     if (!bounds.width || !bounds.height || bounds.bottom < 0 || bounds.top > height || bounds.right < 0 || bounds.left > width) {
-      if (active === owner.activeElement) popup.style.visibility = 'hidden';
+      if (active === termFor(owner.activeElement)) popup.style.visibility = 'hidden';
       else hide();
       return;
     }
@@ -166,44 +217,57 @@ export function installGlossary(root) {
 
   function dismissUnlessFocused() {
     view.clearTimeout(hideTimer);
-    if (!active || pinned === active || active === owner.activeElement) return;
+    if (!active || pinned === active || active === termFor(owner.activeElement)) return;
     hideTimer = view.setTimeout(hide, 150);
   }
 
   annotate(root);
+  syncControlDescriptions();
   const observer = new MutationObserver((changes) => {
     for (const change of changes) {
+      if (change.type === 'attributes') {
+        scheduleTabStops();
+        continue;
+      }
+      if (change.removedNodes.length && change.target instanceof Element) {
+        const control = change.target.closest(controls);
+        if (control && !control.matches(termSelector)) changedControls.add(control);
+        for (const node of change.removedNodes) {
+          if (node instanceof Element && (node.matches(termSelector) || node.querySelector(termSelector))) scheduleTabStops();
+        }
+      }
       if (change.type === 'characterData' && root.contains(change.target)) annotate(change.target);
       for (const node of change.addedNodes) {
         if (root.contains(node)) annotate(node);
       }
     }
+    syncControlDescriptions();
     if (active && !root.contains(active)) hide();
   });
-  observer.observe(root, { childList: true, characterData: true, subtree: true });
+  observer.observe(root, { childList: true, characterData: true, subtree: true, attributeFilter: ['hidden', 'open'] });
 
   root.addEventListener('pointerover', (event) => {
-    const mark = glossaryTerm(event.target);
+    const mark = termFor(event.target);
     if (mark && event.pointerType !== 'touch' && (!pinned || pinned === mark)) show(mark);
   });
   root.addEventListener('pointerout', (event) => {
-    const mark = glossaryTerm(event.target);
+    const mark = termFor(event.target);
     if (mark && active === mark && !mark.contains(event.relatedTarget)) dismissUnlessFocused();
   });
   root.addEventListener('focusin', (event) => {
-    const mark = glossaryTerm(event.target);
+    const mark = termFor(event.target);
     if (mark) show(mark);
   });
   root.addEventListener('focusout', (event) => {
-    if (active && active === glossaryTerm(event.target)) hide();
+    if (active && active === termFor(event.target)) hide();
   });
   root.addEventListener('click', (event) => {
-    const mark = glossaryTerm(event.target);
-    if (mark?.tabIndex === 0) toggle(mark);
+    const mark = termFor(event.target);
+    if (mark) toggle(mark);
   });
   root.addEventListener('keydown', (event) => {
-    const mark = glossaryTerm(event.target);
-    if (mark?.tabIndex !== 0 || !['Enter', ' '].includes(event.key)) return;
+    const mark = termFor(event.target);
+    if (mark?.getAttribute('role') !== 'button' || !['Enter', ' '].includes(event.key)) return;
     event.preventDefault();
     toggle(mark);
   });
@@ -211,14 +275,16 @@ export function installGlossary(root) {
     if (active && event.key === 'Escape') hide();
   });
   owner.addEventListener('pointerdown', (event) => {
-    if (active && active !== glossaryTerm(event.target) && !popup.contains(event.target)) hide();
+    if (active && active !== termFor(event.target) && !popup.contains(event.target)) hide();
   });
   owner.addEventListener('fullscreenchange', () => {
     hide();
     (owner.fullscreenElement ?? owner.body).append(popup);
+    scheduleTabStops();
   });
   popup.addEventListener('pointerenter', () => view.clearTimeout(hideTimer));
   popup.addEventListener('pointerleave', dismissUnlessFocused);
   view.addEventListener('scroll', position, true);
+  view.addEventListener('resize', scheduleTabStops);
   view.addEventListener('resize', position);
 }

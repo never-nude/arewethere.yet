@@ -136,7 +136,7 @@ function mount(container) {
         <div class="panel-heading">
           <div>
             <h3 id="labs-ranking-heading">Model capability leaders</h3>
-            <p>Each developer’s highest Epoch Capabilities Index score among models released in the past 120 days.</p>
+            <p>Each developer’s highest Epoch Capabilities Index score among models released in the past 120 days. With open weights, you can download the model’s learned settings. With closed weights, the developer keeps those settings out of public downloads.</p>
           </div>
         </div>
         <div class="segmented labs-filters" role="group" aria-label="Model weight availability"></div>

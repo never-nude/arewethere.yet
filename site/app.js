@@ -1,4 +1,5 @@
 import { buildIndex, projectThreshold } from './index-model.js';
+import { dailyReading } from './reading-brief.js';
 import { getCountdown } from './countdown.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
@@ -21,7 +22,9 @@ const byId = (id) => document.getElementById(id);
 const formatter = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 const longDate = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const shortDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-const checkTime = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' });
+const checkTime = new Intl.DateTimeFormat(undefined, {
+  year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+});
 const shortTime = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' });
 const checkUrl = new URL('./data/signals.json', import.meta.url);
 const dayMs = 86_400_000;
@@ -100,9 +103,12 @@ function renderReading() {
   byId('current-score').toggleAttribute('data-waiting', !Number.isFinite(score));
   setChange(byId('current-delta'), delta);
   byId('current-delta').title = 'Change from the prior day';
+  byId('index-daily-reading').textContent = dailyReading(index);
   byId('index-fill').style.width = (score ?? 0) + '%';
   byId('watch-tick').style.left = threshold.target + '%';
-  byId('score-coverage').textContent = coverage + '% source coverage';
+  const available = index.factors.filter(factor => Number.isFinite(factor.contribution)).length;
+  byId('score-coverage').textContent = available + ' of ' + index.factors.length + ' inputs have readings';
+  byId('score-coverage').title = coverage + '% of the index weight has a reading';
   byId('watch-line-label').textContent = threshold.target + '-point watch line';
   byId('index-gap').textContent = score == null ? '' : score < threshold.target
     ? 'The current score is ' + num(threshold.target - score) + ' points below it.'
@@ -111,7 +117,7 @@ function renderReading() {
   else byId('index-meter').removeAttribute('aria-valuenow');
   byId('observed').textContent = threshold.observed
     ? 'Evidence gates met · ' + date(threshold.crossingDate)
-    : 'Singularity threshold unobserved';
+    : 'The evidence has yet to establish sustained AI-driven acceleration.';
   const lanes = [
     ['Capability', 'Capability'],
     ['AI research', 'Research'],

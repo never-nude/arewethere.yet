@@ -6,7 +6,7 @@
 .home-header, .home-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .home-header { padding-block: 16px; flex-wrap: wrap; }
 .home-hero { display: grid; grid-template-columns: 1.08fr 1fr; gap: clamp(28px, 6vw, 88px); align-items: center; padding-block: clamp(35px, 6.5vw, 84px); }
-.home-intro h1 { margin: 0; font-size: clamp(39px, 5.7vw, 78px); font-weight: 650; letter-spacing: -.066em; line-height: .99; text-wrap: balance; }
+.home-intro h1 { margin: 0; font-size: clamp(39px, 5.7vw, 78px); font-weight: 650; letter-spacing: -.038em; line-height: 1.04; text-wrap: balance; }
 .home-intro h1 span { color: #cbb7fb; }
 .home-intro > p { max-width: 41ch; margin-top: 21px; color: #d0c6df; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.52; }
 .home-intro .home-answer { padding-left: 13px; border-left: 2px solid var(--teal); color: #e6def1; font-size: 14px; }
@@ -30,6 +30,12 @@
 .home-detail-link, .home-footer a { display: inline-flex; align-items: center; min-height: 44px; gap: 6px; }
 .home-milestone-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-block: 20px 34px; }
 .home-milestone-grid article { display: grid; grid-template-rows: auto 1fr auto; gap: 8px; border: 1px solid #3d334c; border-radius: 12px; padding: 18px 20px; background: #1a1625; }
+.home-milestone-grid [data-milestone="singularity"], .home-milestone-grid [data-milestone="agi"] { grid-column: 1 / -1; }
+.home-milestone-grid article p { max-width: 70ch; }
+@media (min-width: 571px) {
+  .home-milestone-grid { container-type: inline-size; }
+  .home-meter { inline-size: min(100%, calc(50cqi - 48px)); }
+}
 .home-milestone-grid h3 { font-size: clamp(17px, 1.8vw, 22px); letter-spacing: -.045em; line-height: 1.2; font-weight: 610; }
 .home-milestone-grid abbr { color: #baaecb; text-decoration: none; white-space: nowrap; font: 400 12px var(--mono); letter-spacing: 0; margin-left: 3px; }
 .home-milestone-grid p { color: #c5bad3; font-size: 14px; line-height: 1.45; }

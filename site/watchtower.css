@@ -115,7 +115,10 @@
 
 .sw-watch__findings span { color: var(--dim, #b8afc9); }
 .sw-watch a { color: var(--violet, #bdabff); }
-.sw-watch a:hover { text-decoration: underline; }
+.sw-watch a:hover,
+.sw-watch__method a,
+.sw-watch__model-meta a { text-decoration: underline; text-underline-offset: 3px; }
+.sw-watch__model-meta a { display: inline-block; padding-block: 5px; }
 .sw-watch__details {
   margin-top: 10px;
   border-top: 1px solid #39304b;
