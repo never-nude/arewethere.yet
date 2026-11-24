@@ -134,6 +134,12 @@ function sceneMarkup() {
         <p class="sw-terrain__example"><strong>Everyday example</strong><span></span></p>
         <p class="sw-terrain__daily"><strong>What you might notice</strong><span></span></p>
         <a target="_blank" rel="noopener noreferrer"></a>
+        <div class="sw-terrain__verdict" hidden>
+          <h4>Where we stand</h4>
+          <strong></strong>
+          <p class="sw-terrain__verdict-reason"></p>
+          <p class="sw-terrain__verdict-change"></p>
+        </div>
       </div>
     </div>`;
 }
@@ -362,6 +368,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
   let width = 0;
   let height = 0;
   let scores;
+  let milestoneVerdicts;
   let contributionKey;
 
   function refreshScene() {
@@ -411,8 +418,19 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     const link = explanation.querySelector('a');
     link.href = concept.source;
     link.textContent = concept.sourceName + ' ↗';
+    renderVerdict();
     refreshScene();
     if (notify) onSelect?.(id, concept);
+  }
+
+  function renderVerdict() {
+    const result = milestoneVerdicts?.[selected];
+    const section = explanation.querySelector('.sw-terrain__verdict');
+    section.hidden = !result;
+    if (!result) return;
+    section.querySelector('strong').textContent = result.headline + ' · ' + result.confidence;
+    section.querySelector('.sw-terrain__verdict-reason').textContent = result.reason;
+    section.querySelector('.sw-terrain__verdict-change').textContent = result.change;
   }
 
   function setPath(id) {
@@ -479,8 +497,12 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     contributionsList.replaceChildren(...rows);
   }
 
-  function updateConfidence(nextScores, { status, method } = {}) {
+  function updateConfidence(nextScores, { status, method, verdicts } = {}) {
     scores = nextScores;
+    if (verdicts && verdicts !== milestoneVerdicts) {
+      milestoneVerdicts = verdicts;
+      renderVerdict();
+    }
     if (status) confidenceStatus.textContent = status;
     if (method) container.querySelector('.sw-terrain__method-copy').textContent = method;
     for (const button of pathButtons) {

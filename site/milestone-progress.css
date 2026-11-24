@@ -150,6 +150,30 @@
 }
 .milestone-progress__references { display: grid; gap: 1px; }
 
+.milestone-progress__verdict {
+  margin-top: 9px;
+  padding: 8px 9px;
+  border-left: 2px solid var(--progress-accent);
+  border-radius: 0 5px 5px 0;
+  background: #231a31;
+}
+.milestone-progress__verdict h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.milestone-progress__verdict p {
+  margin-top: 4px;
+  color: var(--dim);
+  font-size: 11px;
+  line-height: 1.48;
+}
+.milestone-progress__verdict .milestone-progress__certainty {
+  color: var(--progress-accent);
+  font: 500 9px/1.4 var(--mono);
+}
+
 @media (max-width: 940px) {
   .milestone-progress__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

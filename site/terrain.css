@@ -234,6 +234,10 @@
 .sw-terrain__contribution span { white-space: nowrap; }
 .sw-terrain__contributions a { color: #dfc9ff; text-decoration: underline; }
 .sw-terrain__example strong, .sw-terrain__daily strong { display: block; margin-top: 8px; color: #eee5f8; }
+.sw-terrain__verdict { border-top: 1px solid #473957; margin-top: 11px; padding-top: 9px; font-size: 11px; line-height: 1.5; }
+.sw-terrain__verdict h4 { margin: 0 0 3px; color: #efebf7; font-size: 13px; }
+.sw-terrain__verdict strong { color: #d9c5fc; }
+.sw-terrain__verdict p { margin: 4px 0 0; color: var(--terrain-muted); }
 .sw-terrain__concept {
   min-width: 0;
   border-left: 2px solid color-mix(in srgb, var(--selected-color, #f595ce) 67%, #262039);

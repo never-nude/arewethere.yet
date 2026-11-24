@@ -3,7 +3,7 @@ import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
 import { renderEvidenceLibrary } from './evidence-library.js';
-import { measureMilestoneProgress, renderMilestoneProgress } from './milestone-progress.js';
+import { getMilestoneVerdicts, measureMilestoneProgress, renderMilestoneProgress } from './milestone-progress.js';
 import { renderOrganizationSignals } from './organization-signals.js';
 import { renderOrganizationForecast } from './organization-forecast.js';
 import { renderDependencyTimeline } from './dependency-timeline.js';
@@ -24,6 +24,7 @@ const pageSize = 5;
 
 let dataset;
 let index;
+let milestoneVerdicts;
 let selectedDate;
 let rangeDays = 90;
 let filter = 'All';
@@ -263,6 +264,7 @@ function renderPathConfidence() {
   terrain.updateConfidence(score, {
     status: updates + trade,
     method: routeConfidenceMethod + ' The market is checked every minute while this page is open. Benchmark and research readings change when results are published. Scores show evidence support in points.',
+    verdicts: milestoneVerdicts,
   });
 }
 
@@ -384,6 +386,7 @@ async function reload() {
       const atLatest = !index || selectedDate === index.date;
       dataset = next;
       index = buildIndex(dataset);
+      milestoneVerdicts = getMilestoneVerdicts(index);
       if (atLatest) selectedDate = index.date;
       renderReading();
       renderMilestoneProgress(byId('milestone-progress'), index);

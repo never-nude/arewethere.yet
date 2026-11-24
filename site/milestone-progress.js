@@ -67,9 +67,27 @@ const rubrics = [
 ];
 
 const factorById = new Map(factorDefinitions.map((factor) => [factor.id, factor]));
+const verdictCriteria = {
+  agi: {
+    limits: 'A benchmark composite and selected long tasks provide evidence of capability on the tasks they cover.',
+    change: 'Independent evaluations would need to show skilled human performance across a representative range of unfamiliar tasks.',
+  },
+  asi: {
+    limits: 'These benchmarks describe performance on selected tasks. The comparison required here is against top human experts across fields.',
+    change: 'Independent evaluations would need to show consistent performance above leading human experts across many important domains.',
+  },
+  rsi: {
+    limits: 'These readings show AI contributing to parts of research. The successor’s role in improving a further generation remains the key criterion.',
+    change: 'An independent assessment would need to trace AI-led improvements to a stronger successor and show that successor improving the next generation.',
+  },
+  singularity: {
+    limits: 'The readings describe research tasks and the pace of capability gains at one lab. The site’s threshold requires evidence of causation across generations.',
+  },
+};
 const mounted = new WeakMap();
 const number = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 const fullDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const list = new Intl.ListFormat('en-US', { style: 'long', type: 'conjunction' });
 const clamp = (value) => Math.min(100, Math.max(0, value));
 const round = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
 
@@ -137,6 +155,58 @@ export function measureMilestoneProgress(index) {
   }));
 }
 
+function describeReading({ id, rawValue }) {
+  if (!Number.isFinite(rawValue)) return '';
+  const value = number.format(rawValue);
+  switch (id) {
+    case 'breadth': return 'The recent Epoch capability frontier is ' + value + ' ECI.';
+    case 'reliability': return 'METR estimates a task horizon of ' + value + ' hours at 80% success.';
+    case 'horizon': return 'METR estimates a task horizon of ' + value + ' hours at 50% success.';
+    case 'research-autonomy': return 'OpenAI reports ' + value + '% unassisted completion on selected internal research tasks.';
+    case 'research-acceleration': return 'METR estimates that Anthropic’s model capability gains ran at ' + value + '× the earlier pace.';
+    default: return '';
+  }
+}
+
+function singularityChange(index) {
+  const criteria = new Map((index?.threshold?.criteria ?? []).map((criterion) => [criterion.id, criterion]));
+  const remaining = [
+    ['workday', 'reliable workday-length autonomy'],
+    ['research', 'repeated end-to-end AI research'],
+    ['compounding', 'AI-led gains that accelerate across successive generations'],
+  ].filter(([id]) => criteria.get(id)?.status !== 'met').map(([, label]) => label);
+  if (!remaining.length) return 'Independent replications across labs would strengthen this verdict.';
+  return 'Independent evidence would need to establish ' + list.format(remaining) + '.';
+}
+
+function verdictsFor(index, milestones) {
+  return Object.fromEntries(milestones.map((milestone) => {
+    const { id, name, coverage, contributions } = milestone;
+    const verification = contributions.filter((input) => input.verification);
+    const verified = verification.length > 0 && verification.every((input) => input.points !== null) &&
+      (id !== 'singularity' || index?.threshold?.observed === true);
+    const readings = contributions.map(describeReading).filter(Boolean);
+    const { limits, change } = verdictCriteria[id];
+    const evidence = coverage + '% of rubric weight has evidence.';
+    const reason = verified
+      ? 'Independently sourced evidence in the dashboard meets this milestone’s required criterion. ' + evidence
+      : readings.length ? [...readings, limits, evidence].join(' ')
+        : 'The current snapshot lacks measured inputs for this milestone.';
+    return [id, {
+      headline: verified ? name + ' criterion documented' : name + ' remains unconfirmed',
+      confidence: verified ? 'High confidence under this definition' :
+        readings.length ? 'Limited confidence in the full claim' : 'Insufficient evidence to judge',
+      reason,
+      change: verified ? 'Independent replications would strengthen the verdict.' :
+        id === 'singularity' ? singularityChange(index) : change,
+    }];
+  }));
+}
+
+export function getMilestoneVerdicts(index) {
+  return verdictsFor(index, measureMilestoneProgress(index));
+}
+
 function element(tag, className, text) {
   const result = document.createElement(tag);
   if (className) result.className = className;
@@ -202,12 +272,13 @@ function mount(container) {
     example.append(element('strong', '', 'Everyday example '), rubric.example);
     const contributions = element('ul');
     const references = element('div', 'milestone-progress__references');
+    const verdict = element('section', 'milestone-progress__verdict');
     references.append(...rubric.links.map(([label, href]) => link(label + ' ↗', href)));
     details.append(element('summary', '', 'Rubric and evidence'), element('p', 'milestone-progress__definition', rubric.title + '.'),
-      example, contributions, references);
+      example, contributions, references, verdict);
     card.append(top, element('p', 'milestone-progress__target', rubric.target), meter, coverage, details);
     cards.append(card);
-    return { value, coverage, available, fill, contributions };
+    return { value, coverage, available, fill, contributions, verdict };
   });
   container.replaceChildren(heading, cards);
   const state = { date, refs };
@@ -219,7 +290,9 @@ export function renderMilestoneProgress(container, index) {
   const state = mounted.get(container) ?? mount(container);
   const asOf = Date.parse(index?.date);
   state.date.textContent = Number.isFinite(asOf) ? 'Evidence through ' + fullDate.format(asOf) : 'Waiting for data';
-  for (const [position, milestone] of measureMilestoneProgress(index).entries()) {
+  const milestones = measureMilestoneProgress(index);
+  const verdicts = verdictsFor(index, milestones);
+  for (const [position, milestone] of milestones.entries()) {
     const card = state.refs[position];
     const value = milestone.score === null ? '—' : number.format(milestone.score) + '%';
     card.value.textContent = value;
@@ -228,5 +301,12 @@ export function renderMilestoneProgress(container, index) {
     card.available.style.width = milestone.coverage + '%';
     card.fill.style.width = (milestone.score ?? 0) + '%';
     card.contributions.replaceChildren(...milestone.contributions.map(contributionRow));
+    const { headline, confidence, reason, change } = verdicts[milestone.id];
+    card.verdict.replaceChildren(
+      element('h4', '', headline),
+      element('p', 'milestone-progress__certainty', confidence),
+      element('p', '', reason),
+      element('p', '', change),
+    );
   }
 }
