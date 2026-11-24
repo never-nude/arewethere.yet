@@ -11,6 +11,9 @@
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./terrain.css">
+  <link rel="stylesheet" href="./agi-trajectory.css">
+  <link rel="stylesheet" href="./evidence-library.css">
+  <link rel="stylesheet" href="./milestone-progress.css">
   <link rel="stylesheet" href="./origins.css">
   <link rel="stylesheet" href="./watchtower.css">
   <link rel="stylesheet" href="./labs.css">
@@ -27,6 +30,7 @@
         <a href="#history">History</a>
         <a href="#scenario">Scenarios</a>
         <a href="#signals">Signals</a>
+        <a class="evidence-jump" href="#evidence">References</a>
       </nav>
       <button type="button" class="freshness" id="refresh" title="Check for a newer dataset"><span id="source-status" class="status-dot"></span><span id="source-time">Checking data</span><span aria-hidden="true">↻</span></button>
     </div>
@@ -37,29 +41,57 @@
       <section class="score-panel" aria-labelledby="overview-heading">
         <div class="score-content">
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
-          <h1 id="overview-heading">How close<br> are we?</h1>
+          <h1 id="overview-heading">How close is the Singularity?</h1>
           <p class="lede" id="definition">We’re watching for a sustained feedback loop in which AI-led research makes future systems better at AI research.</p>
           <div class="index-reading">
             <div class="reading-label"><span>EVIDENCE INDEX</span><a href="#methodology">How it works ↗</a></div>
+            <p class="index-explainer">Eight public signals earn weighted points. Benchmarked capability and progress in AI research carry most of the weight.</p>
             <div class="reading-value"><output id="current-score">—</output><span> / 100</span><span id="current-delta" class="change"></span></div>
             <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-valuemin="0" aria-valuemax="100">
               <span class="index-meter-fill" id="index-fill"></span>
               <span class="watch-tick" id="watch-tick"></span>
             </div>
             <div class="meter-key"><span id="score-coverage">Source coverage pending</span><span id="watch-line-label">Watch line</span></div>
+            <ul id="index-breakdown" class="index-breakdown" aria-label="Points by evidence category"></ul>
+            <p class="index-explainer index-footnote">The dashboard chooses the weights and targets. The watch line flags a score to investigate. Independent evidence determines whether the Singularity has occurred.</p>
           </div>
           <p class="threshold-state"><span class="threshold-light" aria-hidden="true"></span><span id="observed">Checking evidence gates</span></p>
+          <a class="milestone-jump" href="#milestone-progress">See the four milestone scores ↓</a>
         </div>
       </section>
       <section id="atlas" class="atlas-panel" aria-labelledby="atlas-heading">
         <div class="panel-heading atlas-heading">
-          <div><p class="eyebrow">THE CONCEPTS</p><h2 id="atlas-heading">The 3D map</h2></div>
+          <div><p class="eyebrow">THE CONCEPTS</p><h2 id="atlas-heading">The 3D map</h2><p>Possible paths and their assumptions <sup class="evidence-citations"><a href="#ref-6" aria-label="Reference 6">[6]</a><a href="#ref-13" aria-label="Reference 13">[13]</a></sup></p></div>
+          <a class="agi-jump" id="agi-jump" href="#agi" hidden>AGI trajectory ↓</a>
         </div>
         <div id="terrain" aria-label="Interactive map of AGI, superintelligence, recursive self-improvement, and singularity">
           <p class="placeholder">Loading the concept map…</p>
         </div>
+        <section id="agi" class="agi-panel" aria-labelledby="agi-title" hidden>
+          <div class="agi-heading">
+            <div>
+              <h3 id="agi-title">AGI trajectory</h3>
+              <p>How broadly measured AI capabilities are changing.</p>
+            </div>
+            <a class="agi-benchmark" href="https://epoch.ai/eci" target="_blank" rel="noopener noreferrer">Epoch benchmark ↗</a>
+          </div>
+          <div class="agi-readings"><p>Loading measured progress…</p></div>
+          <div class="agi-chart" hidden></div>
+          <div class="agi-chart-key" hidden><span>Measured frontier</span><span>Conditional projection</span></div>
+          <p class="agi-method"></p>
+          <p class="evidence-sidenote">Benchmark evidence <sup class="evidence-citations"><a href="#ref-1" aria-label="Reference 1">[1]</a><a href="#ref-2" aria-label="Reference 2">[2]</a></sup> · Market rules <sup class="evidence-citations"><a href="#ref-5" aria-label="Reference 5">[5]</a></sup> <a class="evidence-jump" href="#evidence">View all references ↓</a></p>
+          <div class="agi-market"><span>Loading market reading…</span></div>
+          <p class="agi-context">Researchers use different definitions of AGI. <a href="https://arxiv.org/abs/2311.02462" target="_blank" rel="noopener noreferrer">See how one framework distinguishes breadth, performance, and autonomy ↗</a></p>
+          <details class="agi-news">
+            <summary>Recent news</summary>
+            <ul class="agi-news-list"><li>Loading articles…</li></ul>
+            <p class="agi-next">For a result that could affect your work or community, check the independent evaluation and its limitations. Bring a concrete question about oversight to the people making deployment decisions, and revisit it as more evidence arrives.</p>
+          </details>
+        </section>
       </section>
     </div>
+
+    <section id="milestone-progress" class="section panel" aria-label="Evidence for four AI milestones"></section>
 
     <div class="tape-shell" aria-label="Current signal ticker">
       <div class="tape-heading"><span class="status-dot" aria-hidden="true"></span> SIGNALS</div>
@@ -68,11 +100,12 @@
 
     <section id="watch" class="section panel" aria-label="Acceleration watch">
       <div id="watchtower"><p class="placeholder">Checking acceleration signals…</p></div>
+      <p class="evidence-sidenote">Research assessments and methods <sup class="evidence-citations"><a href="#ref-8" aria-label="Reference 8">[8]</a><a href="#ref-9" aria-label="Reference 9">[9]</a><a href="#ref-10" aria-label="Reference 10">[10]</a><a href="#ref-11" aria-label="Reference 11">[11]</a></sup></p>
     </section>
 
     <section id="history" class="section" aria-labelledby="history-heading">
       <div class="section-heading">
-        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index.</p></div>
+        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index. <sup class="evidence-citations"><a href="#ref-12" aria-label="Reference 12">[12]</a><a href="#ref-13" aria-label="Reference 13">[13]</a><a href="#ref-14" aria-label="Reference 14">[14]</a></sup></p></div>
       </div>
       <div id="origins" class="panel history-origins"></div>
       <div class="history-grid">
@@ -176,6 +209,29 @@
           <ul id="sources-list" class="source-list"></ul>
           <p id="data-freshness" class="small-note">Last source check pending.</p>
         </div>
+      </div>
+    </section>
+
+    <section id="evidence" class="section panel evidence-library" aria-labelledby="evidence-heading">
+      <div class="section-heading"><div><h2 id="evidence-heading">References</h2><p>Read the studies, data, and reporting behind each claim. Numbered links throughout the site jump to the citation and explain what the source contributes.</p></div></div>
+      <div class="evidence-policy">
+        <h3>How sources are selected</h3>
+        <p>We check the author, publisher, editorial oversight, and relevance to the claim. We use peer-reviewed research and evaluations from qualified institutions for technical evidence. Primary records provide their own dated measurements, statements, or historical accounts.</p>
+        <p>For interpretation, we prefer bylined independent reporting that identifies its evidence and distinguishes reporting from opinion. Interviews and viewpoints are labeled. We apply the same standards across editorial perspectives. <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources" target="_blank" rel="noopener noreferrer">Wikipedia’s reliable-source guidance ↗</a> · <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources" target="_blank" rel="noopener noreferrer">Perennial source guidance ↗</a></p>
+      </div>
+      <nav class="evidence-contents" aria-label="Reference topics">
+        <a href="#evidence-capability">Capability</a>
+        <a href="#evidence-agi-timing">AGI timing</a>
+        <a href="#evidence-acceleration">Research acceleration</a>
+        <a href="#evidence-history">Origins</a>
+        <a href="#evidence-journalism">Reporting and perspectives</a>
+      </nav>
+      <div class="evidence-grid">
+        <article class="evidence-card" id="evidence-capability"></article>
+        <article class="evidence-card" id="evidence-agi-timing"></article>
+        <article class="evidence-card" id="evidence-acceleration"></article>
+        <article class="evidence-card" id="evidence-history"></article>
+        <article class="evidence-card" id="evidence-journalism"></article>
       </div>
     </section>
   </main>

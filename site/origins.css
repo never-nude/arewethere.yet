@@ -35,6 +35,164 @@
   font: 400 12px/1.35 var(--mono);
 }
 
+.hist-plot {
+  margin-top: 13px;
+  padding: 12px;
+  border: 1px solid #3f3454;
+  border-radius: 11px;
+  background: #151021a3;
+}
+
+.hist-plot__top, .hist-plot__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 7px 12px;
+}
+
+.hist-plot__top p {
+  margin-top: 3px;
+  color: var(--dim);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.hist-plot__actions {
+  display: flex;
+  gap: 5px;
+}
+
+.hist-plot__coordinates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0 7px;
+}
+
+.hist-plot__coordinates > div {
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #33244980;
+}
+
+.hist-plot__coordinates dt, .hist-plot__legend {
+  color: var(--subtle);
+  font: 400 10px/1.35 var(--mono);
+}
+
+.hist-plot__coordinates dd {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 590;
+  overflow-wrap: anywhere;
+}
+
+.hist-plot__stage {
+  position: relative;
+  height: clamp(240px, 36vw, 355px);
+  overflow: hidden;
+  border: 1px solid #40324e;
+  border-radius: 7px;
+  background: #110e1c;
+}
+
+.hist-plot__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.hist-plot__stage canvas:focus-visible { outline-offset: -3px; }
+.hist-plot__stage[data-dragging] canvas { cursor: grabbing; }
+
+.hist-plot__points {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hist-plot__points button {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: var(--hist-point);
+  background: transparent;
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.hist-plot__points button::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hist-point);
+  box-shadow: 0 0 7px var(--hist-point);
+}
+
+.hist-plot__points button span {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 50%;
+  display: block;
+  transform: translateX(-50%);
+  padding: 3px 4px;
+  border-radius: 4px;
+  background: #181122dd;
+  color: var(--hist-point);
+  white-space: nowrap;
+  pointer-events: none;
+  font: 400 9px/1.2 var(--mono);
+}
+
+.hist-plot__points button[data-crowded='true'] span { visibility: hidden; }
+.hist-plot__points button[data-latest='true'] span { visibility: visible; }
+.hist-plot__points button:hover, .hist-plot__points button:focus-visible,
+.hist-plot__points button[aria-pressed='true'] {
+  z-index: 1;
+  border-color: var(--hist-point);
+  background: #251b36a3;
+}
+.hist-plot__points button:hover span, .hist-plot__points button:focus-visible span,
+.hist-plot__points button[aria-pressed='true'] span { visibility: visible; }
+
+.hist-plot__legend { margin-top: 8px; }
+.hist-plot__legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+  gap: 4px 11px;
+  list-style: none;
+}
+.hist-plot__legend li { color: var(--dim); }
+.hist-plot__legend li::before {
+  content: '';
+  display: inline-block;
+  vertical-align: 1px;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: var(--hist-point);
+}
+
+@media (pointer: coarse) {
+  .hist-plot__stage canvas { touch-action: pan-y; }
+}
+
 .origins-control {
   margin-top: 14px;
   padding: 8px 12px 10px;
@@ -247,4 +405,9 @@
 @media (max-width: 430px) {
   .origins-header { display: grid; gap: 5px; }
   .origins-date { font-size: 11px; }
+  .hist-plot { padding: 9px; }
+  .hist-plot__coordinates { gap: 4px; }
+  .hist-plot__coordinates > div { padding: 5px; }
+  .hist-plot__coordinates dt { font-size: 9px; }
+  .hist-plot__coordinates dd { font-size: 11px; }
 }

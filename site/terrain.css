@@ -41,8 +41,9 @@
 .sw-terrain__legend > p, .sw-terrain__arrow-keys, .sw-terrain__arrow-keys > span { display: flex; align-items: center; gap: 6px; }
 .sw-terrain__grid-key { flex: none; width: 16px; height: 12px; border: 1px solid #a48bcc; border-radius: 2px; background: repeating-linear-gradient(0deg, #211835 0 3px, #674a8b 3px 4px); }
 .sw-terrain__arrow-keys { flex-wrap: wrap; gap: 7px 12px; }
-.sw-terrain__arrow-keys i { width: 16px; border-top: 2px dashed #c8adb7; }
-.sw-terrain__arrow-keys i.sw-terrain__solid { border-top: 2px solid #efafd5; }
+.sw-terrain__arrow-keys i { width: 16px; border-top: 2px dashed #a99cba; }
+.sw-terrain__arrow-keys i.sw-terrain__solid { border-top: 2px solid #a99cba; }
+.sw-terrain__arrow-keys i.sw-terrain__filled { height: 2px; border: 0; background: linear-gradient(90deg, #ffcb8c, #f595ce); }
 .sw-terrain__legend-hint { margin-top: 4px; color: var(--terrain-muted); font-size: 11px; line-height: 1.4; }
 
 .sw-terrain__markers { position: absolute; inset: 0; pointer-events: none; }
@@ -188,6 +189,8 @@
 .sw-terrain__path-buttons strong { font: 400 15px/1.3 var(--mono, monospace); white-space: nowrap; color: #f2e9ff; }
 .sw-terrain__path-buttons strong small, .sw-terrain__coverage { color: #d1c1e3; font: 400 9px/1.25 var(--mono, monospace); }
 .sw-terrain__coverage { display: block; margin-top: 3px; }
+.sw-terrain__route-intro { color: #d7cbe8; display: block; margin-top: 3px; font-weight: 400; }
+.sw-terrain__route-note { margin-top: 7px; color: var(--terrain-muted); font-size: 11px; line-height: 1.45; }
 .sw-terrain__path-buttons button:is(:hover, [aria-pressed='true']) {
   color: #f3e8ff;
   border-color: #7963ad;

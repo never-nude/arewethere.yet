@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { getSignals } from '../src/signals.mjs';
 import { buildIndex } from '../site/index-model.js';
+import { buildCompanionFeed } from '../site/companion-feed.js';
 
 const target = new URL('../dist-pages/', import.meta.url);
 
@@ -45,5 +46,6 @@ await cp(new URL('../site/', import.meta.url), target, { recursive: true });
 await cp(new URL('../licenses/', import.meta.url), new URL('licenses/', target), { recursive: true });
 await mkdir(new URL('data/', target), { recursive: true });
 await writeFile(new URL('data/signals.json', target), JSON.stringify(published));
+await writeFile(new URL('data/companion.json', target), JSON.stringify(buildCompanionFeed(published, result)));
 await writeFile(new URL('.nojekyll', target), '');
 console.log(`Pages bundle ready. ${published.sources.filter((source) => source.status === 'live').length} sources checked; ${result.history.length} index dates.`);

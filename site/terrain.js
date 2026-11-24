@@ -59,7 +59,8 @@ const compounding = {
 
 const paths = {
   breadth: {
-    label: 'General ability first',
+    label: 'Broad skills first',
+    intro: 'AI gets good at many kinds of work, then helps build stronger AI.',
     detail: 'Broadly superhuman performance includes broad general ability under these definitions. A single system could demonstrate both together.',
     legs: [
       { from: 'agi', to: 'asi', detail: 'Broad competence could deepen until the system outperforms top human experts across many fields.', example: 'A versatile assistant goes from helping you understand an electricity bill to consistently designing more efficient appliances than expert teams.' },
@@ -68,7 +69,8 @@ const paths = {
     ],
   },
   research: {
-    label: 'AI research first',
+    label: 'Research specialist first',
+    intro: 'AI starts building stronger AI while its other skills are still narrow.',
     detail: 'A specialized research system could start the feedback loop before broad AGI or ASI. Broader abilities could emerge later if research gains transfer to other domains.',
     legs: [compounding],
   },
@@ -91,20 +93,21 @@ function sceneMarkup() {
     <div class="sw-terrain__toolbar">
       <div class="sw-terrain__confidence-head"><h3>Path confidence</h3><span class="sw-terrain__confidence-status">Waiting for evidence</span></div>
       <div class="sw-terrain__path-buttons" role="group" aria-label="Choose a possible sequence">
-        ${Object.entries(paths).map(([id, path]) => `<button type="button" data-path="${id}" aria-pressed="false"><span>${path.label}<small class="sw-terrain__coverage"></small></span><strong><span data-route-score="${id}">—</span><small> / 100</small></strong></button>`).join('')}
+        ${Object.entries(paths).map(([id, path]) => `<button type="button" data-path="${id}" aria-pressed="false"><span><b>${path.label}</b><span class="sw-terrain__route-intro">${path.intro}</span><small class="sw-terrain__coverage"></small></span><strong><span data-route-score="${id}">—</span><small> / 100</small></strong></button>`).join('')}
       </div>
+      <p class="sw-terrain__route-note">These are two possible starting points. Either could reach the same feedback loop if gains keep accelerating. Scores summarize public evidence for each scenario.</p>
       <div class="sw-terrain__legend" id="terrain-legend">
         <p><span class="sw-terrain__grid-key" aria-hidden="true"></span><span><strong>Purple grid</strong> gives the scene depth. Spacing, height, and arrow length are illustrative.</span></p>
-        <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span></div>
+        <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span><span><i class="sw-terrain__filled" aria-hidden="true"></i>Evidence score</span></div>
       </div>
-      <p class="sw-terrain__legend-hint">Select a dot for its definition and what it could mean in everyday life.</p>
+      <p class="sw-terrain__legend-hint">Color fills each arrow to its evidence score. Select a dot for its definition and everyday effects.</p>
     </div>
     <div class="sw-terrain__stage">
-      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating concept landscape. Use arrow keys to rotate, plus or minus to zoom, and Home to reset."></canvas>
+      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating concept landscape. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
         ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
       </div>
-      <div class="sw-terrain__guide">Drag to rotate · Shift + drag to pan</div>
+      <div class="sw-terrain__guide">Left-drag to rotate · Right-drag or Shift-drag to pan</div>
       <div class="sw-terrain__camera" role="group" aria-label="View controls">
         <button type="button" data-camera="far" aria-label="Zoom out" title="Zoom out">−</button>
         <button type="button" data-camera="close" aria-label="Zoom in" title="Zoom in">+</button>
@@ -221,7 +224,7 @@ function paintGround(ctx, project, width, height) {
   ctx.stroke();
 }
 
-function paintLeg(ctx, { from: start, to: end, required }, project, active) {
+function paintLeg(ctx, { from: start, to: end, required }, project, active, score) {
   const [a, b] = [concepts[start], concepts[end]];
   const nodes = Array.from({ length: 33 }, (_, index) => {
     const t = index / 32;
@@ -233,29 +236,48 @@ function paintLeg(ctx, { from: start, to: end, required }, project, active) {
   const [endX, endY] = nodes.at(-1);
   if (Math.hypot(endX - startX, endY - startY) < 3) return;
 
-  const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
-  gradient.addColorStop(0, a.color);
-  gradient.addColorStop(1, b.color);
   ctx.save();
-  ctx.strokeStyle = gradient;
-  ctx.globalAlpha = active ? .13 : .08;
-  ctx.lineWidth = 6;
+  ctx.strokeStyle = '#a99cba';
+  ctx.globalAlpha = active ? .52 : .36;
+  ctx.lineWidth = required ? 1.65 : 1.4;
+  if (!required) ctx.setLineDash([4, 5]);
   trace(ctx, nodes);
-  ctx.stroke();
-  ctx.globalAlpha = active || required ? .95 : .65;
-  ctx.lineWidth = required ? 2.2 : 1.55;
-  if (!required) ctx.setLineDash([5, 5]);
   ctx.stroke();
   ctx.setLineDash([]);
 
   const [x, y] = nodes[21];
   const [prevX, prevY] = nodes[20];
   const angle = Math.atan2(y - prevY, x - prevX);
-  ctx.translate(x, y);
-  ctx.rotate(angle);
-  trace(ctx, [[-5, -3.6], [0, 0], [-5, 3.6]]);
-  ctx.strokeStyle = b.color;
+  trace(ctx, [[x - 5 * Math.cos(angle - .55), y - 5 * Math.sin(angle - .55)], [x, y],
+    [x - 5 * Math.cos(angle + .55), y - 5 * Math.sin(angle + .55)]]);
   ctx.stroke();
+
+  const fraction = Number.isFinite(score) ? clamp(score / 100, 0, 1) : 0;
+  if (fraction > 0) {
+    const lengths = nodes.slice(1).map(([x, y], i) => Math.hypot(x - nodes[i][0], y - nodes[i][1]));
+    let remaining = lengths.reduce((total, length) => total + length, 0) * fraction;
+    const filled = [nodes[0]];
+    for (const [i, length] of lengths.entries()) {
+      if (remaining < length) {
+        const ratio = remaining / length;
+        filled.push(nodes[i].map((value, axis) => value + (nodes[i + 1][axis] - value) * ratio));
+        break;
+      }
+      filled.push(nodes[i + 1]);
+      remaining -= length;
+    }
+    const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
+    gradient.addColorStop(0, a.color);
+    gradient.addColorStop(1, b.color);
+    ctx.strokeStyle = gradient;
+    ctx.globalAlpha = active ? .19 : .1;
+    ctx.lineWidth = 7;
+    trace(ctx, filled);
+    ctx.stroke();
+    ctx.globalAlpha = active ? 1 : .85;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -353,8 +375,10 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     const project = createProjector(camera, width, height);
     paintBackground(ctx, width, height);
     paintGround(ctx, project, width, height);
+    const steps = scores?.[pathId]?.steps ?? [];
     for (const leg of paths[pathId].legs) {
-      paintLeg(ctx, leg, project, selected === leg.from || selected === leg.to);
+      const step = steps.find(({ from, to }) => from === leg.from && to === leg.to);
+      paintLeg(ctx, leg, project, selected === leg.from || selected === leg.to, step?.score);
     }
     const sorted = [...conceptEntries].sort((a, b) => project(a[1].position)[2] - project(b[1].position)[2]);
     const positions = sorted.map(([id, concept]) => ({ id, ...paintConcept(ctx, concept, project, selected === id) }));
@@ -467,6 +491,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
       button.title = route?.score == null ? paths[path].label : route.coverage + '% evidence coverage. ' + route.summary;
     }
     renderRouteEvidence();
+    refreshScene();
   }
 
   function zoomBy(factor) {
@@ -509,29 +534,43 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
 
   if (ctx) {
     canvas.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      const mouseButton = event.pointerType === 'mouse' ? event.button : null;
+      if (mouseButton !== null && mouseButton !== 0 && mouseButton !== 2) return;
       canvas.setPointerCapture(event.pointerId);
-      pointers.set(event.pointerId, [event.clientX, event.clientY]);
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, mouseButton });
       stage.setAttribute('data-dragging', '');
     }, listener);
 
     canvas.addEventListener('pointermove', (event) => {
       const previous = pointers.get(event.pointerId);
       if (!previous) return;
-      const current = [event.clientX, event.clientY];
-      const [dx, dy] = current.map((value, i) => value - previous[i]);
-      pointers.set(event.pointerId, current);
-      const other = [...pointers].find(([id]) => id !== event.pointerId)?.[1];
+      const { x, y, mouseButton } = previous;
+      if (mouseButton !== null && !(event.buttons & (mouseButton === 2 ? 2 : 1))) {
+        stopPointer(event);
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        return;
+      }
+      const dx = event.clientX - x;
+      const dy = event.clientY - y;
+      previous.x = event.clientX;
+      previous.y = event.clientY;
+      const other = mouseButton === null
+        ? [...pointers].find(([id, pointer]) => id !== event.pointerId && pointer.mouseButton === null)?.[1]
+        : null;
       if (other) {
-        const before = Math.hypot(previous[0] - other[0], previous[1] - other[1]);
-        const after = Math.hypot(current[0] - other[0], current[1] - other[1]);
+        const before = Math.hypot(x - other.x, y - other.y);
+        const after = Math.hypot(previous.x - other.x, previous.y - other.y);
         if (before > 10 && after > 10) zoomBy(after / before);
         pan(dx / 2, dy / 2);
-      } else if (event.shiftKey) pan(dx, dy);
+      } else if (mouseButton === 2 || event.shiftKey) pan(dx, dy);
       else rotate(dx * -.009, dy * .006);
     }, listener);
 
     for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) canvas.addEventListener(event, stopPointer, listener);
+
+    canvas.addEventListener('contextmenu', (event) => {
+      if (event.button === 2) event.preventDefault();
+    }, listener);
 
     canvas.addEventListener('wheel', (event) => {
       if (document.activeElement !== canvas || event.ctrlKey) return;

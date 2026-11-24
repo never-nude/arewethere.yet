@@ -1,6 +1,9 @@
+import { mountHistoricTerrain } from './historic-terrain.js';
+
 const milestones = [
   {
     date: '1958-05-01',
+    lane: 'ideas',
     when: 'May 1958',
     label: 'Ulam',
     title: 'An early use of “singularity”',
@@ -13,6 +16,7 @@ const milestones = [
   },
   {
     date: '1965-12-31',
+    lane: 'ideas',
     when: '1965',
     label: 'Good',
     title: 'A machine could help design a better machine',
@@ -25,6 +29,7 @@ const milestones = [
   },
   {
     date: '1993-12-01',
+    lane: 'ideas',
     when: '1993',
     label: 'Vinge',
     title: 'The technological singularity takes shape',
@@ -37,6 +42,7 @@ const milestones = [
   },
   {
     date: '1997-05-11',
+    lane: 'capability',
     when: 'May 1997',
     label: 'Deep Blue',
     title: 'A computer beats the reigning chess champion',
@@ -51,6 +57,7 @@ const milestones = [
   },
   {
     date: '2020-05-28',
+    lane: 'capability',
     when: 'May 2020',
     label: 'GPT-3',
     title: 'One model adapts to multiple language tasks',
@@ -65,6 +72,7 @@ const milestones = [
   },
   {
     date: '2025-05-14',
+    lane: 'research',
     when: 'May 2025',
     label: 'AlphaEvolve',
     title: 'An AI agent helps improve AI training',
@@ -77,6 +85,7 @@ const milestones = [
   },
   {
     date: '2026-11-05',
+    lane: 'research',
     when: 'November 2026',
     label: 'AI research',
     title: 'Independent researchers assess AI-assisted R&D',
@@ -91,6 +100,7 @@ const milestones = [
   },
   {
     date: '2026-11-20',
+    lane: 'capability',
     when: 'November 2026',
     label: 'Task horizons',
     title: 'Independent evaluations measure longer tasks',
@@ -188,6 +198,7 @@ function mount(container) {
       </div>
       <output class="origins-date" for="origins-year"></output>
     </div>
+    <div class="hist-plot"></div>
     <div class="origins-control">
       <div class="origins-control-label">
         <label for="origins-year">Explore by year</label>
@@ -245,16 +256,24 @@ function mount(container) {
     buttons: [],
   };
   $('.origins-landmarks ol').append(...state.markers.map(({ item }) => item));
+  state.plot = mountHistoricTerrain($('.hist-plot'), (id) => {
+    state.selection = id === 'latest' ? state.current : id;
+    state.selectedPoint = id;
+    state.exact = true;
+    update(state);
+  });
 
   state.slider.addEventListener('input', () => {
     const year = Number(state.slider.value);
     const latest = year === Number(state.current.slice(0, 4));
     state.selection = latest ? state.current : `${year}-12-31`;
+    state.selectedPoint = latest ? 'latest' : null;
     state.exact = latest;
     update(state);
   });
   state.latest.addEventListener('click', () => {
     state.selection = state.current;
+    state.selectedPoint = 'latest';
     state.exact = true;
     update(state);
   });
@@ -266,6 +285,7 @@ function mount(container) {
     button.title = milestone.title;
     button.addEventListener('click', () => {
       state.selection = milestone.date;
+      state.selectedPoint = milestone.date;
       state.exact = true;
       update(state);
     });
@@ -310,6 +330,8 @@ function update(state) {
   }
 
   const crossing = index?.threshold?.observed ? index.threshold.crossingDate : null;
+  const evidenceDates = evidenceLandmarks.map((landmark) => landmark.milestone?.date ?? crossing);
+  const countAt = (date) => evidenceDates.filter((evidenceDate) => evidenceDate && evidenceDate <= date).length;
   let observed = 0;
   for (const [position, landmark] of evidenceLandmarks.entries()) {
     const date = landmark.milestone?.date ?? crossing;
@@ -323,6 +345,7 @@ function update(state) {
 
   const history = Array.isArray(index?.history) ? index.history : [];
   const frame = history.find(({ date }) => date === selection);
+  const latestFrame = history.find(({ date }) => date === current);
   const firstScoreDate = history.find(({ score }) => Number.isFinite(score))?.date;
   state.score.textContent = Number.isFinite(frame?.score)
     ? formatScore.format(frame.score) + ' / 100'
@@ -330,6 +353,39 @@ function update(state) {
   state.indexContext.textContent = Number.isFinite(frame?.score)
     ? `${frame.coverage}% source coverage. The daily score uses weighted recent signals.`
     : firstScoreDate ? `Daily score coverage starts ${fullDate(firstScoreDate)}.` : 'Waiting for daily score data.';
+
+  const points = milestones.filter(({ date }) => date <= current).map((event) => ({
+    id: event.date,
+    date: event.date,
+    label: event.label,
+    title: event.title,
+    when: event.when,
+    lane: event.lane,
+    count: countAt(event.date),
+  }));
+  if (Number.isFinite(latestFrame?.score)) {
+    points.push({
+      id: 'latest',
+      date: current,
+      label: 'Latest reading',
+      title: 'Latest evidence index',
+      when: fullDate(current),
+      lane: 'latest',
+      count: countAt(current),
+    });
+  }
+  const selectedPoint = points.find(({ id, date }) => id === state.selectedPoint && date === selection)
+    ?? points.findLast(({ date }) => date === selection);
+  state.plot.update({
+    points,
+    firstDate: milestones[0].date,
+    lastDate: current,
+    selectedDate: selection,
+    selectedId: selectedPoint?.id,
+    dateLabel,
+    count: observed,
+    total: evidenceLandmarks.length,
+  });
 }
 
 export function renderOrigins(container, { index } = {}) {
@@ -338,6 +394,7 @@ export function renderOrigins(container, { index } = {}) {
   const current = index?.date ?? new Date().toISOString().slice(0, 10);
   if (!state.selection || state.selection === state.current || state.selection > current) {
     state.selection = current;
+    state.selectedPoint = 'latest';
     state.exact = true;
   }
   state.current = current;

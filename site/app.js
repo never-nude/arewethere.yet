@@ -1,6 +1,9 @@
 import { buildIndex, projectThreshold } from './index-model.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
+import { renderAgiTrajectory } from './agi-trajectory.js';
+import { renderEvidenceLibrary } from './evidence-library.js';
+import { renderMilestoneProgress } from './milestone-progress.js';
 import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-confidence.js';
 import { renderOrigins } from './origins.js';
 import { renderWatchtower } from './watchtower.js';
@@ -95,6 +98,21 @@ function renderReading() {
   byId('observed').textContent = threshold.observed
     ? 'Evidence gates met · ' + date(threshold.crossingDate)
     : 'Singularity threshold unobserved';
+  const lanes = [
+    ['Capability', 'Capability'],
+    ['AI research', 'Research'],
+    ['Compute', 'Inputs'],
+    ['Market and releases', 'Expectations'],
+  ];
+  byId('index-breakdown').replaceChildren(...lanes.map(([label, lane]) => {
+    const factors = index.factors.filter((factor) => factor.lane === lane);
+    const weight = factors.reduce((sum, factor) => sum + factor.weight, 0);
+    const covered = factors.filter((factor) => Number.isFinite(factor.contribution));
+    const points = covered.length ? num(covered.reduce((sum, factor) => sum + factor.contribution, 0)) : '—';
+    const item = element('li');
+    item.append(element('span', '', label), element('strong', '', points + ' / ' + weight));
+    return item;
+  }));
 }
 
 function renderTicker() {
@@ -224,6 +242,7 @@ function renderPathConfidence() {
   const savedForecast = dataset.metrics.find(({ id }) => id === 'forecast');
   const liveIsNewer = forecast && (!forecast.observedAt || forecast.observedAt >= (savedForecast?.asOf ?? ''));
   const selectedForecast = liveIsNewer ? forecast : undefined;
+  renderAgiTrajectory(byId('agi'), dataset, selectedForecast);
   const score = scoreRoutes(index, { forecast: selectedForecast, openBreadth, closedBreadth });
   const lastTrade = selectedForecast?.observedAt ?? savedForecast?.asOf;
   const updates = liveMarketChecked ? 'Checked ' + shortTime.format(forecast.checkedAt ? new Date(forecast.checkedAt) : lastAttempt) : 'Market check unavailable · showing saved evidence';
@@ -354,6 +373,7 @@ async function reload() {
       index = buildIndex(dataset);
       if (atLatest) selectedDate = index.date;
       renderReading();
+      renderMilestoneProgress(byId('milestone-progress'), index);
       renderTicker();
       renderReplay();
       renderScenario();
@@ -423,7 +443,21 @@ const plots = new ResizeObserver(() => {
 plots.observe(byId('history-chart'));
 plots.observe(byId('scenario-chart'));
 
-const terrain = renderTerrain(byId('terrain'));
+const terrain = renderTerrain(byId('terrain'), {
+  onSelect: (id) => {
+    byId('agi').hidden = id !== 'agi';
+    byId('agi-jump').hidden = id !== 'agi';
+  },
+});
+function openLinkedAgi() {
+  if (window.location.hash !== '#agi') return;
+  terrain.select('agi');
+  requestAnimationFrame(() => byId('agi').scrollIntoView());
+}
+window.addEventListener('hashchange', openLinkedAgi);
+openLinkedAgi();
+renderEvidenceLibrary(byId('evidence'));
+renderMilestoneProgress(byId('milestone-progress'));
 renderOrigins(byId('origins'));
 renderWatchtower(byId('watchtower'));
 renderLabs(byId('labs-board'));
