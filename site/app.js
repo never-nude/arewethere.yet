@@ -3,7 +3,10 @@ import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
 import { renderEvidenceLibrary } from './evidence-library.js';
-import { renderMilestoneProgress } from './milestone-progress.js';
+import { measureMilestoneProgress, renderMilestoneProgress } from './milestone-progress.js';
+import { renderOrganizationSignals } from './organization-signals.js';
+import { renderOrganizationForecast } from './organization-forecast.js';
+import { renderDependencyTimeline } from './dependency-timeline.js';
 import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-confidence.js';
 import { renderOrigins } from './origins.js';
 import { renderWatchtower } from './watchtower.js';
@@ -92,7 +95,10 @@ function renderReading() {
   byId('index-fill').style.width = (score ?? 0) + '%';
   byId('watch-tick').style.left = threshold.target + '%';
   byId('score-coverage').textContent = coverage + '% source coverage';
-  byId('watch-line-label').textContent = threshold.target + ' watch line';
+  byId('watch-line-label').textContent = threshold.target + '-point watch line';
+  byId('index-gap').textContent = score == null ? '' : score < threshold.target
+    ? 'The current score is ' + num(threshold.target - score) + ' points below it.'
+    : 'The current score has reached it.';
   if (score != null) byId('index-meter').setAttribute('aria-valuenow', score);
   else byId('index-meter').removeAttribute('aria-valuenow');
   byId('observed').textContent = threshold.observed
@@ -184,6 +190,8 @@ function renderScenario() {
   const pace = Number(byId('scenario-pace').value);
   const result = projectThreshold(index, { monthlyPoints: pace });
   byId('scenario-rate').textContent = changeText(pace, '');
+  byId('leader-scenario-rate').textContent = changeText(pace, '');
+  byId('leader-scenario-pace').value = pace;
   setPressed('scenario-presets', 'pace', pace);
   scenarioPlot(byId('scenario-chart'), index, pace, result);
   let description = 'No watch-line crossing at this pace within five years.';
@@ -191,6 +199,11 @@ function renderScenario() {
   else if (result.status === 'no-reading') description = 'A current index reading is needed to plot this illustration.';
   else if (result.date && result.days <= 60 * 30.4375) description = 'Under this assumption, the score crosses on ' + date(result.date) + '.';
   byId('scenario-caption').textContent = description;
+  const milestones = measureMilestoneProgress(index);
+  renderOrganizationForecast(byId('organization-forecast'), {
+    payload: dataset, index, projection: result,
+    onDateChange: (day) => renderDependencyTimeline(byId('dependency-timeline'), index, result, milestones, day),
+  });
 }
 
 function renderGates() {
@@ -383,6 +396,7 @@ async function reload() {
       renderOrigins(byId('origins'), { index });
       renderWatchtower(byId('watchtower'), { index, payload: dataset });
       renderLabs(byId('labs-board'), { index, payload: dataset });
+      renderOrganizationSignals(byId('leaders'), { index, payload: dataset });
       renderPathConfidence();
     }
     renderSources();
@@ -413,6 +427,10 @@ byId('replay-back').addEventListener('click', () => selectReplay(Number(byId('re
 byId('replay-forward').addEventListener('click', () => selectReplay(Number(byId('replay').value) + 1));
 byId('replay-latest').addEventListener('click', () => selectReplay(datesInRange().length - 1));
 byId('scenario-pace').addEventListener('input', renderScenario);
+byId('leader-scenario-pace').addEventListener('input', (event) => {
+  byId('scenario-pace').value = event.target.value;
+  renderScenario();
+});
 byId('scenario-presets').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-pace]');
   if (!button) return;
@@ -461,6 +479,8 @@ renderMilestoneProgress(byId('milestone-progress'));
 renderOrigins(byId('origins'));
 renderWatchtower(byId('watchtower'));
 renderLabs(byId('labs-board'));
+renderOrganizationSignals(byId('leaders'));
+renderOrganizationForecast(byId('organization-forecast'));
 reload();
 setInterval(() => { if (!document.hidden) reload(); }, 60_000);
 document.addEventListener('visibilitychange', () => {

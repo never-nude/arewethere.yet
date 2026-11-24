@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="./agi-trajectory.css">
   <link rel="stylesheet" href="./evidence-library.css">
   <link rel="stylesheet" href="./milestone-progress.css">
+  <link rel="stylesheet" href="./organization-signals.css">
+  <link rel="stylesheet" href="./organization-forecast.css">
   <link rel="stylesheet" href="./origins.css">
   <link rel="stylesheet" href="./watchtower.css">
   <link rel="stylesheet" href="./labs.css">
@@ -27,6 +29,7 @@
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#atlas">3D Map</a>
         <a href="#watch">Watch</a>
+        <a href="#leaders">Leaders</a>
         <a href="#history">History</a>
         <a href="#scenario">Scenarios</a>
         <a href="#signals">Signals</a>
@@ -42,18 +45,18 @@
         <div class="score-content">
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
-          <p class="lede" id="definition">We’re watching for a sustained feedback loop in which AI-led research makes future systems better at AI research.</p>
+          <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The site watches for public evidence of that change.</p>
           <div class="index-reading">
             <div class="reading-label"><span>EVIDENCE INDEX</span><a href="#methodology">How it works ↗</a></div>
-            <p class="index-explainer">Eight public signals earn weighted points. Benchmarked capability and progress in AI research carry most of the weight.</p>
+            <p class="index-explainer">Think of this as a report card for the evidence. Eight signals earn points. Tests of what AI can do and whether it helps build better AI count the most.</p>
             <div class="reading-value"><output id="current-score">—</output><span> / 100</span><span id="current-delta" class="change"></span></div>
             <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-valuemin="0" aria-valuemax="100">
               <span class="index-meter-fill" id="index-fill"></span>
               <span class="watch-tick" id="watch-tick"></span>
             </div>
-            <div class="meter-key"><span id="score-coverage">Source coverage pending</span><span id="watch-line-label">Watch line</span></div>
+            <div class="meter-key"><span id="score-coverage">Source coverage pending</span><a id="watch-line-label" href="#watch-line">75-point watch line</a></div>
             <ul id="index-breakdown" class="index-breakdown" aria-label="Points by evidence category"></ul>
-            <p class="index-explainer index-footnote">The dashboard chooses the weights and targets. The watch line flags a score to investigate. Independent evidence determines whether the Singularity has occurred.</p>
+            <p class="index-explainer index-footnote"><strong>Why 75?</strong> That’s when we take a closer look. Both AI skills and AI research gains must contribute. <span id="index-gap"></span></p>
           </div>
           <p class="threshold-state"><span class="threshold-light" aria-hidden="true"></span><span id="observed">Checking evidence gates</span></p>
           <a class="milestone-jump" href="#milestone-progress">See the four milestone scores ↓</a>
@@ -141,6 +144,16 @@
       <div class="section-heading">
         <div><h2 id="labs-heading">Who’s moving the frontier?</h2><p>Compare developers’ strongest recent models and see how labs use AI to build AI.</p></div>
       </div>
+      <div id="leaders" class="panel leader-board" aria-label="Organization rankings by milestone"></div>
+      <section id="projected-leaders" class="panel leader-board" aria-label="Projected rankings and milestone dates">
+        <div class="scenario-control leader-pace">
+          <label for="leader-scenario-pace">Assumed index points per month</label>
+          <output id="leader-scenario-rate" for="leader-scenario-pace">+1</output>
+          <input id="leader-scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
+        </div>
+        <div id="organization-forecast"></div>
+        <div id="dependency-timeline" class="dependency-timeline"></div>
+      </section>
       <div id="labs-board"></div>
     </section>
 
@@ -203,6 +216,11 @@
           <p>Confirming the singularity calls for documented, independently assessed evidence that holds up across multiple generations.</p>
           <p>AGI describes breadth, superintelligence describes depth of performance across domains, and recursive self-improvement describes a process. Narrow AI research can accelerate before broad AGI. The map shows possible orders.</p>
           <a href="https://deepmind.google/research/publications/66938/" target="_blank" rel="noopener noreferrer">DeepMind’s AGI framework ↗</a>
+          <div class="watch-line-explainer" id="watch-line">
+            <h3>The 75-point watch line</h3>
+            <p>The dashboard uses 75 out of 100 as a cue to check the evidence more closely. At that point, we’d look for researchers outside the AI companies to verify that AI can handle longer tasks, do whole research projects, and keep speeding up the next round of AI improvements.</p>
+            <p>Even if all the other signals earned full points, reaching 75 would still require at least 25 points for what AI can do and 10 points for its role in AI research.</p>
+          </div>
         </div>
         <div>
           <h3>Public sources</h3>
@@ -219,6 +237,10 @@
         <p>We check the author, publisher, editorial oversight, and relevance to the claim. We use peer-reviewed research and evaluations from qualified institutions for technical evidence. Primary records provide their own dated measurements, statements, or historical accounts.</p>
         <p>For interpretation, we prefer bylined independent reporting that identifies its evidence and distinguishes reporting from opinion. Interviews and viewpoints are labeled. We apply the same standards across editorial perspectives. <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources" target="_blank" rel="noopener noreferrer">Wikipedia’s reliable-source guidance ↗</a> · <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources" target="_blank" rel="noopener noreferrer">Perennial source guidance ↗</a></p>
       </div>
+      <aside class="readiness" aria-label="How to stay ready">
+        <blockquote>“Stay ready so you don’t have to get ready.”</blockquote>
+        <p>Check the date, scope, and uncertainty of a new result. Look for independent follow-up. At work or in your community, ask who reviews AI-assisted decisions and what would trigger a change in practice.</p>
+      </aside>
       <nav class="evidence-contents" aria-label="Reference topics">
         <a href="#evidence-capability">Capability</a>
         <a href="#evidence-agi-timing">AGI timing</a>
@@ -236,6 +258,6 @@
     </section>
   </main>
 
-  <footer class="wrap footer"><a href="#main">Singularity Watch ↑</a><a href="https://github.com/never-nude/singularity" target="_blank" rel="noopener noreferrer">Source code ↗</a></footer>
+  <footer class="wrap footer"><a href="#main">Singularity Watch ↑</a><a href="https://github.com/never-nude/arewethere.yet" target="_blank" rel="noopener noreferrer">Source code ↗</a></footer>
 </body>
 </html>

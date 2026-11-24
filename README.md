@@ -1,6 +1,6 @@
 # Singularity Watch
 
-An interactive observatory for public evidence of self-accelerating AI. The site publishes at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
+An interactive observatory for public evidence of self-accelerating AI. The site publishes at [never-nude.github.io/arewethere.yet](https://never-nude.github.io/arewethere.yet/). DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
 
 ## Development
 
