@@ -32,10 +32,25 @@ const events = [...new Map([
   ...(previous?.events ?? []).map((event) => [event.url.replace(/\/$/, ''), event]),
   ...current.events.map((event) => [event.url.replace(/\/$/, ''), event]),
 ]).values()].sort((left, right) => right.date.localeCompare(left.date)).slice(0, 120);
+const incidentCutoff = new Date(Date.parse(current.checkedAt) - 365 * 86_400_000).toISOString();
+const liveIncidentProviders = new Set(current.incidentSources.filter(({ status }) => status === 'live').map(({ organization }) => organization));
+const savedIncidents = (previous?.incidents ?? []).filter((incident) =>
+  incident.startedAt >= incidentCutoff && (incident.status === 'resolved' || !liveIncidentProviders.has(incident.organization)));
+const incidents = [...new Map([...savedIncidents, ...current.incidents].map((incident) => [incident.id, incident])).values()]
+  .sort((left, right) => right.startedAt.localeCompare(left.startedAt));
+const previousIncidentSources = new Map((previous?.incidentSources ?? []).map((source) => [source.organization, source]));
+const incidentSources = current.incidentSources.map((source) => {
+  const prior = previousIncidentSources.get(source.organization);
+  const oldestDate = incidents.findLast((incident) => incident.organization === source.organization)?.date ?? null;
+  const lastSuccessAt = source.lastSuccessAt ?? prior?.lastSuccessAt ?? null;
+  return { ...source, oldestDate, lastSuccessAt, status: source.status === 'live' || !lastSuccessAt ? source.status : 'snapshot' };
+});
 const published = {
   ...current,
   metrics: preserveMetrics,
   events,
+  incidents,
+  incidentSources,
   delivery: { kind: 'github-pages', builtAt: new Date().toISOString(), checkIntervalHours: 1 },
 };
 

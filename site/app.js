@@ -13,6 +13,7 @@ import { renderDependencyTimeline } from './dependency-timeline.js';
 import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-confidence.js';
 import { renderOrigins } from './origins.js';
 import { renderWatchtower } from './watchtower.js';
+import { renderWatchHistory } from './watch-history.js';
 import { renderLabs } from './labs.js';
 import { installGlossary } from './glossary.js';
 
@@ -439,6 +440,7 @@ async function reload() {
       renderNews();
       renderOrigins(byId('origins'), { index });
       renderWatchtower(byId('watchtower'), { index, payload: dataset });
+      renderWatchHistory(byId('watchdog-board'), { index, payload: dataset });
       renderLabs(byId('labs-board'), { index, payload: dataset });
       renderOrganizationSignals(byId('leaders'), { index, payload: dataset });
       renderPathConfidence();

@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="./organization-forecast.css">
   <link rel="stylesheet" href="./origins.css">
   <link rel="stylesheet" href="./watchtower.css">
+  <link rel="stylesheet" href="./watch-history.css">
   <link rel="stylesheet" href="./labs.css">
   <script type="module" src="./app.js"></script>
 </head>
@@ -30,7 +31,7 @@
       <a href="#main" class="wordmark"><span class="wordmark-icon" aria-hidden="true">✧</span> Singularity Watch</a>
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#atlas">Milestone Map</a>
-        <a href="#watch">Watch</a>
+        <a href="#watchdog">Watchdog</a>
         <a href="#leaders">Leaders</a>
         <a href="#history">History</a>
         <a href="#scenario">Scenarios</a>
@@ -47,7 +48,7 @@
         <div class="score-content">
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
-          <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The site watches for public evidence of that change.</p>
+          <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? Check what researchers have measured and put the headlines in context.</p>
           <p class="term-help">Hover or tap a dotted term for a definition. Try ECI.</p>
           <div class="watch-clock">
             <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
@@ -130,6 +131,15 @@
       <div class="tape-heading"><span class="status-dot" aria-hidden="true"></span> SIGNALS</div>
       <div id="tape" class="tape" tabindex="0"><p class="placeholder">Loading measurements…</p></div>
     </div>
+
+    <section id="watchdog" class="section panel watchdog-panel" aria-labelledby="watchdog-heading">
+      <div class="section-heading">
+        <div><h2 id="watchdog-heading">AI watchdog</h2><p>Zoom in on a date to see measured changes, new models, and service incidents.</p></div>
+        <a class="evidence-jump" href="#watch">Acceleration watch ↓</a>
+      </div>
+      <div id="watchdog-board"><p class="placeholder">Loading the daily record…</p></div>
+      <p class="small-note">The watchdog uses peer-reviewed research and independent evaluations for measurements, official records for service incidents, and vetted reporting for context. <a class="evidence-jump" href="#evidence">See the source standards ↓</a></p>
+    </section>
 
     <section id="human-evidence" class="section panel human-evidence" aria-labelledby="human-evidence-heading">
       <div class="section-heading">
@@ -298,11 +308,11 @@
         <h3>How sources are selected</h3>
         <p>We check the author, publisher, editorial oversight, and relevance to the claim. We use peer-reviewed research and evaluations from qualified institutions for technical evidence. Primary records provide their own dated measurements, statements, or historical accounts.</p>
         <p>For interpretation, we prefer bylined independent reporting that identifies its evidence and distinguishes reporting from opinion. Interviews and viewpoints are labeled. We apply the same standards across editorial perspectives. <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources" target="_blank" rel="noopener noreferrer">Wikipedia’s reliable-source guidance ↗</a> · <a href="https://en.wikipedia.org/wiki/Wikipedia:Reliable_sources/Perennial_sources" target="_blank" rel="noopener noreferrer">Perennial source guidance ↗</a></p>
-        <p>Bot accounts, AI-generated articles, and unattributed advocacy are ineligible as references. The published benchmark data and each reporter’s article link back to the original source.</p>
+        <p>We exclude the New York Post, Newsmax, bot accounts, AI-generated articles, and unattributed advocacy. The benchmark data, journal papers, and reporting link to their original sources.</p>
       </div>
       <aside class="readiness" aria-label="How to stay ready">
         <blockquote>“Stay ready so you don’t have to get ready.”</blockquote>
-        <p>Check the date, scope, and uncertainty of a new result. Look for independent follow-up. At work or in your community, ask who reviews AI-assisted decisions and what would trigger a change in practice.</p>
+        <p>When a headline sounds alarming, check what was measured and where the finding applies. Look for independent follow-up. At work or in your community, ask who reviews AI-assisted decisions and what would trigger a change in practice.</p>
       </aside>
       <nav class="evidence-contents" aria-label="Reference topics">
         <a href="#evidence-capability">Capability</a>

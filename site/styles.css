@@ -141,6 +141,8 @@ h1 { margin-top: 8px; font-size: clamp(36px, 4.35vw, 65px); font-weight: 690; li
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 14px; }
 .section-heading h2 { margin-top: 3px; font-size: clamp(27px, 3.6vw, 43px); line-height: 1.07; letter-spacing: -.064em; font-weight: 670; }
 .section-heading p:not(.eyebrow) { color: var(--dim); font-size: 14px; margin-top: 5px; line-height: 1.5; }
+.watchdog-panel { padding: clamp(14px, 2vw, 22px); }
+.watchdog-panel > .section-heading { flex-wrap: wrap; }
 .human-evidence { padding: clamp(14px, 2vw, 22px); }
 .human-evidence-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .human-evidence-grid article { display: grid; align-content: start; gap: 8px; padding: 12px; border: 1px solid #493a5d; border-radius: 8px; background: #211a31; }

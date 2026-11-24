@@ -6,6 +6,7 @@ import {
   sourceDefinitions,
   studyDate,
 } from "./snapshot.js";
+import { getProviderIncidents } from './provider-incidents.mjs';
 
 const metrAssets = "https://metr.org/assets/images/q4-2026-capability-update/";
 const marketId = "hh2bXhwKDTioZ7KtGKfC";
@@ -353,7 +354,7 @@ function feedResult(definition, result) {
 export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
   const checkedAt = now.toISOString();
   const startDay = new Date(now.getTime() - 365 * day).toISOString().slice(0, 10);
-  let [h50, h80, epoch, eci, manifold, openai, anthropic, metrNews] = await Promise.allSettled([
+  let [h50, h80, epoch, eci, manifold, openai, anthropic, metrNews, providerIncidents] = await Promise.allSettled([
     getBenchmark(fetcher, "horizon", metrAssets + "cad6b5d98261f80c.json", "TH1.1 and TH2"),
     getBenchmark(fetcher, "reliability", metrAssets + "1dfa453dcd603b2d.json", "TH2 (Verifiable)"),
     getCompute(fetcher),
@@ -362,6 +363,7 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
     getFeed(fetcher, sourceDefinitions.openai, "https://openai.com/news/rss.xml", startDay),
     getAnthropicReleases(fetcher, startDay),
     getFeed(fetcher, sourceDefinitions.metrNews, "https://metr.org/feed.xml", startDay),
+    getProviderIncidents(fetcher, checkedAt),
   ]);
   const benchmarkReports = metrNews.value?.benchmarkUpdates?.sort((a, b) => byDate(b, a)) ?? [];
   const latestBenchmarkReport = benchmarkReports[0];
@@ -412,6 +414,8 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
     events,
     releaseEvents,
     releaseStart,
+    incidents: providerIncidents.value?.incidents ?? [],
+    incidentSources: providerIncidents.value?.incidentSources ?? [],
     sources: [
       benchmarkSource,
       sourceResult(sourceDefinitions.epoch, compute.status, compute.asOf),
