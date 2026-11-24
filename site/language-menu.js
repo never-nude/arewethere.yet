@@ -38,12 +38,12 @@ function pageInLanguage(code) {
 class SiteLanguageMenu extends HTMLElement {
   connectedCallback() {
     if (this.firstElementChild) return;
-    const form = document.createElement('form');
     const label = document.createElement('label');
     label.append('Language');
     const select = document.createElement('select');
     select.name = 'language';
-    select.setAttribute('aria-label', 'Page language');
+    select.setAttribute('aria-label', 'Change page language');
+    select.title = 'Selecting a language opens a Google translation. Choose English for the original.';
     // Autonyms must retain their own language and script when the rest of the page changes.
     select.translate = false;
     select.className = 'notranslate';
@@ -62,18 +62,15 @@ class SiteLanguageMenu extends HTMLElement {
     }
     select.append(translations);
     select.value = active;
-    const apply = document.createElement('button');
-    apply.type = 'submit';
-    apply.textContent = 'Go';
-    apply.title = 'Open the selected language with Google Translate, or return to the English original';
-    apply.setAttribute('aria-label', apply.title);
     label.append(select);
-    form.append(label, apply);
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      if (select.value !== currentLanguage()) location.assign(pageInLanguage(select.value).href);
-    });
-    this.append(form);
+    this.append(label);
+    // The translation service may replace label contents. Listen on the host.
+    this.onchange = (event) => {
+      const choice = event.target;
+      if (choice.matches('select[name="language"]') && choice.value !== currentLanguage()) {
+        location.assign(pageInLanguage(choice.value).href);
+      }
+    };
   }
 }
 
