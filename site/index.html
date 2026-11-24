@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#100e1a">
   <meta name="description" content="Explore the evidence for self-accelerating AI through a milestone map, historical replay, signal index, and interactive scenarios.">
   <title>Singularity Watch</title>
-  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="./favicon.svg?v=2" type="image/svg+xml">
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./glossary.css">
@@ -30,7 +30,7 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="topbar">
     <div class="wrap header-inner">
-      <a href="#main" class="wordmark"><span class="wordmark-icon" aria-hidden="true">✧</span> Singularity Watch</a>
+      <a href="#main" class="wordmark"><img class="wordmark-icon" src="./favicon.svg?v=2" width="30" height="30" alt=""> Singularity Watch</a>
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#atlas">Milestone Map</a>
         <a href="#watchdog">Watchdog</a>
@@ -53,22 +53,23 @@
       </header>
       <section class="overview-index" aria-labelledby="evidence-index-heading">
         <h2 id="evidence-index-heading" class="reading-label">Evidence index</h2>
-        <div class="reading-value"><output id="current-score" data-waiting>Loading score…</output><span> / 100</span></div>
+        <div class="reading-value"><output id="current-score" aria-describedby="index-score-meaning" data-waiting>Loading score…</output><span> / 100</span></div>
+        <p class="reading-explainer" id="index-score-meaning">This is how many of 100 possible points the latest public evidence earns. The Watch scores eight measures, and the total can rise or fall as those readings change.</p>
         <div class="reading-meta"><span id="current-delta" class="change"></span><a href="#methodology">How it works ↗</a></div>
-        <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-valuemin="0" aria-valuemax="100">
+        <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-describedby="index-watch-meaning" aria-valuemin="0" aria-valuemax="100">
           <span class="index-meter-fill" id="index-fill"></span>
           <span class="watch-tick" id="watch-tick"></span>
         </div>
         <div class="meter-scale" aria-hidden="true"><span>0</span><span>100 points</span></div>
         <div class="meter-key"><span id="score-coverage">Source coverage pending</span><a id="watch-line-label" href="#watch-line">75-point watch line</a></div>
+        <p class="reading-explainer reading-watch" id="index-watch-meaning"><strong>The vertical mark means take a closer look.</strong> We chose 75 points because reaching it requires points for both AI skills and AI research. Confirming the Singularity takes separate, independent evidence. <span id="index-gap"></span></p>
       </section>
       <section class="score-panel" aria-labelledby="readout-heading">
         <div class="score-content">
           <h2 id="readout-heading">What the score measures</h2>
-          <p class="lede" id="definition">Eight public signals earn points on a scale of 0 to 100. Tests of what AI can do and whether it helps build better AI carry the most weight.</p>
+          <p class="lede" id="definition">Tests of what AI can do and whether it helps build better AI carry the most weight. Below are the points earned in each category and the maximum each can contribute.</p>
           <p class="index-explainer">The Singularity would mean that AI helps build better successors so effectively that development keeps speeding up across generations.</p>
           <ul id="index-breakdown" class="index-breakdown" aria-label="Points by evidence category"></ul>
-          <p class="index-explainer index-footnote"><strong>Why 75?</strong> That’s when we take a closer look. Both AI skills and AI research gains must contribute. <span id="index-gap"></span></p>
           <p class="threshold-state"><span class="threshold-light" aria-hidden="true"></span><span id="observed">Checking evidence gates</span></p>
           <div class="score-actions">
             <a href="#milestone-progress">See the four milestone scores ↓</a>
