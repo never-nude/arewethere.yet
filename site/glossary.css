@@ -1,0 +1,24 @@
+.glossary-term {
+  text-decoration: underline dotted currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+
+.glossary-term[tabindex] { cursor: help; }
+.glossary-term:hover { text-decoration-style: solid; }
+
+.glossary-popup {
+  position: fixed;
+  z-index: 20;
+  width: min(280px, calc(100vw - 20px));
+  padding: 10px 12px;
+  border: 1px solid #766195;
+  border-radius: 9px;
+  background: #231b33;
+  box-shadow: 0 8px 24px #0b0813aa;
+  color: var(--ink);
+  font: 400 13px/1.4 Geist, system-ui, sans-serif;
+}
+
+.glossary-popup strong { display: block; margin-bottom: 3px; color: #e3d2ff; font-weight: 660; }
+.glossary-popup p { margin: 0; }

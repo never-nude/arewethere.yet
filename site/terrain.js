@@ -3,7 +3,6 @@ const concepts = {
     label: 'AGI',
     title: 'Artificial general intelligence',
     color: '#59e0c9',
-    position: [-1.02, .29, -1.02],
     description: 'An AI system that performs competently across many kinds of tasks, including unfamiliar ones. Researchers disagree on where to draw the line.',
     implication: 'Breadth and depth can grow at different rates. An AI can be useful across many fields while specialists still outperform it in each.',
     example: 'Imagine one assistant that can help with a lease, tutor a teenager, plan an accessible trip, and pick up a new kind of task from a few instructions.',
@@ -15,7 +14,6 @@ const concepts = {
     label: 'ASI',
     title: 'Artificial superintelligence',
     color: '#b69bff',
-    position: [1.05, .92, -.91],
     description: 'AI that substantially exceeds the strongest human performance across many important cognitive domains.',
     implication: 'ASI refers to performance. Self-awareness is a separate question. Human-led engineering could produce superintelligence, as could repeated AI-led improvements.',
     example: 'Imagine a system that consistently beats specialist teams at designing better batteries, finding errors in complex software, and reasoning through new scientific problems.',
@@ -27,7 +25,6 @@ const concepts = {
     label: 'Self-improvement',
     title: 'Recursive self-improvement',
     color: '#ffcb8c',
-    position: [-.96, .70, 1.02],
     description: 'An AI system helps make a more capable version or successor, which can in turn make further improvements. Research teams can supervise the loop.',
     implication: 'A narrow AI research specialist could contribute to this loop before broad AGI. Each round still depends on usable ideas, compute, evaluation, and other resources.',
     example: 'A coding assistant helps developers build and test a better coding assistant. The successor then does more of the work on the next version.',
@@ -39,7 +36,6 @@ const concepts = {
     label: 'Singularity',
     title: 'The technological singularity',
     color: '#f595ce',
-    position: [.99, 1.48, 1.16],
     description: 'In this observatory, the singularity is the point where AI-led research makes successive AI systems better at research, driving sustained acceleration across generations.',
     implication: 'The evidence would need to connect gains in AI research ability to increasingly fast improvements over multiple generations. Progress could plateau before this happens.',
     example: 'Imagine a workshop whose tools help make better tools so reliably that each generation takes less time to design and delivers a bigger improvement.',
@@ -77,9 +73,22 @@ const paths = {
 };
 
 const conceptEntries = Object.entries(concepts);
-const initialCamera = { yaw: .31, pitch: .39, zoom: 1, panX: 0, panY: 0 };
+const initialCamera = { yaw: .68, pitch: .39, zoom: 1, panX: 0, panY: 0 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const confidenceNumber = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
+const axes = [
+  { id: 'x', label: 'First supporting measure', color: '#82dbe5' },
+  { id: 'y', label: 'Independent confirmation', color: '#d1b2ff' },
+  { id: 'z', label: 'Second supporting measure', color: '#ffc78f' },
+];
+const plotEdge = 1.3;
+const lowerCorner = axes.map(() => -plotEdge);
+const upperCorner = axes.map(() => plotEdge);
+const ticks = [0, 25, 50, 75, 100];
+
+function plotValue(percent) {
+  return -plotEdge + 2 * plotEdge * clamp(percent, 0, 100) / 100;
+}
 
 function node(tag, name, content) {
   const item = document.createElement(tag);
@@ -97,13 +106,17 @@ function sceneMarkup() {
       </div>
       <p class="sw-terrain__route-note">These are two possible starting points. Either could reach the same feedback loop if gains keep accelerating. Scores summarize public evidence for each scenario.</p>
       <div class="sw-terrain__legend" id="terrain-legend">
-        <p><span class="sw-terrain__grid-key" aria-hidden="true"></span><span><strong>Purple grid</strong> gives the scene depth. Spacing, height, and arrow length are illustrative.</span></p>
+        <ul class="sw-terrain__axes" aria-label="Graph axes, 0 to 100 percent of available evidence credit">
+          ${axes.map(({ id, label, color }) => `<li style="--axis-color:${color}"><b>${id.toUpperCase()}</b> ${label}</li>`).join('')}
+        </ul>
+        <p>Each axis shows how many of its available points the evidence earned, from 0% to 100%. The supporting tests differ by milestone. Points on the floor still await independent confirmation.</p>
+        <p>Positions and distances reflect evidence credit. Arrows show possible sequences and fill to their support scores. Select a milestone to see its calculations.</p>
         <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span><span><i class="sw-terrain__filled" aria-hidden="true"></i>Evidence score</span></div>
       </div>
-      <p class="sw-terrain__legend-hint">Color fills each arrow to its evidence score. Select a dot for its definition and everyday effects.</p>
     </div>
-    <div class="sw-terrain__stage">
-      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating concept landscape. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
+    <div class="sw-terrain__stage" data-waiting>
+      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating 3D milestone evidence graph. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
+      <p class="sw-terrain__scene-message">Waiting for measured evidence</p>
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
         ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
       </div>
@@ -129,27 +142,35 @@ function sceneMarkup() {
       <div class="sw-terrain__concept" aria-live="polite" aria-atomic="true">
         <p class="sw-terrain__overline">Selected concept</p>
         <h3></h3>
+        <div class="sw-terrain__coordinates" hidden>
+          <h4>Position in the evidence graph</h4>
+          <p>Each coordinate is credited points ÷ available points × 100.</p>
+          <ul></ul>
+        </div>
         <p class="sw-terrain__definition"></p>
         <p class="sw-terrain__implication"></p>
         <p class="sw-terrain__example"><strong>Everyday example</strong><span></span></p>
         <p class="sw-terrain__daily"><strong>What you might notice</strong><span></span></p>
-        <a target="_blank" rel="noopener noreferrer"></a>
+        <a class="sw-terrain__concept-source" target="_blank" rel="noopener noreferrer"></a>
         <div class="sw-terrain__verdict" hidden>
           <h4>Where we stand</h4>
           <strong></strong>
           <p class="sw-terrain__verdict-reason"></p>
+          <p class="sw-terrain__verdict-human"></p>
           <p class="sw-terrain__verdict-change"></p>
         </div>
       </div>
     </div>`;
 }
 
-const terrainLines = [];
-for (let row = 0; row <= 18; row += 1) {
-  const position = -2.05 + row * 4.1 / 18;
-  terrainLines.push([[-2.05, -.07, position], [2.05, -.07, position]]);
-  terrainLines.push([[position, -.07, -2.05], [position, -.07, 2.05]]);
-}
+const floor = [lowerCorner, [plotEdge, -plotEdge, -plotEdge], [plotEdge, -plotEdge, plotEdge], [-plotEdge, -plotEdge, plotEdge]];
+const terrainLines = ticks.flatMap((tick) => {
+  const position = plotValue(tick);
+  return [
+    [[-plotEdge, -plotEdge, position], [plotEdge, -plotEdge, position]],
+    [[position, -plotEdge, -plotEdge], [position, -plotEdge, plotEdge]],
+  ];
+});
 
 const stars = Array.from({ length: 118 }, (_, index) => ({
   x: ((index * 73 + 23) % 193) / 193,
@@ -163,9 +184,9 @@ function createProjector(camera, width, height) {
   const sinYaw = Math.sin(camera.yaw);
   const cosPitch = Math.cos(camera.pitch);
   const sinPitch = Math.sin(camera.pitch);
-  const scale = Math.min(width * .215, height * .328) * camera.zoom;
+  const scale = Math.min(width * .185, height * .19) * camera.zoom;
   const originX = width * .51 + camera.panX;
-  const originY = height * .68 + camera.panY;
+  const originY = height * .44 + camera.panY;
 
   return ([x, y, z]) => {
     const horizontal = x * cosYaw - z * sinYaw;
@@ -203,14 +224,13 @@ function trace(ctx, points) {
 }
 
 function paintGround(ctx, project, width, height) {
-  const corners = [[-2.05, -.07, -2.05], [-2.05, -.07, 2.05], [2.05, -.07, 2.05], [2.05, -.07, -2.05]];
-  trace(ctx, corners.map(project));
+  trace(ctx, floor.map(project));
   ctx.closePath();
-  const floor = ctx.createLinearGradient(0, height * .3, width, height);
-  floor.addColorStop(0, 'rgba(35, 153, 165, .14)');
-  floor.addColorStop(.48, 'rgba(142, 98, 252, .12)');
-  floor.addColorStop(1, 'rgba(73, 37, 110, .06)');
-  ctx.fillStyle = floor;
+  const gradient = ctx.createLinearGradient(0, height * .3, width, height);
+  gradient.addColorStop(0, 'rgba(35, 153, 165, .14)');
+  gradient.addColorStop(.48, 'rgba(142, 98, 252, .18)');
+  gradient.addColorStop(1, 'rgba(73, 37, 110, .09)');
+  ctx.fillStyle = gradient;
   ctx.fill();
 
   const mesh = ctx.createLinearGradient(width * .09, 0, width * .88, height);
@@ -223,62 +243,111 @@ function paintGround(ctx, project, width, height) {
     trace(ctx, line.map(project));
     ctx.stroke();
   }
-  trace(ctx, corners.map(project));
-  ctx.closePath();
-  ctx.lineWidth = 1.2;
-  ctx.strokeStyle = 'rgba(163, 137, 239, .34)';
-  ctx.stroke();
 }
 
-function paintLeg(ctx, { from: start, to: end, required }, project, active, score) {
+function paintAxes(ctx, project, width) {
+  ctx.save();
+  const ceiling = floor.map(([x, , z]) => [x, plotEdge, z]);
+  ctx.strokeStyle = '#c6a8ee61';
+  ctx.lineWidth = .8;
+  for (const corners of [floor, ceiling]) {
+    trace(ctx, corners.map(project));
+    ctx.closePath();
+    ctx.stroke();
+  }
+  for (const [index, corner] of floor.entries()) {
+    trace(ctx, [project(corner), project(ceiling[index])]);
+    ctx.stroke();
+  }
+
+  const [originX, originY] = project(lowerCorner);
+  ctx.font = '11px ui-monospace, monospace';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#e1d3f7';
+  ctx.textAlign = 'center';
+  ctx.fillText('0%', originX, originY + 12);
+
+  for (const [index, axis] of axes.entries()) {
+    const at = (percent) => project(lowerCorner.map((value, dimension) => dimension === index ? plotValue(percent) : value));
+    const [endX, endY] = at(100);
+    const dx = endX - originX;
+    const dy = endY - originY;
+    const length = Math.hypot(dx, dy);
+    if (length < 12) continue;
+    const normal = [-dy / length * 3, dx / length * 3];
+    const side = index === 1 ? -1 : Math.sign(dx);
+    ctx.strokeStyle = axis.color;
+    ctx.fillStyle = axis.color;
+    ctx.lineWidth = 1.45;
+    trace(ctx, [[originX, originY], [endX, endY]]);
+    ctx.stroke();
+    for (const tick of ticks.slice(1)) {
+      const [x, y] = at(tick);
+      trace(ctx, [[x - normal[0], y - normal[1]], [x + normal[0], y + normal[1]]]);
+      ctx.stroke();
+      if (tick === 50 && length > 65) {
+        ctx.textAlign = 'center';
+        ctx.fillText('50%', x + normal[0] * side * 4, y + normal[1] * side * 4);
+      }
+    }
+    const name = `${axis.id.toUpperCase()} 100%`;
+    const textWidth = ctx.measureText(name).width;
+    ctx.textAlign = 'center';
+    const labelX = endX + (index === 1 ? 0 : side * (textWidth / 2 + 7));
+    const boundedX = clamp(labelX, textWidth / 2 + 4, width - textWidth / 2 - 4);
+    if (endX >= 0 && endX <= width) {
+      ctx.fillText(name, boundedX, endY + (index === 1 ? -11 : boundedX === labelX ? 0 : 12));
+    }
+  }
+
+  const [targetX, targetY] = project(upperCorner);
+  ctx.strokeStyle = '#bca8dfac';
+  ctx.lineWidth = 1.1;
+  trace(ctx, [[targetX, targetY - 5], [targetX + 5, targetY], [targetX, targetY + 5], [targetX - 5, targetY]]);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fillStyle = '#d9c9eb';
+  ctx.fillText('Full credit', targetX, targetY - 13);
+  ctx.restore();
+}
+
+function paintLeg(ctx, { from: start, to: end, required }, positions, project, active, score) {
+  if (!positions.has(start) || !positions.has(end)) return;
   const [a, b] = [concepts[start], concepts[end]];
-  const nodes = Array.from({ length: 33 }, (_, index) => {
-    const t = index / 32;
-    const curve = Math.sin(t * Math.PI);
-    const [x, y, z] = a.position.map((value, axis) => value + (b.position[axis] - value) * t);
-    return project([x, y + curve * .32, z + curve * .12]);
-  });
-  const [startX, startY] = nodes[0];
-  const [endX, endY] = nodes.at(-1);
-  if (Math.hypot(endX - startX, endY - startY) < 3) return;
+  const startPoint = project(positions.get(start));
+  const endPoint = project(positions.get(end));
+  const [startX, startY] = startPoint;
+  const [endX, endY] = endPoint;
+  const length = Math.hypot(endX - startX, endY - startY);
+  if (length < 3) return;
+  const at = (fraction) => [startX + (endX - startX) * fraction, startY + (endY - startY) * fraction];
 
   ctx.save();
   ctx.strokeStyle = '#a99cba';
   ctx.globalAlpha = active ? .52 : .36;
   ctx.lineWidth = required ? 1.65 : 1.4;
   if (!required) ctx.setLineDash([4, 5]);
-  trace(ctx, nodes);
+  trace(ctx, [startPoint, endPoint]);
   ctx.stroke();
   ctx.setLineDash([]);
 
-  const [x, y] = nodes[21];
-  const [prevX, prevY] = nodes[20];
-  const angle = Math.atan2(y - prevY, x - prevX);
-  trace(ctx, [[x - 5 * Math.cos(angle - .55), y - 5 * Math.sin(angle - .55)], [x, y],
-    [x - 5 * Math.cos(angle + .55), y - 5 * Math.sin(angle + .55)]]);
-  ctx.stroke();
+  if (length > 16) {
+    const [x, y] = at(.66);
+    const angle = Math.atan2(endY - startY, endX - startX);
+    trace(ctx, [[x - 5 * Math.cos(angle - .55), y - 5 * Math.sin(angle - .55)], [x, y],
+      [x - 5 * Math.cos(angle + .55), y - 5 * Math.sin(angle + .55)]]);
+    ctx.stroke();
+  }
 
   const fraction = Number.isFinite(score) ? clamp(score / 100, 0, 1) : 0;
   if (fraction > 0) {
-    const lengths = nodes.slice(1).map(([x, y], i) => Math.hypot(x - nodes[i][0], y - nodes[i][1]));
-    let remaining = lengths.reduce((total, length) => total + length, 0) * fraction;
-    const filled = [nodes[0]];
-    for (const [i, length] of lengths.entries()) {
-      if (remaining < length) {
-        const ratio = remaining / length;
-        filled.push(nodes[i].map((value, axis) => value + (nodes[i + 1][axis] - value) * ratio));
-        break;
-      }
-      filled.push(nodes[i + 1]);
-      remaining -= length;
-    }
     const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
     gradient.addColorStop(0, a.color);
     gradient.addColorStop(1, b.color);
     ctx.strokeStyle = gradient;
     ctx.globalAlpha = active ? .19 : .1;
     ctx.lineWidth = 7;
-    trace(ctx, filled);
+    trace(ctx, [startPoint, at(fraction)]);
     ctx.stroke();
     ctx.globalAlpha = active ? 1 : .85;
     ctx.lineWidth = 2.5;
@@ -287,9 +356,7 @@ function paintLeg(ctx, { from: start, to: end, required }, project, active, scor
   ctx.restore();
 }
 
-function paintConcept(ctx, concept, project, selected) {
-  const [x, y, z] = concept.position;
-  const [centerX, centerY, perspective] = project([x, y, z]);
+function paintConcept(ctx, concept, [centerX, centerY, perspective], selected) {
   ctx.save();
   ctx.strokeStyle = concept.color;
 
@@ -314,32 +381,37 @@ function paintConcept(ctx, concept, project, selected) {
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
-  return { x: centerX, y: centerY - radius - 10 };
 }
 
-function positionMarkers(positions, markers, width, height) {
-  const spacing = 8;
+function positionMarkers(ctx, positions, markers, width, height) {
+  const spacing = 6;
   const occupied = [];
   for (const point of positions) {
     const button = markers.get(point.id);
     const buttonWidth = button.offsetWidth;
     const buttonHeight = button.offsetHeight;
-    const minX = buttonWidth / 2 + spacing;
-    const centerX = clamp(point.x, minX, width - minX);
-    let y = clamp(point.y, buttonHeight + 20, height - 50);
-    const left = centerX - buttonWidth / 2;
-    const right = centerX + buttonWidth / 2;
-    for (const other of occupied) {
-      const overlapsX = left < other.right + spacing && right > other.left - spacing;
-      if (overlapsX && Math.abs(other.y - y) < buttonHeight + spacing) {
-        const above = other.y - buttonHeight - spacing;
-        y = above > buttonHeight + spacing ? above : other.y + buttonHeight + spacing;
-      }
-    }
-    y = clamp(y, buttonHeight + 12, height - 45);
-    button.style.left = `${centerX}px`;
-    button.style.top = `${y}px`;
-    occupied.push({ left, right, y });
+    const halfWidth = buttonWidth / 2;
+    const step = buttonHeight + spacing;
+    const place = (dx, dy) => {
+      const x = clamp(point.x + dx, halfWidth + spacing, width - halfWidth - spacing);
+      const bottom = clamp(point.y + dy, buttonHeight + 10, height - 49);
+      return { x, left: x - halfWidth, right: x + halfWidth, top: bottom - buttonHeight, bottom };
+    };
+    const candidates = [place(0, -13), place(halfWidth + 16, -3), place(-halfWidth - 16, -3), place(0, buttonHeight + 13)];
+    for (let repeat = 1; repeat <= markers.size; repeat += 1) candidates.push(place(0, -13 - step * repeat), place(0, buttonHeight + 13 + step * repeat));
+    const label = candidates.find((candidate) => occupied.every((other) =>
+      candidate.right + spacing < other.left || candidate.left - spacing > other.right ||
+      candidate.bottom + spacing <= other.top || candidate.top - spacing >= other.bottom)) ?? candidates[0];
+    button.style.left = `${label.x}px`;
+    button.style.top = `${label.bottom}px`;
+    occupied.push(label);
+
+    ctx.save();
+    ctx.lineWidth = .9;
+    ctx.strokeStyle = concepts[point.id].color + '8c';
+    trace(ctx, [[point.x, point.y], [clamp(point.x, label.left, label.right), clamp(point.y, label.top, label.bottom)]]);
+    ctx.stroke();
+    ctx.restore();
   }
 }
 
@@ -354,6 +426,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
   const pathButtons = container.querySelectorAll('[data-path]');
   const guide = stage.querySelector('.sw-terrain__guide');
   const explanation = container.querySelector('.sw-terrain__concept');
+  const coordinates = explanation.querySelector('.sw-terrain__coordinates');
   const pathDetail = container.querySelector('.sw-terrain__path-detail');
   const stepList = container.querySelector('.sw-terrain__steps');
   const stepRows = new Map();
@@ -369,7 +442,10 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
   let height = 0;
   let scores;
   let milestoneVerdicts;
+  let milestoneEvidence;
+  const scenePoints = new Map();
   let contributionKey;
+  let coordinateKey;
 
   function refreshScene() {
     if (!ctx) return;
@@ -382,15 +458,18 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     const project = createProjector(camera, width, height);
     paintBackground(ctx, width, height);
     paintGround(ctx, project, width, height);
+    paintAxes(ctx, project, width);
+    if (!scenePoints.size) return;
     const steps = scores?.[pathId]?.steps ?? [];
     for (const leg of paths[pathId].legs) {
       const step = steps.find(({ from, to }) => from === leg.from && to === leg.to);
-      paintLeg(ctx, leg, project, selected === leg.from || selected === leg.to, step?.score);
+      paintLeg(ctx, leg, scenePoints, project, selected === leg.from || selected === leg.to, step?.score);
     }
-    const sorted = [...conceptEntries].sort((a, b) => project(a[1].position)[2] - project(b[1].position)[2]);
-    const positions = sorted.map(([id, concept]) => ({ id, ...paintConcept(ctx, concept, project, selected === id) }));
-    positions.sort((a, b) => a.y - b.y);
-    positionMarkers(positions, markerButtons, width, height);
+    const projected = [...scenePoints].map(([id, point]) => ({ id, screen: project(point) }));
+    projected.sort((a, b) => Number(a.id === selected) - Number(b.id === selected) || a.screen[2] - b.screen[2]);
+    for (const { id, screen } of projected) paintConcept(ctx, concepts[id], screen, id === selected);
+    const labels = projected.reverse().map(({ id, screen: [x, y] }) => ({ id, x, y }));
+    positionMarkers(ctx, labels, markerButtons, width, height);
   }
 
   function resize() {
@@ -415,12 +494,45 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     explanation.querySelector('.sw-terrain__implication').textContent = concept.implication;
     explanation.querySelector('.sw-terrain__example span').textContent = concept.example;
     explanation.querySelector('.sw-terrain__daily span').textContent = concept.daily;
-    const link = explanation.querySelector('a');
+    const link = explanation.querySelector('.sw-terrain__concept-source');
     link.href = concept.source;
     link.textContent = concept.sourceName + ' ↗';
+    renderCoordinates();
     renderVerdict();
     refreshScene();
     if (notify) onSelect?.(id, concept);
+  }
+
+  function renderCoordinates() {
+    const reading = milestoneEvidence?.[selected];
+    coordinates.hidden = !reading;
+    if (!reading) return;
+    const key = JSON.stringify([selected, reading]);
+    if (key === coordinateKey) return;
+    coordinateKey = key;
+
+    const rows = [...reading.axes, ...(reading.additional ?? [])].map((axis) => {
+      const label = axis.axis ? `${axis.axis.toUpperCase()} · ${axis.label}` : axis.label;
+      const result = (axis.axis ? `${confidenceNumber.format(axis.percent)}%` : 'Additional criterion') +
+        (axis.pending ? ' · pending' : '');
+      const item = node('li');
+      const heading = node('div', 'sw-terrain__coordinate-heading');
+      heading.append(node('strong', '', label), node('span', '', result));
+      item.append(heading);
+      const credit = `${confidenceNumber.format(axis.points ?? 0)} / ${confidenceNumber.format(axis.weight)} points credited`;
+      const value = Number.isFinite(axis.value) ? confidenceNumber.format(axis.value) + (axis.unit ?? '').replace(/^[a-z]/i, ' $&') : '';
+      item.append(node('p', '', credit + (value ? ` · Measured ${value}` : '')));
+      if (axis.detail) item.append(node('p', '', axis.detail));
+      if (axis.sourceUrl?.startsWith('https://') && axis.source) {
+        const source = node('a', 'sw-terrain__coordinate-source', axis.source + ' ↗');
+        source.href = axis.sourceUrl;
+        source.target = '_blank';
+        source.rel = 'noopener noreferrer';
+        item.append(source);
+      }
+      return item;
+    });
+    coordinates.querySelector('ul').replaceChildren(...rows);
   }
 
   function renderVerdict() {
@@ -430,6 +542,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     if (!result) return;
     section.querySelector('strong').textContent = result.headline + ' · ' + result.confidence;
     section.querySelector('.sw-terrain__verdict-reason').textContent = result.reason;
+    section.querySelector('.sw-terrain__verdict-human').textContent = result.humanContext ?? '';
     section.querySelector('.sw-terrain__verdict-change').textContent = result.change;
   }
 
@@ -497,8 +610,19 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
     contributionsList.replaceChildren(...rows);
   }
 
-  function updateConfidence(nextScores, { status, method, verdicts } = {}) {
+  function updateConfidence(nextScores, { status, method, verdicts, evidence } = {}) {
     scores = nextScores;
+    if (evidence && evidence !== milestoneEvidence) {
+      milestoneEvidence = evidence;
+      for (const [id, button] of markerButtons) {
+        const reading = evidence[id];
+        if (!reading) continue;
+        scenePoints.set(id, reading.axes.map(({ percent }) => plotValue(percent)));
+        button.title = reading.axes.map(({ axis, percent }) => `${axis.toUpperCase()} ${confidenceNumber.format(percent)}%`).join(' · ');
+      }
+      stage.toggleAttribute('data-waiting', !scenePoints.size);
+      renderCoordinates();
+    }
     if (verdicts && verdicts !== milestoneVerdicts) {
       milestoneVerdicts = verdicts;
       renderVerdict();

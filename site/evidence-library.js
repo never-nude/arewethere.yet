@@ -167,6 +167,41 @@ export const evidenceGroups = [
       },
     ],
   },
+  {
+    id: 'evidence-human',
+    title: 'Empathy, appropriate reliance, and trustworthiness',
+    claim: 'Use human ratings, observed decisions, and tests of system reliability to answer different questions about how AI works with people.',
+    sources: [
+      {
+        title: 'Comparing Physician and Artificial Intelligence Chatbot Responses to Patient Questions Posted to a Public Social Media Forum',
+        by: 'John W. Ayers and colleagues · JAMA Internal Medicine · Apr 28, 2023',
+        kind: 'Peer-reviewed study',
+        url: 'https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2804309',
+        role: 'Compares clinician ratings of anonymized written replies to 195 questions. The study measured perceived empathy in public forum responses. It did not evaluate patient outcomes.',
+      },
+      {
+        title: 'To Rely or Not to Rely? Evaluating Interventions for Appropriate Reliance on Large Language Models',
+        by: 'Jessica Y. Bo, Sophia Wan, and Ashton Anderson · ACM CHI · 2025',
+        kind: 'Peer-reviewed experiment',
+        url: 'https://arxiv.org/html/2412.15584v1#S4.T1',
+        role: 'Table 1 provides rates for using correct advice and setting aside wrong advice in the control group on logical reasoning. The researchers recruited 400 participants across all conditions.',
+      },
+      {
+        title: 'AI Risk Management Framework 1.0, Section 3',
+        by: 'National Institute of Standards and Technology · Jan 2023',
+        kind: 'Evaluation framework',
+        url: 'https://airc.nist.gov/airmf-resources/airmf/3-sec-characteristics/',
+        role: 'Identifies characteristics of trustworthy AI, including validity, reliability, accountability, transparency, privacy, and fairness. It recommends choosing tests appropriate to the application.',
+      },
+      {
+        title: 'Sycophantic AI decreases prosocial intentions and promotes dependence',
+        by: 'Myra Cheng and colleagues · Science · Mar 26, 2026',
+        kind: 'Peer-reviewed experiments',
+        url: 'https://pubmed.ncbi.nlm.nih.gov/41886588/',
+        role: 'Tests how agreement with a user affects perceived trust and reported willingness to repair disagreements. Participants’ reported intentions describe what they said they would do.',
+      },
+    ],
+  },
 ];
 
 function element(tag, text, className) {

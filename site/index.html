@@ -10,6 +10,7 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./terrain.css">
   <link rel="stylesheet" href="./relationship-map.css">
   <link rel="stylesheet" href="./agi-trajectory.css">
@@ -47,6 +48,7 @@
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
           <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The site watches for public evidence of that change.</p>
+          <p class="term-help">Hover or tap a dotted term for a definition. Try ECI.</p>
           <div class="watch-clock">
             <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
               <h2 id="forecast-disclaimer">How to read the predictions</h2>
@@ -90,12 +92,12 @@
         </div>
         <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
           <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">Relationships</button>
-          <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D routes</button>
+          <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D evidence</button>
         </div>
         <div id="relationships">
           <p class="placeholder">Loading milestone relationships…</p>
         </div>
-        <div id="terrain" aria-label="Interactive 3D routes to the Singularity" hidden>
+        <div id="terrain" aria-label="Interactive 3D milestone evidence and possible routes" hidden>
           <p class="placeholder">Loading the concept map…</p>
         </div>
         <section id="agi" class="agi-panel" aria-labelledby="agi-title" hidden>
@@ -128,6 +130,38 @@
       <div class="tape-heading"><span class="status-dot" aria-hidden="true"></span> SIGNALS</div>
       <div id="tape" class="tape" tabindex="0"><p class="placeholder">Loading measurements…</p></div>
     </div>
+
+    <section id="human-evidence" class="section panel human-evidence" aria-labelledby="human-evidence-heading">
+      <div class="section-heading">
+        <div><h2 id="human-evidence-heading">Empathy and trust</h2><p>How AI responds to people matters, and so does how people use its advice. These studies measure specific behaviors under stated conditions.</p></div>
+      </div>
+      <div class="human-evidence-grid">
+        <article>
+          <h3>Empathic communication</h3>
+          <p>Measure the share of replies that independent raters judge empathetic or very empathetic.</p>
+          <dl aria-label="Replies rated empathetic or very empathetic">
+            <div><dt>Chatbot replies</dt><dd>45.1%</dd></div>
+            <div><dt>Physician replies</dt><dd>4.6%</dd></div>
+          </dl>
+          <p>Clinicians rated written answers to 195 public medical forum questions in 2023. The chatbot answers were longer. The ratings describe how the text came across in that setting. <sup class="evidence-citations"><a href="#ref-20" aria-label="Reference 20">[20]</a></sup></p>
+        </article>
+        <article>
+          <h3>Knowing when to trust AI</h3>
+          <p>Check how often people use correct AI advice and set aside wrong advice when it conflicts with their first answer.</p>
+          <dl aria-label="How participants responded to AI advice on logical reasoning questions">
+            <div><dt>Used correct advice</dt><dd>66%</dd></div>
+            <div><dt>Set aside wrong advice</dt><dd>44%</dd></div>
+          </dl>
+          <p>These rates come from one group in a 2025 logical-reasoning experiment. Researchers controlled how often advice was correct so they could measure what people did with it. <sup class="evidence-citations"><a href="#ref-21" aria-label="Reference 21">[21]</a></sup></p>
+        </article>
+        <article>
+          <h3>What makes AI trustworthy</h3>
+          <p>Evaluate how often it gets things right, how it handles errors, and whether safeguards hold for different people and situations. <sup class="evidence-citations"><a href="#ref-22" aria-label="Reference 22">[22]</a></sup></p>
+          <p>In a 2026 study of advice about personal disagreements, people trusted overly agreeable AI more and reported less willingness to repair conflicts. That's a reason to measure reliability alongside perceived trust. <sup class="evidence-citations"><a href="#ref-23" aria-label="Reference 23">[23]</a></sup></p>
+        </article>
+      </div>
+      <p class="small-note">The figures describe individual studies. Tracking change over time would require repeated tests on comparable tasks, with the same rating rules and clearly identified models.</p>
+    </section>
 
     <section id="watch" class="section panel" aria-label="Acceleration watch">
       <div id="watchtower"><p class="placeholder">Checking acceleration signals…</p></div>
@@ -276,6 +310,7 @@
         <a href="#evidence-acceleration">Research acceleration</a>
         <a href="#evidence-history">Origins</a>
         <a href="#evidence-journalism">Reporting and perspectives</a>
+        <a href="#evidence-human">Empathy and trust</a>
       </nav>
       <div class="evidence-grid">
         <article class="evidence-card" id="evidence-capability"></article>
@@ -283,6 +318,7 @@
         <article class="evidence-card" id="evidence-acceleration"></article>
         <article class="evidence-card" id="evidence-history"></article>
         <article class="evidence-card" id="evidence-journalism"></article>
+        <article class="evidence-card" id="evidence-human"></article>
       </div>
     </section>
   </main>

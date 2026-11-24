@@ -71,17 +71,21 @@ const verdictCriteria = {
   agi: {
     limits: 'A benchmark composite and selected long tasks provide evidence of capability on the tasks they cover.',
     change: 'Independent evaluations would need to show skilled human performance across a representative range of unfamiliar tasks.',
+    humanContext: 'A broad evaluation can include unfamiliar conversations, with people rating whether the AI acknowledges concerns and responds appropriately.',
   },
   asi: {
     limits: 'These benchmarks describe performance on selected tasks. The comparison required here is against top human experts across fields.',
     change: 'Independent evaluations would need to show consistent performance above leading human experts across many important domains.',
+    humanContext: 'A claim of superhuman social judgment would need independent comparisons with leading human experts in realistic situations.',
   },
   rsi: {
     limits: 'These readings show AI contributing to parts of research. The successor’s role in improving a further generation remains the key criterion.',
     change: 'An independent assessment would need to trace AI-led improvements to a stronger successor and show that successor improving the next generation.',
+    humanContext: 'Researchers can check the results against a record of what the AI changed and repeat the experiments independently.',
   },
   singularity: {
     limits: 'The readings describe research tasks and the pace of capability gains at one lab. The site’s threshold requires evidence of causation across generations.',
+    humanContext: 'Independent replication strengthens evidence of acceleration. People’s trust in AI can help explain how widely new tools are adopted.',
   },
 };
 const mounted = new WeakMap();
@@ -186,7 +190,7 @@ function verdictsFor(index, milestones) {
     const verified = verification.length > 0 && verification.every((input) => input.points !== null) &&
       (id !== 'singularity' || index?.threshold?.observed === true);
     const readings = contributions.map(describeReading).filter(Boolean);
-    const { limits, change } = verdictCriteria[id];
+    const { limits, change, humanContext } = verdictCriteria[id];
     const evidence = coverage + '% of rubric weight has evidence.';
     const reason = verified
       ? 'Independently sourced evidence in the dashboard meets this milestone’s required criterion. ' + evidence
@@ -197,6 +201,7 @@ function verdictsFor(index, milestones) {
       confidence: verified ? 'High confidence under this definition' :
         readings.length ? 'Limited confidence in the full claim' : 'Insufficient evidence to judge',
       reason,
+      humanContext,
       change: verified ? 'Independent replications would strengthen the verdict.' :
         id === 'singularity' ? singularityChange(index) : change,
     }];
@@ -251,7 +256,8 @@ function mount(container) {
   header.id = 'milestone-progress-heading';
   container.setAttribute('aria-labelledby', header.id);
   introduction.append(header,
-    element('p', '', 'Each percentage is the share of weighted evidence points earned under this dashboard’s definition. Open verification points stay unfilled.'));
+    element('p', '', 'Each milestone uses its own rubric. The percentage shows how many of its weighted evidence points are supported. Criteria awaiting verification stay unfilled.'),
+    link('How empathy and trust can be tested ↗', '#human-evidence'));
   const date = element('p', 'milestone-progress__date');
   heading.append(introduction, date);
   const cards = element('div', 'milestone-progress__grid');
@@ -301,12 +307,13 @@ export function renderMilestoneProgress(container, index) {
     card.available.style.width = milestone.coverage + '%';
     card.fill.style.width = (milestone.score ?? 0) + '%';
     card.contributions.replaceChildren(...milestone.contributions.map(contributionRow));
-    const { headline, confidence, reason, change } = verdicts[milestone.id];
+    const { headline, confidence, reason, change, humanContext } = verdicts[milestone.id];
     card.verdict.replaceChildren(
       element('h4', '', headline),
       element('p', 'milestone-progress__certainty', confidence),
       element('p', '', reason),
       element('p', '', change),
+      element('p', '', humanContext),
     );
   }
 }

@@ -2,6 +2,7 @@ import { foundationNotes } from './foundation-notes.js';
 
 const capabilityFramework = ['Morris et al., ICML (2024)', 'https://proceedings.mlr.press/v235/morris24b.html'];
 const attributionMethod = ['METR, assessing AI research acceleration', 'https://metr.org/blog/2026-10-14-ai-rd-acceleration-assessment-proposal/'];
+const humanEvidence = ['How empathy and trust can be tested', '#human-evidence'];
 const formatReading = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
 const milestones = {
@@ -13,7 +14,7 @@ const milestones = {
     summary: 'An AI system consistently matches skilled people across a wide range of unfamiliar tasks.',
     importance: 'Broad skills could make an AI useful across more kinds of research. A specialized tool can already improve individual steps in AI research.',
     example: 'The same assistant could tutor a student through an unfamiliar problem, help understand a lease and troubleshoot a home network.',
-    sources: [capabilityFramework, ['AGI trajectory and reporting', '#agi']],
+    sources: [capabilityFramework, ['AGI trajectory and reporting', '#agi'], humanEvidence],
   },
   asi: {
     label: 'ASI',
@@ -24,7 +25,7 @@ const milestones = {
     importance: 'Under this definition ASI includes the breadth AGI requires and adds stronger performance. Evidence could establish both in the same period. The research loop can develop alongside this capability.',
     example: 'A system might design more durable batteries than leading teams can design and also outperform experts on problems in mathematics and logistics.',
     context: 'Sentience asks whether a system has subjective experience. This map tracks demonstrated capabilities and research gains.',
-    sources: [capabilityFramework, ['Butlin et al., research on AI and consciousness', 'https://arxiv.org/abs/2308.08708'], ['Capability evidence', '#evidence-capability']],
+    sources: [capabilityFramework, ['Butlin et al., research on AI and consciousness', 'https://arxiv.org/abs/2308.08708'], ['Capability evidence', '#evidence-capability'], humanEvidence],
   },
   autonomy: {
     label: 'Reliable autonomy',
@@ -54,7 +55,7 @@ const milestones = {
     summary: 'An AI system helps make a stronger successor, and that stronger system improves the generation after it.',
     importance: 'The watch requires this repeatable loop as part of its Singularity definition. The pace can still level off if compute, verification or other inputs become bottlenecks.',
     example: 'An assistant helps make a better version of itself. That version then makes a measurable contribution to building the next one.',
-    sources: [['I. J. Good, original 1965 essay', 'https://vtechworks.lib.vt.edu/items/5085379d-b24c-424e-8861-e70a47b4b2fb'], attributionMethod],
+    sources: [['I. J. Good, original 1965 essay', 'https://vtechworks.lib.vt.edu/items/5085379d-b24c-424e-8861-e70a47b4b2fb'], attributionMethod, humanEvidence],
   },
   singularity: {
     label: 'Singularity',
@@ -64,7 +65,7 @@ const milestones = {
     summary: 'For this watch, the Singularity means sustained acceleration in AI development driven by successive AI systems improving AI research.',
     importance: 'The watch requires independent evidence of workday-length autonomy, repeated end-to-end research, and accelerating gains across successive AI generations attributable to AI-led research. A quick burst of releases can have multiple causes.',
     example: 'Useful AI upgrades might start arriving in shorter and shorter cycles, giving schools and workplaces less time to adjust between changes.',
-    sources: [['The three evidence checks', '#evidence-gates'], attributionMethod, ['The history of the Singularity idea', '#evidence-history']],
+    sources: [['The three evidence checks', '#evidence-gates'], attributionMethod, ['The history of the Singularity idea', '#evidence-history'], humanEvidence],
   },
 };
 
@@ -239,6 +240,7 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       evidence.replaceChildren(info(verdict.headline, verdict.reason),
         make('p', 'srm__confidence', verdict.confidence),
         make('p', '', verdict.change));
+      if (verdict.humanContext) evidence.append(make('p', '', verdict.humanContext));
       return;
     }
     const factorId = { autonomy: 'reliability', 'ai-research': 'research-acceleration' }[activeId];

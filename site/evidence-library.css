@@ -55,10 +55,10 @@
 .evidence-source-kind { color: #c4b6d7; font: 400 10px/1.5 var(--mono); }
 .evidence-source-byline, .evidence-source-role { margin-top: 3px; color: var(--dim); font-size: 11px; line-height: 1.5; }
 .evidence-source-role { color: #e5daef; }
-#evidence-journalism { grid-column: 1 / -1; }
-#evidence-journalism .evidence-entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 13px; }
+#evidence-journalism, #evidence-human { grid-column: 1 / -1; }
+:is(#evidence-journalism, #evidence-human) .evidence-entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 13px; }
 
 @media (max-width: 730px) {
   .top-nav { flex-wrap: wrap; column-gap: clamp(9px, 3vw, 16px); }
-  .evidence-grid, #evidence-journalism .evidence-entries { grid-template-columns: 1fr; }
+  .evidence-grid, :is(#evidence-journalism, #evidence-human) .evidence-entries { grid-template-columns: 1fr; }
 }

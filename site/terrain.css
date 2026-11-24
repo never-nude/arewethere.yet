@@ -37,14 +37,27 @@
 .sw-terrain__confidence-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 3px 10px; margin-bottom: 6px; }
 .sw-terrain__confidence-head h3 { font-size: 12px; font-weight: 650; }
 .sw-terrain__confidence-status { color: var(--terrain-muted); font: 400 10px/1.4 var(--mono, monospace); }
-.sw-terrain__legend { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; margin-top: 9px; color: #ded3ef; font-size: 11px; line-height: 1.4; }
-.sw-terrain__legend > p, .sw-terrain__arrow-keys, .sw-terrain__arrow-keys > span { display: flex; align-items: center; gap: 6px; }
-.sw-terrain__grid-key { flex: none; width: 16px; height: 12px; border: 1px solid #a48bcc; border-radius: 2px; background: repeating-linear-gradient(0deg, #211835 0 3px, #674a8b 3px 4px); }
+.sw-terrain__legend { display: grid; gap: 5px; margin-top: 9px; color: #ded3ef; font-size: 11px; line-height: 1.4; }
+.sw-terrain__axes { display: flex; flex-wrap: wrap; gap: 5px 12px; padding: 0; list-style: none; }
+.sw-terrain__axes li { display: flex; align-items: baseline; gap: 5px; }
+.sw-terrain__axes b { color: var(--axis-color); font: 650 12px/1.2 var(--mono, monospace); }
+.sw-terrain__arrow-keys, .sw-terrain__arrow-keys > span { display: flex; align-items: center; gap: 6px; }
 .sw-terrain__arrow-keys { flex-wrap: wrap; gap: 7px 12px; }
 .sw-terrain__arrow-keys i { width: 16px; border-top: 2px dashed #a99cba; }
 .sw-terrain__arrow-keys i.sw-terrain__solid { border-top: 2px solid #a99cba; }
 .sw-terrain__arrow-keys i.sw-terrain__filled { height: 2px; border: 0; background: linear-gradient(90deg, #ffcb8c, #f595ce); }
-.sw-terrain__legend-hint { margin-top: 4px; color: var(--terrain-muted); font-size: 11px; line-height: 1.4; }
+
+.sw-terrain__scene-message {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  display: none;
+  color: var(--terrain-muted);
+  font: 400 11px/1.4 var(--mono, monospace);
+  pointer-events: none;
+}
+
+.sw-terrain__stage[data-waiting] .sw-terrain__scene-message { display: block; }
 
 .sw-terrain__markers { position: absolute; inset: 0; pointer-events: none; }
 
@@ -140,7 +153,7 @@
 
 .sw-terrain__stage[data-fallback] { min-height: 11rem; }
 .sw-terrain__stage[data-fallback] :is(.sw-terrain__camera, .sw-terrain__canvas) { display: none; }
-.sw-terrain__stage[data-fallback] .sw-terrain__markers {
+.sw-terrain__stage:is([data-fallback], [data-waiting]) .sw-terrain__markers {
   display: flex;
   gap: 6px;
   align-items: center;
@@ -148,7 +161,7 @@
   justify-content: center;
   flex-wrap: wrap;
 }
-.sw-terrain__stage[data-fallback] .sw-terrain__marker { position: relative; transform: none; }
+.sw-terrain__stage:is([data-fallback], [data-waiting]) .sw-terrain__marker { position: relative; transform: none; }
 
 .sw-terrain__readout {
   display: grid;
@@ -238,6 +251,15 @@
 .sw-terrain__verdict h4 { margin: 0 0 3px; color: #efebf7; font-size: 13px; }
 .sw-terrain__verdict strong { color: #d9c5fc; }
 .sw-terrain__verdict p { margin: 4px 0 0; color: var(--terrain-muted); }
+.sw-terrain__coordinates { margin-top: 8px; padding: 8px 9px; border: 1px solid #4c3b60; border-radius: 8px; background: #1b162a; }
+.sw-terrain__coordinates h4 { margin: 0; color: #f2e9ff; font-size: 12px; }
+.sw-terrain__coordinates p { margin: 4px 0 0; color: #c9bbda; font-size: 11px; line-height: 1.4; }
+.sw-terrain__coordinates ul { list-style: none; margin: 7px 0 0; padding: 0; }
+.sw-terrain__coordinates li { padding-block: 6px; border-top: 1px solid #3f3151; }
+.sw-terrain__coordinates li:last-child { padding-bottom: 0; }
+.sw-terrain__coordinate-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; font-size: 11px; line-height: 1.35; }
+.sw-terrain__coordinate-heading span { color: #e2c9ff; font: 400 10px/1.3 var(--mono, monospace); }
+.sw-terrain__coordinates .sw-terrain__coordinate-source { margin-top: 4px; }
 .sw-terrain__concept {
   min-width: 0;
   border-left: 2px solid color-mix(in srgb, var(--selected-color, #f595ce) 67%, #262039);

@@ -2,6 +2,7 @@ import { buildIndex, projectThreshold } from './index-model.js';
 import { getCountdown } from './countdown.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
+import { measureTerrainEvidence } from './terrain-evidence.js';
 import { renderRelationshipMap } from './relationship-map.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
 import { renderEvidenceLibrary } from './evidence-library.js';
@@ -13,6 +14,7 @@ import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-
 import { renderOrigins } from './origins.js';
 import { renderWatchtower } from './watchtower.js';
 import { renderLabs } from './labs.js';
+import { installGlossary } from './glossary.js';
 
 const byId = (id) => document.getElementById(id);
 const formatter = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
@@ -301,6 +303,7 @@ function renderPathConfidence() {
     status: updates + trade,
     method: routeConfidenceMethod + ' The market is checked every minute while this page is open. Benchmark and research readings change when results are published. Scores show evidence support in points.',
     verdicts: milestoneVerdicts,
+    evidence: measureTerrainEvidence(index),
   });
 }
 
@@ -551,6 +554,8 @@ function openLinkedMapDetail() {
     activeMap.select('agi');
   } else if (hash === '#foundations') {
     setMapView('relationships');
+  } else if (hash === '#terrain') {
+    setMapView('routes');
   } else {
     return;
   }
@@ -565,6 +570,7 @@ renderWatchtower(byId('watchtower'));
 renderLabs(byId('labs-board'));
 renderOrganizationSignals(byId('leaders'));
 renderOrganizationForecast(byId('organization-forecast'));
+installGlossary(byId('main'));
 reload();
 tickCountdown();
 setInterval(() => { if (!document.hidden) reload(); }, 60_000);
