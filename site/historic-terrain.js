@@ -7,6 +7,8 @@ const lanes = [
 const laneById = new Map(lanes.map((lane) => [lane.id, lane]));
 const initial = { yaw: -.23, pitch: .36, zoom: 1, x: 0, y: 0 };
 const axis = { start: -2.7, end: 2.7, step: .49 };
+const axisFront = lanes[0].depth - .32;
+const axisBack = lanes.at(-1).depth + .13;
 const handleOffsets = [[0, 0], [0, -26], [-26, 0], [26, 0], [0, 26], [-26, -26], [26, -26], [-26, 26], [26, 26]];
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -45,7 +47,6 @@ function paintGrid(ctx, project, dateX, model) {
     ctx.stroke();
   }
 
-  const front = lanes[0].depth - .32;
   const yearLast = Number(model.lastDate.slice(0, 4));
   const labels = [{ date: model.firstDate, label: model.firstDate.slice(0, 4) }];
   for (const year of [1980, 2000, 2020]) {
@@ -54,25 +55,52 @@ function paintGrid(ctx, project, dateX, model) {
   labels.push({ date: model.lastDate, label: String(yearLast) });
   for (const { date, label } of labels) {
     const x = dateX(date);
-    shape(ctx, [[x, 0, front], [x, 0, lanes.at(-1).depth + .13]].map(project));
+    shape(ctx, [[x, 0, axisFront], [x, 0, axisBack]].map(project));
     ctx.strokeStyle = '#66547c64';
     ctx.stroke();
-    const [sx, sy] = project([x, 0, front - .12]);
+    const [sx, sy] = project([x, 0, axisFront - .12]);
     ctx.textAlign = 'center';
     ctx.fillStyle = '#b6a6c6';
     ctx.fillText(label, sx, sy + 12);
   }
 
-  shape(ctx, [[axis.start, 0, front], [axis.start, axis.step * model.total, front]].map(project));
+  shape(ctx, [[axis.start, axis.step * model.total, axisFront], [axis.start, 0, axisFront],
+    [axis.end, 0, axisFront], [axis.end, 0, axisBack]].map(project));
   ctx.strokeStyle = '#a78db480';
   ctx.stroke();
   for (let count = 0; count <= model.total; count += 1) {
-    const [sx, sy] = project([axis.start, count * axis.step, front]);
+    const [sx, sy] = project([axis.start, count * axis.step, axisFront]);
     shape(ctx, [[sx - 3, sy], [sx + 4, sy]]);
     ctx.stroke();
     ctx.textAlign = 'right';
     ctx.fillStyle = '#c0adc9';
     ctx.fillText(String(count), sx - 7, sy);
+  }
+}
+
+function paintAxisLabels(ctx, project, total, width, height) {
+  const narrow = width < 370;
+  const labels = [
+    [narrow ? 'X · Date' : 'X · Calendar date', [0, 0, axisFront], 29],
+    [narrow ? 'Y · Landmarks' : 'Y · Landmarks documented', [axis.start, axis.step * total, axisFront], -17],
+    [narrow ? 'Z · Category' : 'Z · Evidence category', [axis.end, 0, axisBack], -15],
+  ];
+  ctx.font = '600 12px Geist, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const placed = [];
+  for (const [label, location, offset] of labels) {
+    const [x, y] = project(location);
+    if (x < 0 || x > width || y < 0 || y > height) continue;
+    const halfWidth = ctx.measureText(label).width / 2 + 6;
+    const center = clamp(x, halfWidth + 5, width - halfWidth - 5);
+    const line = clamp(y + offset, 13, height - 13);
+    if (placed.some(([px, py, span]) => Math.abs(py - line) < 22 && Math.abs(px - center) < span + halfWidth)) continue;
+    placed.push([center, line, halfWidth]);
+    ctx.fillStyle = '#231830';
+    ctx.fillRect(center - halfWidth, line - 9, halfWidth * 2, 18);
+    ctx.fillStyle = '#ecdefb';
+    ctx.fillText(label, center, line + 1);
   }
 }
 
@@ -86,7 +114,7 @@ function paintTrace(ctx, project, points, selected, currentX) {
     ctx.setLineDash([]);
   }
   if (!selected) {
-    shape(ctx, [[currentX, 0, lanes[0].depth - .32], [currentX, 0, lanes.at(-1).depth + .13]].map(project));
+    shape(ctx, [[currentX, 0, axisFront], [currentX, 0, axisBack]].map(project));
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#f3c9fc';
     ctx.stroke();
@@ -111,20 +139,20 @@ function paintTrace(ctx, project, points, selected, currentX) {
 export function mountHistoricTerrain(container, onSelect) {
   container.innerHTML = `
     <div class="hist-plot__top">
-      <div><h4>History in 3D</h4><p>Height counts how many evidence landmarks had been documented by each date. The dashed path connects events in date order.</p></div>
+      <div><h4>History in 3D</h4><p>Move across dates and look up to see how many evidence landmarks were documented by then. Each lane at a different depth groups events by category. The dashed path connects events in date order.</p></div>
       <div class="hist-plot__actions" role="group" aria-label="Historical 3D view controls">
         <button class="calendar-step" type="button" data-hist-action="out" aria-label="Zoom out of history">−</button>
         <button class="calendar-step" type="button" data-hist-action="in" aria-label="Zoom into history">+</button>
         <button class="calendar-step" type="button" data-hist-action="reset">Reset view</button>
       </div>
     </div>
-    <dl class="hist-plot__coordinates">
+    <dl class="hist-plot__coordinates" id="history-plot-coordinates">
       <div><dt>X · Calendar date</dt><dd data-hist-time></dd></div>
-      <div><dt>Y · Landmarks reached</dt><dd data-hist-count></dd></div>
+      <div><dt>Y · Landmarks documented</dt><dd data-hist-count></dd></div>
       <div><dt>Z · Evidence category</dt><dd data-hist-lane></dd></div>
     </dl>
     <div class="hist-plot__stage">
-      <canvas tabindex="0" aria-label="3D history plot. Arrow keys rotate. Shift with arrow keys pans. Plus and minus zoom. Home resets the view."></canvas>
+      <canvas tabindex="0" aria-describedby="history-plot-coordinates" aria-label="3D history plot. Arrow keys rotate. Shift with arrow keys pans. Plus and minus zoom. Home resets the view."></canvas>
       <div class="hist-plot__points" role="group" aria-label="Select a dated point"></div>
     </div>
     <div class="hist-plot__legend">
@@ -184,6 +212,7 @@ export function mountHistoricTerrain(container, onSelect) {
     ctx.fillRect(0, 0, width, height);
     paintGrid(ctx, project, dateX, model);
     paintTrace(ctx, project, points, selected, dateX(model.selectedDate));
+    paintAxisLabels(ctx, project, model.total, width, height);
     const occupied = [];
     const newestFirst = [...points].reverse();
     if (selected) {

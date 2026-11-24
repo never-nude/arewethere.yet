@@ -148,13 +148,13 @@ function paintChart(state) {
   const { plot, frames, selected, events } = state;
   if (!frames?.length) return;
   const width = Math.max(254, plot.clientWidth);
-  const height = 255;
+  const height = 280;
   const start = 43;
   const end = width - 17;
-  const top = 19;
-  const bottom = 147;
-  const eventBandTop = 157;
-  const eventBandBottom = 231;
+  const top = 29;
+  const bottom = 157;
+  const eventBandTop = 167;
+  const eventBandBottom = 241;
   const x = (index) => frames.length > 1 ? start + index * (end - start) / (frames.length - 1) : (start + end) / 2;
   const values = frames.map((frame) => frame.score).filter(Number.isFinite);
   const low = values.length ? Math.max(0, Math.floor(Math.min(...values) - .5)) : 0;
@@ -162,11 +162,13 @@ function paintChart(state) {
   const y = (value) => bottom - (value - low) / (high - low) * (bottom - top);
   const graph = svgItem('svg', {
     viewBox: `0 0 ${width} ${height}`, role: 'img',
-    'aria-label': `Evidence index points from ${number.format(low)} to ${number.format(high)} on the vertical axis. Calendar dates on the horizontal axis. Event dots appear in a separate band below the line. Use the day slider to select a date.`,
+    'aria-label': `Evidence index points from ${number.format(low)} to ${number.format(high)} on the vertical axis. Calendar dates (UTC) on the horizontal axis. Event dots appear in a separate band below the line. Use the day slider to select a date.`,
   });
   graph.append(
+    svgItem('text', { x: 8, y: 16, class: 'watch-history__axis-title' }, 'Y · Evidence index (0–100 points)'),
     svgItem('rect', { x: start, y: eventBandTop, width: end - start, height: eventBandBottom - eventBandTop, rx: 4, class: 'watch-history__event-band' }),
     svgItem('text', { x: start + 6, y: eventBandTop + 15 }, 'Events by date'),
+    svgItem('text', { x: (start + end) / 2, y: height - 6, 'text-anchor': 'middle', class: 'watch-history__axis-title' }, 'X · Date (UTC)'),
   );
   for (const tick of [low, (low + high) / 2, high]) {
     const at = y(tick);
@@ -179,7 +181,7 @@ function paintChart(state) {
   const dates = new Set(Array.from({ length: dateSlots }, (_, i) => Math.round(i * (frames.length - 1) / (dateSlots - 1))));
   for (const tick of dates) {
     const anchor = tick === 0 ? 'start' : tick === frames.length - 1 ? 'end' : 'middle';
-    graph.append(svgItem('text', { x: x(tick), y: height - 5, 'text-anchor': anchor }, dayLabel(frames[tick].date, monthDay)));
+    graph.append(svgItem('text', { x: x(tick), y: height - 23, 'text-anchor': anchor }, dayLabel(frames[tick].date, monthDay)));
   }
   let startSegment = true;
   const trace = frames.map((frame, index) => {
@@ -336,12 +338,8 @@ function mount(container) {
         <label>Show activity from <select data-field="provider"><option value="">All providers</option></select></label>
       </div>
       <div class="watch-history__chart-heading"><h3>Daily evidence index</h3><p data-field="window"></p></div>
-      <div class="watch-history__axes">
-        <p><strong>Vertical axis</strong> Evidence index (0–100 points)</p>
-        <p><strong>Horizontal axis</strong> Calendar date (UTC)</p>
-      </div>
-      <p class="watch-history__note">The vertical scale zooms in on the scores for the dates you selected. The dots in the lower band mark events by date.</p>
       <div class="watch-history__plot"></div>
+      <p class="watch-history__note">The vertical scale zooms in on the scores for the dates you selected. The dots in the lower band mark events by date.</p>
       <ul class="watch-history__legend" aria-label="Activity markers">
         <li data-kind="release">Model release</li><li data-kind="gain">Benchmark gain</li><li data-kind="drop">Benchmark drop</li>
         <li data-kind="measured">Benchmark reading or research</li><li data-kind="incident">Service incident</li>

@@ -127,13 +127,13 @@ function listItem(row, position, model) {
 }
 
 function update(state) {
-  const { model, slider, selection, lead, table, scale } = state;
+  const { model, slider, selection, lead, table, axes, scale } = state;
   if (!Number.isFinite(model.asOf)) {
     slider.disabled = true;
     selection.textContent = 'Waiting for benchmark data';
     lead.textContent = 'Organization-specific projections need a dated benchmark release.';
     table.replaceChildren();
-    scale.hidden = true;
+    axes.hidden = true;
     return;
   }
   const days = Number(slider.value);
@@ -144,7 +144,7 @@ function update(state) {
   if (days > horizon) {
     lead.textContent = 'Organization estimates cover the first 180 days, through ' + dateFormat.format(model.asOf + horizon * dayMs) + '.';
     table.replaceChildren();
-    scale.hidden = true;
+    axes.hidden = true;
   } else {
     const { rows, lead: margin } = forecastAt(model, days);
     const marginLabel = margin === null ? '' : margin < .05
@@ -154,9 +154,8 @@ function update(state) {
       : rows.length ? rows[0].organization + ' leads this scenario' + (marginLabel ? ' · ' + marginLabel : '')
         : 'No organization has enough recent data to project a pace.';
     table.replaceChildren(...rows.map((row, position) => listItem(row, position, model)));
-    scale.hidden = !rows.length;
-    scale.textContent = 'The end of each colored bar marks the projected ECI score. The scale starts at ' + number.format(model.min)
-      + ' and ends at ' + number.format(model.max) + '. A white tick marks that developer’s latest measured monthly high.';
+    axes.hidden = !rows.length;
+    scale.replaceChildren(element('span', '', number.format(model.min)), element('span', '', number.format(model.max)));
   }
   state.onDateChange?.(days);
 }
@@ -194,7 +193,12 @@ function mount(container) {
       <p class="org-forecast__end"></p>
     </div>
     <p class="org-forecast__lead"></p>
-    <p class="org-forecast__scale"></p>
+    <div class="org-forecast__axes" hidden>
+      <p class="org-forecast__axis-title">Y · Developer rank</p>
+      <p class="org-forecast__axis-title">X · Projected ECI (points)</p>
+      <p class="org-forecast__scale">The colored bars show projected scores. White ticks mark each developer’s latest measured monthly high.</p>
+      <div class="org-forecast__range"></div>
+    </div>
     <ol class="org-forecast__table" aria-label="Organizations ranked by projected ECI"></ol>
     <details class="org-forecast__method">
       <summary>Projection method and data gaps</summary>
@@ -211,7 +215,8 @@ function mount(container) {
     selection: container.querySelector('output'),
     lead: container.querySelector('.org-forecast__lead'),
     table: container.querySelector('ol'),
-    scale: container.querySelector('.org-forecast__scale'),
+    axes: container.querySelector('.org-forecast__axes'),
+    scale: container.querySelector('.org-forecast__range'),
     end: container.querySelector('.org-forecast__end'),
     ticks: container.querySelector('.org-forecast__ticks'),
     unavailable: container.querySelector('.org-forecast__unavailable'),

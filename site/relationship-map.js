@@ -1,4 +1,5 @@
 import { foundationNotes } from './foundation-notes.js';
+import { measureMilestoneProgress } from './milestone-progress.js';
 
 const capabilityFramework = ['Morris et al., ICML (2024)', 'https://proceedings.mlr.press/v235/morris24b.html'];
 const attributionMethod = ['METR, assessing AI research acceleration', 'https://metr.org/blog/2026-10-14-ai-rd-acceleration-assessment-proposal/'];
@@ -75,10 +76,26 @@ const connectors = {
   required: 'Required here',
 };
 
+const plotRows = { agi: 23, asi: 43, rsi: 72, singularity: 92 };
+const edges = [
+  { from: 'agi', to: 'asi', kind: 'possible', detail: 'A system that meets the ASI standard also meets the AGI standard. One evaluation could establish both.' },
+  { from: 'agi', to: 'rsi', kind: 'enabling', detail: 'Broad skills can help with AI research. A research specialist could start the loop before AGI.' },
+  { from: 'rsi', to: 'singularity', kind: 'required', detail: 'The Singularity requires independent evidence that successors keep improving later generations at a faster pace.' },
+  { from: 'autonomy', to: 'ai-research', kind: 'enabling', detail: 'AI systems that finish longer tasks reliably can take on more steps in a research project.' },
+  { from: 'ai-research', to: 'rsi', kind: 'possible', detail: 'Helping improve one model is a precursor. A successor needs to repeat that improvement for the loop to hold.' },
+];
+const plottedEdges = edges.filter(({ from, to }) => from in plotRows && to in plotRows);
+
 function make(tag, className, copy) {
   const node = document.createElement(tag);
   if (className) node.className = className;
   if (copy) node.textContent = copy;
+  return node;
+}
+
+function svgNode(tag, attributes) {
+  const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
   return node;
 }
 
@@ -109,6 +126,7 @@ function link(label, url) {
 export function renderRelationshipMap(container, { onSelect } = {}) {
   const foundations = new Map(foundationNotes.map((note) => [note.id, note]));
   const buttons = new Map();
+  const scores = new Map();
   let activeId = 'singularity';
   let currentIndex;
   let currentVerdicts;
@@ -116,7 +134,7 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   function buttonFor(id) {
     const note = foundations.get(id);
     const item = note ?? milestones[id];
-    const button = make('button', note ? 'srm__foundation' : 'srm__node');
+    const button = make('button', note ? 'srm__foundation' : id in plotRows ? 'srm__marker' : 'srm__node');
     button.type = 'button';
     button.dataset.node = id;
     button.setAttribute('aria-pressed', 'false');
@@ -126,6 +144,13 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       year.dateTime = String(note.year);
       const targets = note.related.map((id) => milestones[id]?.label).filter(Boolean);
       button.append(year, title, make('span', 'srm__foundation-link', '→ ' + targets.join(' · ')));
+    } else if (id in plotRows) {
+      const marker = make('span', 'srm__dot');
+      marker.setAttribute('aria-hidden', 'true');
+      const text = make('span', 'srm__marker-label');
+      text.append(title, make('span', 'srm__marker-score'));
+      button.append(marker, text);
+      button.style.setProperty('--srm-row', plotRows[id] + '%');
     } else {
       button.append(
         make('span', 'srm__node-role', item.role),
@@ -140,7 +165,7 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
 
   const map = make('div', 'srm');
   const graph = make('div', 'srm__graph');
-  const intro = make('p', 'srm__intro', 'Read each row as a different kind of progress. Follow the arrows to see what can lead to something else. Spacing is for readability. Select a card for its definition and evidence.');
+  const intro = make('p', 'srm__intro', 'Dots move left or right as the evidence changes. The percentage is how much of that milestone’s evidence checklist is supported. Rows group related milestones.');
   const legend = make('ul', 'srm__legend');
   legend.setAttribute('aria-label', 'Connection types');
   for (const kind of Object.keys(connectors)) {
@@ -149,37 +174,38 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
     legend.append(item);
   }
 
-  const top = make('div', 'srm__top');
-  const autonomy = make('section', 'srm__lane srm__lane--autonomy');
-  autonomy.append(make('h3', 'srm__lane-title', 'How reliably AI can act'), buttonFor('autonomy'));
-  const capability = make('section', 'srm__lane srm__lane--capability');
-  const capabilityChain = make('div', 'srm__chain srm__chain--capability');
-  capabilityChain.append(buttonFor('agi'), connector('possible', 'Can improve'), buttonFor('asi'));
-  capability.append(make('h3', 'srm__lane-title', 'What AI can do'), capabilityChain,
-    make('p', 'srm__lane-note', 'Both levels require broad skills. ASI clears the AGI bar and sets a higher performance standard across the same kinds of tasks.'));
-  top.append(autonomy, capability);
+  const heading = make('div', 'srm__graph-heading');
+  heading.append(make('p', 'srm__axis-title', 'Y · Milestone group'), link('Foundations before AI ↓', '#foundations'));
+  const plot = make('div', 'srm__plot');
+  const lines = svgNode('svg', { 'aria-hidden': 'true' });
+  const definitions = svgNode('defs', {});
+  for (const kind of Object.keys(connectors)) {
+    const marker = svgNode('marker', { id: 'srm-arrow-' + kind, viewBox: '0 0 8 8',
+      refX: 7, refY: 4, markerWidth: 8, markerHeight: 8, markerUnits: 'userSpaceOnUse', orient: 'auto' });
+    marker.append(svgNode('path', { d: 'M1 1 L7 4 L1 7', class: 'srm__edge srm__edge--' + kind }));
+    definitions.append(marker);
+  }
+  lines.append(definitions);
+  const paths = plottedEdges.map(({ kind }) => svgNode('path', { class: 'srm__edge srm__edge--' + kind,
+    'marker-end': 'url(#srm-arrow-' + kind + ')' }));
+  lines.append(...paths);
+  plot.append(lines, make('p', 'srm__band', 'Broad AI capability'), make('p', 'srm__band srm__band--research', 'AI improving AI'));
+  const ticks = make('div', 'srm__ticks');
+  ticks.setAttribute('aria-hidden', 'true');
+  for (const value of [0, 25, 50, 75, 100]) {
+    const tick = make('span', '', value + '%');
+    tick.style.setProperty('--srm-tick', value + '%');
+    ticks.append(tick);
+  }
+  const pending = make('div', 'srm__pending');
+  pending.append(make('p', '', 'Awaiting evidence points'));
+  const pendingNodes = make('div', 'srm__pending-nodes');
+  pending.append(pendingNodes);
+  for (const id of Object.keys(plotRows)) pendingNodes.append(buttonFor(id));
+  graph.append(heading, plot, ticks, make('p', 'srm__axis-title srm__axis-x', 'X · Evidence points earned (%)'), pending, legend);
 
-  const bridges = make('div', 'srm__bridges');
-  const autonomyBridge = make('div', 'srm__bridge');
-  autonomyBridge.append(connector('enabling', 'Autonomy → research'),
-    make('p', '', 'Reliable execution helps AI handle research tasks. Specialized systems can contribute before AGI.'));
-  const capabilityBridge = make('div', 'srm__bridge');
-  capabilityBridge.append(connector('enabling', 'Broad skills and RSI'),
-    make('p', '', 'Broad skills can help with AI research. A research loop could also improve broad skills if its gains carry over to other tasks.'));
-  bridges.append(autonomyBridge, capabilityBridge);
-
-  const research = make('section', 'srm__lane srm__lane--research');
-  const researchChain = make('div', 'srm__chain srm__chain--research');
-  researchChain.append(
-    buttonFor('ai-research'),
-    connector('possible', 'May lead to'),
-    buttonFor('rsi'),
-    connector('required'),
-    buttonFor('singularity'),
-  );
-  research.append(make('h3', 'srm__lane-title', 'How AI improves AI'), researchChain,
-    make('p', 'srm__lane-note', 'To confirm the Singularity, the watch checks for reliable workday-length autonomy, repeated research projects, and accelerating gains across AI generations.'));
-  graph.append(top, bridges, research);
+  const support = make('div', 'srm__support');
+  support.append(make('h3', 'srm__lane-title', 'Evidence that can help explain progress'), buttonFor('autonomy'), buttonFor('ai-research'));
 
   const history = make('section', 'srm__history');
   history.id = 'foundations';
@@ -193,8 +219,55 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   detail.setAttribute('aria-label', 'Selected milestone details');
   const announcement = make('span', 'srm__screen-reader');
   announcement.setAttribute('role', 'status');
-  map.append(intro, legend, graph, history, detail, announcement);
+  map.append(intro, graph, support, detail, history, announcement);
   container.replaceChildren(map);
+
+  function drawConnections() {
+    const { clientWidth: width, clientHeight: height } = plot;
+    if (!width || !height) return;
+    lines.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    for (const [i, { from, to }] of plottedEdges.entries()) {
+      if (!Number.isFinite(scores.get(from)) || !Number.isFinite(scores.get(to))) {
+        paths[i].removeAttribute('d');
+        continue;
+      }
+      const x1 = width * scores.get(from) / 100;
+      const x2 = width * scores.get(to) / 100;
+      const y1 = height * plotRows[from] / 100 + 7;
+      const y2 = height * plotRows[to] / 100 - 10;
+      const bend = (y1 + y2) / 2;
+      paths[i].setAttribute('d', 'M' + x1 + ' ' + y1 + ' C' + x1 + ' ' + bend + ' ' + x2 + ' ' + bend + ' ' + x2 + ' ' + y2);
+    }
+  }
+
+  new ResizeObserver(drawConnections).observe(plot);
+
+  function updatePlot() {
+    for (const { id, score } of measureMilestoneProgress(currentIndex)) {
+      const button = buttons.get(id);
+      const scored = Number.isFinite(score);
+      const place = scored ? plot : pendingNodes;
+      const amount = scored ? formatReading.format(score) + '%' : '';
+      scores.set(id, score);
+      if (button.parentNode !== place) place.append(button);
+      button.style.setProperty('--srm-position', scored ? score + '%' : '0%');
+      button.dataset.left = String(score >= 50);
+      button.querySelector('.srm__marker-score').textContent = amount;
+      button.setAttribute('aria-label', milestones[id].title + (scored ? ', ' + amount + ' of evidence points earned' : ', awaiting evidence points'));
+    }
+    pending.hidden = !pendingNodes.childElementCount;
+    drawConnections();
+  }
+
+  function jumpButton(id, label) {
+    const jump = make('button', '', label);
+    jump.type = 'button';
+    jump.addEventListener('click', () => {
+      select(id);
+      buttons.get(id).focus();
+    });
+    return jump;
+  }
 
   function renderDetail() {
     const note = foundations.get(activeId);
@@ -219,15 +292,28 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       const related = make('div', 'srm__related');
       for (const id of note.related) {
         if (!milestones[id]) continue;
-        const jump = make('button', '', milestones[id].label);
-        jump.type = 'button';
-        jump.addEventListener('click', () => {
-          select(id);
-          buttons.get(id).focus();
-        });
-        related.append(jump);
+        related.append(jumpButton(id, milestones[id].label));
       }
       detail.append(related);
+    } else {
+      const connections = edges.filter(({ from, to }) => from === activeId || to === activeId);
+      if (connections.length) {
+        const items = make('ul', 'srm__connection-list');
+        for (const { from, to, kind, detail: explanation } of connections) {
+          const item = make('li', '');
+          const target = activeId === from ? to : from;
+          const label = milestones[from].label + ' → ' + milestones[to].label;
+          item.append(jumpButton(target, label), make('p', '', connectors[kind] + '. ' + explanation));
+          items.append(item);
+        }
+        detail.append(items);
+      }
+      const earlier = foundationNotes.filter((foundation) => foundation.related.includes(activeId));
+      if (earlier.length) {
+        const related = make('div', 'srm__related');
+        related.append(make('p', '', 'Earlier foundations'), ...earlier.map(({ id, label }) => jumpButton(id, label)));
+        detail.append(related);
+      }
     }
     const evidence = make('div', 'srm__evidence');
     detail.append(evidence, refs);
@@ -264,6 +350,9 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
       button.setAttribute('aria-pressed', String(nodeId === id));
       button.classList.toggle('srm__node--related', related.includes(nodeId));
     }
+    for (const [i, { from, to }] of plottedEdges.entries()) {
+      paths[i].classList.toggle('srm__edge--active', from === id || to === id);
+    }
     renderDetail();
     if (notify) {
       announcement.textContent = 'Showing ' + (foundations.get(id) ?? milestones[id]).title + ' details.';
@@ -275,9 +364,11 @@ export function renderRelationshipMap(container, { onSelect } = {}) {
   function update({ index = currentIndex, verdicts = currentVerdicts } = {}) {
     currentIndex = index;
     currentVerdicts = verdicts;
+    updatePlot();
     renderEvidence(detail.querySelector('.srm__evidence'));
   }
 
+  updatePlot();
   select(activeId, { notify: false });
   return { select, update };
 }

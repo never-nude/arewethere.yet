@@ -131,6 +131,16 @@
   line-height: 1.5;
 }
 .org-forecast__scale { margin-top: 5px; color: var(--dim); font-size: 12px; }
+.org-forecast__axes { margin: 9px 0 0 28px; }
+.org-forecast__axis-title { margin-top: 4px; color: #ecdefb; font: 600 12px/1.4 Geist, sans-serif; }
+.org-forecast__range {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  border-bottom: 1px solid #66557e;
+  color: var(--dim);
+  font: 400 11px/1.5 var(--mono);
+}
 .org-forecast__method { margin-top: 9px; }
 .org-forecast__method summary {
   width: fit-content;
@@ -163,6 +173,7 @@
 }
 
 @media (max-width: 520px) {
+  .org-forecast__axes { margin-left: 21px; }
   .org-forecast { padding: 11px; }
   .org-forecast__header { flex-direction: column; gap: 4px; }
   .org-forecast__item { grid-template-columns: 16px minmax(0, 1fr) max-content 64px; column-gap: 5px; }

@@ -51,7 +51,12 @@ const published = {
   events,
   incidents,
   incidentSources,
-  delivery: { kind: 'github-pages', builtAt: new Date().toISOString(), checkIntervalHours: 1 },
+  delivery: {
+    kind: 'github-pages',
+    builtAt: new Date().toISOString(),
+    checkTimes: ['00:00', '06:00', '09:30', '16:00'],
+    checkTimeZone: 'America/New_York',
+  },
 };
 
 const result = buildIndex(published);

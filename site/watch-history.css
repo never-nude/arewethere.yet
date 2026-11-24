@@ -20,12 +20,11 @@
 .watch-history__chart-heading, .watch-history__day-heading { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 5px 12px; }
 .watch-history__chart-heading h3, .watch-history__day-heading h3 { font-size: 18px; letter-spacing: -.02em; }
 .watch-history__chart-heading p, .watch-history__day-heading p { color: #d8cde7; font-size: 13px; }
-.watch-history__axes { display: flex; flex-wrap: wrap; gap: 6px 18px; color: #e1d6ec; font-size: 13px; line-height: 1.45; }
-.watch-history__axes strong { margin-right: 4px; color: var(--ink); }
 .watch-history__day-heading strong { color: var(--ink); font-variant-numeric: tabular-nums; }
 .watch-history__plot { min-width: 0; border: 1px solid #423454; border-radius: 8px; background: linear-gradient(145deg, #171222, #201830); }
 .watch-history__plot svg { display: block; width: 100%; cursor: crosshair; }
 .watch-history__plot text { fill: #cbbedf; font: 400 11px var(--mono, monospace); }
+.watch-history__plot .watch-history__axis-title { fill: #ecdefb; font: 600 12px Geist, sans-serif; }
 .watch-history__gridline { stroke: #3b2d51; }
 .watch-history__event-band { fill: #221936; stroke: #493862; }
 .watch-history__trace { fill: none; stroke: #ba9af5; stroke-width: 2.2; stroke-linejoin: round; }

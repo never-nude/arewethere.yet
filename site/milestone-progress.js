@@ -256,7 +256,7 @@ function mount(container) {
   header.id = 'milestone-progress-heading';
   container.setAttribute('aria-labelledby', header.id);
   introduction.append(header,
-    element('p', '', 'Each milestone uses its own rubric. The percentage shows how many of its weighted evidence points are supported. Criteria awaiting verification stay unfilled.'),
+    element('p', '', 'Each milestone has its own scoring guide. The bright part of the bar shows points earned. The darker solid part shows unearned points for criteria with evidence. Stripes show points still awaiting evidence.'),
     link('How empathy and trust can be tested ↗', '#human-evidence'));
   const date = element('p', 'milestone-progress__date');
   heading.append(introduction, date);
@@ -272,6 +272,9 @@ function mount(container) {
     const available = element('div', 'milestone-progress__available');
     const fill = element('div', 'milestone-progress__fill');
     meter.append(available, fill);
+    const scale = element('div', 'milestone-progress__scale');
+    scale.setAttribute('aria-hidden', 'true');
+    scale.append(element('span', '', '0%'), element('span', '', '100% of points'));
     const coverage = element('p', 'milestone-progress__coverage');
     const details = element('details', 'milestone-progress__details');
     const example = element('p', 'milestone-progress__example');
@@ -282,7 +285,7 @@ function mount(container) {
     references.append(...rubric.links.map(([label, href]) => link(label + ' ↗', href)));
     details.append(element('summary', '', 'Rubric and evidence'), element('p', 'milestone-progress__definition', rubric.title + '.'),
       example, contributions, references, verdict);
-    card.append(top, element('p', 'milestone-progress__target', rubric.target), meter, coverage, details);
+    card.append(top, element('p', 'milestone-progress__target', rubric.target), meter, scale, coverage, details);
     cards.append(card);
     return { value, coverage, available, fill, contributions, verdict };
   });

@@ -6,7 +6,9 @@ An interactive observatory for public evidence of self-accelerating AI. The site
 
 Use Node.js 24. Run `npm run dev` for the local site and live source checks. Run `npm run build` to fetch public data and generate a static GitHub Pages bundle in `dist-pages/`. The build and interface have no package dependencies.
 
-GitHub Actions publishes on pushes to `main` and checks sources hourly. Public figures arrive on their publishers’ schedules. If all sources fail during a scheduled run, the previous Pages deployment stays live. A compatible new METR dataset replaces the current benchmark data automatically, and a changed format is flagged for review.
+GitHub Actions publishes on pushes to `main` and schedules source checks daily at midnight, 6 a.m., 9:30 a.m., and 4 p.m. Eastern time, including weekends and holidays. The last two checks use the regular NYSE opening and closing times as clock anchors. [NYSE trading hours](https://www.nyse.com/trade/hours-calendars)
+
+Public figures arrive on their publishers’ schedules. If all sources fail during a scheduled run, the previous Pages deployment stays live. A compatible new METR dataset replaces the current benchmark data automatically, and a changed format is flagged for review.
 
 ## The evidence index
 
@@ -16,6 +18,6 @@ A scenario date marks a hypothetical crossing of the 75-point watch line. The wo
 
 ## Paths and acceleration watch
 
-The 3D map illustrates possible sequences. Its grid provides perspective, and each arrow has an evidence bar and explanation. Path confidence uses editorial weights to total evidence points with a separate coverage figure. The browser checks a public play-money forecast every minute while open. The hourly build incorporates benchmark updates as publishers release them.
+The 2D map positions each milestone by its latest evidence score and groups related milestones. The 3D map positions milestones by their requirements for breadth, performance relative to people, and successive AI-led improvement. Its arrows show possible sequences and fill in proportion to the evidence for each step. Path scores use published weights and report source coverage separately. The browser checks a public play-money forecast every minute while open. Scheduled builds incorporate published benchmark updates.
 
 The acceleration watch looks for large, corroborating capability and research gains over 7 and 30 days. Open- and closed-weight model leaders share the same Epoch benchmark scale. The long-run timeline uses documented landmarks from 1958 and displays the daily numerical index when a reading is available.

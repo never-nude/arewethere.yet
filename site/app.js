@@ -2,7 +2,6 @@ import { buildIndex, projectThreshold } from './index-model.js';
 import { getCountdown } from './countdown.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
-import { measureTerrainEvidence } from './terrain-evidence.js';
 import { renderRelationshipMap } from './relationship-map.js';
 import { mountAtlasFullscreen } from './atlas-fullscreen.js';
 import { renderAgiTrajectory } from './agi-trajectory.js';
@@ -31,6 +30,7 @@ const pageSize = 5;
 let dataset;
 let index;
 let milestoneVerdicts;
+let milestoneMeasurements;
 let selectedDate;
 let rangeDays = 90;
 let filter = 'All';
@@ -96,7 +96,8 @@ function setPressed(group, property, value) {
 
 function renderReading() {
   const { score, delta, coverage, threshold } = index;
-  byId('current-score').textContent = num(score);
+  byId('current-score').textContent = Number.isFinite(score) ? num(score) : 'Score unavailable';
+  byId('current-score').toggleAttribute('data-waiting', !Number.isFinite(score));
   setChange(byId('current-delta'), delta);
   byId('current-delta').title = 'Change from the prior day';
   byId('index-fill').style.width = (score ?? 0) + '%';
@@ -305,7 +306,7 @@ function renderPathConfidence() {
     status: updates + trade,
     method: routeConfidenceMethod + ' The market is checked every minute while this page is open. Benchmark and research readings change when results are published. Scores show evidence support in points.',
     verdicts: milestoneVerdicts,
-    evidence: measureTerrainEvidence(index),
+    evidence: milestoneMeasurements,
   });
 }
 
@@ -398,7 +399,9 @@ function renderSources() {
   });
   const checked = dataset.checkedAt ? checkTime.format(new Date(dataset.checkedAt)) : 'Unknown';
   const prefix = 'Last source check ' + checked + '. ';
-  const cadence = dataset.delivery?.kind === 'github-pages' ? 'GitHub Actions checks sources hourly.' : 'This preview checks sources while open.';
+  const cadence = dataset.delivery?.kind === 'github-pages'
+    ? 'Source checks are scheduled daily at midnight, 6 a.m., 9:30 a.m., and 4 p.m. Eastern.'
+    : 'This preview checks for updated data while open.';
   byId('sources-list').replaceChildren(...sources);
   byId('data-freshness').textContent = prefix + cadence;
   byId('refresh').title = prefix + 'Click to check for a newer dataset.';
@@ -429,6 +432,7 @@ async function reload() {
       dataset = next;
       index = buildIndex(dataset);
       milestoneVerdicts = getMilestoneVerdicts(index);
+      milestoneMeasurements = Object.fromEntries(measureMilestoneProgress(index).map(({ id, contributions }) => [id, contributions]));
       relationships.update({ index, verdicts: milestoneVerdicts });
       if (atLatest) selectedDate = index.date;
       renderReading();
@@ -454,7 +458,10 @@ async function reload() {
   } catch (error) {
     byId('source-status').dataset.state = 'saved';
     byId('source-time').textContent = dataset ? 'Update unavailable' : 'Data unavailable';
-    if (!dataset) byId('observed').textContent = 'Source data unavailable';
+    if (!dataset) {
+      byId('observed').textContent = 'Source data unavailable';
+      byId('current-score').textContent = 'Score unavailable';
+    }
     console.warn('Signal refresh:', error.message);
   } finally {
     await liveCheck;
@@ -515,7 +522,7 @@ plots.observe(byId('scenario-chart'));
 
 const terrainConcepts = new Set(['agi', 'asi', 'rsi', 'singularity']);
 const mapSelection = { relationships: 'singularity', routes: 'singularity' };
-let mapView = 'routes';
+let mapView = 'relationships';
 
 function updateAgiVisibility() {
   const show = mapSelection[mapView] === 'agi';

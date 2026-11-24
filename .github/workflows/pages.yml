@@ -5,7 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '0 0,6,16 * * *'
+      timezone: 'America/New_York'
+    - cron: '30 9 * * *'
+      timezone: 'America/New_York'
 
 concurrency:
   group: singularity-pages

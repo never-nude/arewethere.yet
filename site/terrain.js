@@ -77,13 +77,25 @@ const initialCamera = { yaw: .68, pitch: .39, zoom: 1, panX: 0, panY: 0 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const confidenceNumber = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 const axes = [
-  { id: 'x', label: 'First supporting measure', color: '#82dbe5' },
-  { id: 'y', label: 'Independent confirmation', color: '#d1b2ff' },
-  { id: 'z', label: 'Second supporting measure', color: '#ffc78f' },
+  { id: 'x', label: 'Range of skills', endLabel: 'Many fields', levels: ['No minimum', 'Many kinds of work'], color: '#82dbe5' },
+  { id: 'y', label: 'Skill vs. people', endLabel: 'Above experts', levels: ['No minimum', 'Matches skilled people', 'Beats leading experts'], color: '#d1b2ff' },
+  { id: 'z', label: 'AI builds better AI', endLabel: 'Faster each round', levels: ['No loop required', 'Repeated improvement', 'Faster gains each generation'], color: '#ffc78f' },
 ];
+// Requirements on the three shared scales, in X, Y, Z order.
+const requirements = {
+  agi: [1, 1, 0],
+  asi: [1, 2, 0],
+  rsi: [0, 0, 1],
+  singularity: [0, 0, 2],
+};
+const relationships = {
+  agi: 'AGI and ASI both cover many kinds of work. AGI sets the bar at skilled human performance.',
+  asi: 'ASI covers the same broad range as AGI and sets a higher bar on those tasks.',
+  rsi: 'A research specialist can help build a better successor, which can then improve the next one.',
+  singularity: 'The same loop must produce faster gains across successive AI generations.',
+};
 const plotEdge = 1.3;
 const lowerCorner = axes.map(() => -plotEdge);
-const upperCorner = axes.map(() => plotEdge);
 const ticks = [0, 25, 50, 75, 100];
 
 function plotValue(percent) {
@@ -99,16 +111,15 @@ function node(tag, name, content) {
 
 function sceneMarkup() {
   return `
-    <div class="sw-terrain__toolbar">
+    <div class="sw-terrain__toolbar" id="terrain-routes">
       <div class="sw-terrain__confidence-head"><h3>Evidence for two example routes</h3><span class="sw-terrain__confidence-status">Waiting for evidence</span></div>
       <div class="sw-terrain__path-buttons" role="group" aria-label="Choose an example sequence">
         ${Object.entries(paths).map(([id, path]) => `<button type="button" data-path="${id}" aria-pressed="false"><span><b>${path.label}</b><span class="sw-terrain__route-intro">${path.intro}</span><small class="sw-terrain__coverage"></small></span><strong><span data-route-score="${id}">—</span><small> / 100</small></strong></button>`).join('')}
       </div>
       <p class="sw-terrain__route-note">Each score totals weighted evidence points for the example shown. <a class="evidence-jump" href="#milestone-order">See which milestones can happen first.</a></p>
     </div>
-    <div class="sw-terrain__stage" data-waiting>
-      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-legend" aria-label="Rotating 3D milestone evidence graph. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
-      <p class="sw-terrain__scene-message">Waiting for measured evidence</p>
+    <div class="sw-terrain__stage">
+      <canvas class="sw-terrain__canvas" tabindex="0" aria-describedby="terrain-position-key terrain-arrow-key" aria-label="Rotating 3D milestone requirements map. Use arrow keys to rotate, Shift and arrow keys to pan, plus or minus to zoom, and Home to reset."></canvas>
       <button type="button" class="sw-terrain__orbit" data-camera="orbit">Start orbit</button>
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
         ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
@@ -120,12 +131,23 @@ function sceneMarkup() {
         <button type="button" data-camera="reset" class="sw-terrain__reset" aria-label="Reset view" title="Reset view">Reset</button>
       </div>
     </div>
-    <div class="sw-terrain__legend" id="terrain-legend">
-      <ul class="sw-terrain__axes" aria-label="Graph axes, 0 to 100 percent of available evidence credit">
-        ${axes.map(({ id, label, color }) => `<li style="--axis-color:${color}"><b>${id.toUpperCase()}</b> ${label}</li>`).join('')}
-      </ul>
-      <p>Each axis shows the share of available points the evidence earned. The supporting tests differ by milestone. Points at the base still await independent confirmation.</p>
-      <p>Select a milestone to see its calculations. Curved arrows illustrate a sequence, and their filled length shows the step’s evidence score.</p>
+    <div class="sw-terrain__chart-key">
+      <div class="sw-terrain__position-key">
+        <h2>What <span data-selected-concept>the Singularity</span> requires</h2>
+        <p id="terrain-position-key">Dots close together have similar requirements. Each axis shows a different requirement, from the lowest bar at the base to the highest at the end.</p>
+        <dl class="sw-terrain__axis-readings" aria-live="polite" aria-atomic="true">
+          ${axes.map(({ id, label, color }) => `<div data-axis="${id}" style="--axis-color:${color}"><dt><b>${id.toUpperCase()}</b> ${label}</dt><dd></dd></div>`).join('')}
+        </dl>
+        <p class="sw-terrain__relationship"></p>
+      </div>
+      <div class="sw-terrain__arrow-key">
+        <h2>Arrow fill · evidence for each step</h2>
+        <p id="terrain-arrow-key">Arrows show possible orders. The bright part shows how many of 100 evidence points each step earned.</p>
+        <ul class="sw-terrain__arrow-readings" aria-label="Evidence scores for the steps shown"></ul>
+        <a class="evidence-jump" href="#terrain-routes">See what earns points</a>
+      </div>
+    </div>
+    <div class="sw-terrain__legend">
       <div class="sw-terrain__arrow-keys"><span><i aria-hidden="true"></i>Possible step</span><span><i class="sw-terrain__solid" aria-hidden="true"></i>Required by our definition</span><span><i class="sw-terrain__filled" aria-hidden="true"></i>Evidence score</span></div>
     </div>
     <div class="sw-terrain__readout">
@@ -144,8 +166,8 @@ function sceneMarkup() {
         <p class="sw-terrain__overline">Selected concept</p>
         <h3></h3>
         <div class="sw-terrain__coordinates" hidden>
-          <h4>Position in the evidence graph</h4>
-          <p>Each coordinate is credited points ÷ available points × 100.</p>
+          <h4>What we measure</h4>
+          <p>Each test earns points under this milestone’s scoring rules. Checks that still need evidence show as pending.</p>
           <ul></ul>
         </div>
         <p class="sw-terrain__definition"></p>
@@ -239,14 +261,12 @@ function paintGround(ctx, project) {
   ctx.restore();
 }
 
-function paintAxes(ctx, project, width) {
+function paintAxes(ctx, project, width, height) {
   ctx.save();
+  const labelBounds = [];
   const [originX, originY] = project(lowerCorner);
-  ctx.font = '11px ui-monospace, monospace';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#e1d3f7';
   ctx.textAlign = 'center';
-  ctx.fillText('0%', originX, originY + 12);
 
   for (const [index, axis] of axes.entries()) {
     const at = (percent) => project(lowerCorner.map((value, dimension) => dimension === index ? plotValue(percent) : value));
@@ -256,39 +276,64 @@ function paintAxes(ctx, project, width) {
     const length = Math.hypot(dx, dy);
     if (length < 12) continue;
     const normal = [-dy / length * 3, dx / length * 3];
-    const side = index === 1 ? -1 : Math.sign(dx);
+    const side = index === 1 ? -1 : Math.sign(dx) || 1;
     ctx.strokeStyle = axis.color;
     ctx.fillStyle = axis.color;
     ctx.lineWidth = 1.45;
     trace(ctx, [[originX, originY], [endX, endY]]);
     ctx.stroke();
-    for (const tick of ticks.slice(1)) {
-      const [x, y] = at(tick);
+    for (let level = 1; level < axis.levels.length; level += 1) {
+      const [x, y] = at(100 * level / (axis.levels.length - 1));
       trace(ctx, [[x - normal[0], y - normal[1]], [x + normal[0], y + normal[1]]]);
       ctx.stroke();
-      if (tick === 50 && length > 65) {
-        ctx.textAlign = 'center';
-        ctx.fillText('50%', x + normal[0] * side * 4, y + normal[1] * side * 4);
-      }
     }
-    const name = `${axis.id.toUpperCase()} 100%`;
-    const textWidth = ctx.measureText(name).width;
-    ctx.textAlign = 'center';
-    const labelX = endX + (index === 1 ? 0 : side * (textWidth / 2 + 7));
-    const boundedX = clamp(labelX, textWidth / 2 + 4, width - textWidth / 2 - 4);
-    if (endX >= 0 && endX <= width) {
-      ctx.fillText(name, boundedX, endY + (index === 1 ? -11 : boundedX === labelX ? 0 : 12));
+    ctx.font = '600 11px system-ui, sans-serif';
+    const name = `${axis.id.toUpperCase()} · ${axis.label}`;
+    const textWidth = Math.max(ctx.measureText(name).width, ctx.measureText(axis.endLabel).width);
+    const labelX = endX + side * (textWidth / 2 + 14);
+    const boundedX = clamp(index === 1 ? endX : labelX, textWidth / 2 + 8, width - textWidth / 2 - 8);
+    if (endX >= 0 && endX <= width && endY >= 0 && endY <= height) {
+      const labelY = clamp(endY + (index === 1 ? -26 : 12), 16, height - 33);
+      ctx.strokeStyle = '#130e24';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(name, boundedX, labelY);
+      ctx.fillText(name, boundedX, labelY);
+      ctx.font = '11px system-ui, sans-serif';
+      ctx.strokeText(axis.endLabel, boundedX, labelY + 13);
+      ctx.fillText(axis.endLabel, boundedX, labelY + 13);
+      labelBounds.push({ left: boundedX - textWidth / 2, right: boundedX + textWidth / 2, top: labelY - 7, bottom: labelY + 20 });
     }
   }
 
-  const [targetX, targetY] = project(upperCorner);
-  ctx.strokeStyle = '#bca8dfac';
-  ctx.lineWidth = 1.1;
-  trace(ctx, [[targetX, targetY - 5], [targetX + 5, targetY], [targetX, targetY + 5], [targetX - 5, targetY]]);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fillStyle = '#d9c9eb';
-  ctx.fillText('Full credit', targetX, targetY - 13);
+  ctx.restore();
+  return labelBounds;
+}
+
+function paintCoordinateGuides(ctx, project, point) {
+  if (!point) return;
+  const onFloor = [point[0], lowerCorner[1], point[2]];
+  const [floorX, floorY] = project(onFloor);
+  ctx.save();
+  ctx.lineWidth = 1;
+  for (const [index, axis] of axes.entries()) {
+    const endpoint = [...lowerCorner];
+    endpoint[index] = point[index];
+    const [x, y] = project(endpoint);
+    ctx.strokeStyle = axis.color + '86';
+    ctx.fillStyle = axis.color;
+    ctx.setLineDash([2, 5]);
+    if (axis.id === 'y') {
+      if (point[index] > lowerCorner[index]) trace(ctx, [project(point), [floorX, floorY]]);
+      else ctx.beginPath();
+    } else {
+      trace(ctx, [[floorX, floorY], [x, y]]);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, 2.3, 0, 2 * Math.PI);
+    ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -403,9 +448,9 @@ function paintConcept(ctx, concept, [centerX, centerY, perspective], selected) {
   ctx.restore();
 }
 
-function positionMarkers(ctx, positions, markers, width, height) {
+function positionMarkers(ctx, positions, markers, width, height, axisLabels) {
   const spacing = 6;
-  const occupied = [];
+  const occupied = [...axisLabels];
   for (const point of positions) {
     const button = markers.get(point.id);
     const buttonWidth = button.offsetWidth;
@@ -439,10 +484,13 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
   container.classList.add('sw-terrain');
   container.innerHTML = sceneMarkup();
   const stage = container.querySelector('.sw-terrain__stage');
+  const chartKey = container.querySelector('.sw-terrain__chart-key');
   if (stageMount) {
     stageMount.classList.add('sw-terrain');
-    stageMount.replaceChildren(stage);
+    stageMount.replaceChildren(stage, chartKey);
   }
+  const axisReadings = [...chartKey.querySelectorAll('[data-axis] dd')];
+  const arrowReadings = chartKey.querySelector('.sw-terrain__arrow-readings');
   const canvas = stage.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   const markerButtons = new Map([...stage.querySelectorAll('[data-concept]')].map((button) => [button.dataset.concept, button]));
@@ -469,9 +517,11 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
   let scores;
   let milestoneVerdicts;
   let milestoneEvidence;
-  const scenePoints = new Map();
+  const scenePoints = new Map(Object.entries(requirements).map(([id, levels]) => [id,
+    levels.map((level, index) => plotValue(100 * level / (axes[index].levels.length - 1)))]));
   let contributionKey;
   let coordinateKey;
+  let arrowKey;
   let orbitEnabled = false;
   let lastOrbitFrame = null;
   let hoveredMarker = null;
@@ -498,9 +548,9 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     const project = createProjector(camera, width, height);
     paintBackground(ctx, width, height, camera.yaw);
     paintGround(ctx, project);
-    paintAxes(ctx, project, width);
+    const axisLabels = paintAxes(ctx, project, width, height);
     if (orbiting) refreshScene();
-    if (!scenePoints.size) return;
+    paintCoordinateGuides(ctx, project, scenePoints.get(selected));
     const steps = scores?.[pathId]?.steps ?? [];
     for (const leg of paths[pathId].legs) {
       const step = steps.find(({ from, to }) => from === leg.from && to === leg.to);
@@ -510,7 +560,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     projected.sort((a, b) => Number(a.id === selected) - Number(b.id === selected) || a.screen[2] - b.screen[2]);
     for (const { id, screen } of projected) paintConcept(ctx, concepts[id], screen, id === selected);
     const labels = projected.reverse().map(({ id, screen: [x, y] }) => ({ id, x, y }));
-    positionMarkers(ctx, labels, markerButtons, width, height);
+    positionMarkers(ctx, labels, markerButtons, width, height, axisLabels);
   }
 
   function setOrbit(enabled) {
@@ -546,35 +596,37 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     const link = explanation.querySelector('.sw-terrain__concept-source');
     link.href = concept.source;
     link.textContent = concept.sourceName + ' ↗';
-    renderCoordinates();
+    chartKey.querySelector('[data-selected-concept]').textContent = id === 'singularity' ? 'the Singularity' : concept.label;
+    requirements[id].forEach((level, index) => { axisReadings[index].textContent = axes[index].levels[level]; });
+    chartKey.querySelector('.sw-terrain__relationship').textContent = relationships[id];
+    renderMeasurements();
     renderVerdict();
     refreshScene();
     if (notify) onSelect?.(id, concept);
   }
 
-  function renderCoordinates() {
+  function renderMeasurements() {
     const reading = milestoneEvidence?.[selected];
     coordinates.hidden = !reading;
-    if (!reading) return;
     const key = JSON.stringify([selected, reading]);
     if (key === coordinateKey) return;
     coordinateKey = key;
+    if (!reading) return;
 
-    const rows = [...reading.axes, ...(reading.additional ?? [])].map((axis) => {
-      const label = axis.axis ? `${axis.axis.toUpperCase()} · ${axis.label}` : axis.label;
-      const result = (axis.axis ? `${confidenceNumber.format(axis.percent)}%` : 'Additional criterion') +
-        (axis.pending ? ' · pending' : '');
+    const rows = reading.map((criterion) => {
       const item = node('li');
       const heading = node('div', 'sw-terrain__coordinate-heading');
-      heading.append(node('strong', '', label), node('span', '', result));
+      const available = confidenceNumber.format(criterion.weight);
+      const credit = criterion.points == null ? `Pending · ${available} pts` :
+        `${confidenceNumber.format(criterion.points)} / ${available} pts`;
+      heading.append(node('strong', '', criterion.label), node('span', '', credit));
       item.append(heading);
-      const credit = `${confidenceNumber.format(axis.points ?? 0)} / ${confidenceNumber.format(axis.weight)} points credited`;
-      const value = Number.isFinite(axis.value) ? confidenceNumber.format(axis.value) + (axis.unit ?? '').replace(/^[a-z]/i, ' $&') : '';
-      item.append(node('p', '', credit + (value ? ` · Measured ${value}` : '')));
-      if (axis.detail) item.append(node('p', '', axis.detail));
-      if (axis.sourceUrl?.startsWith('https://') && axis.source) {
-        const source = node('a', 'sw-terrain__coordinate-source', axis.source + ' ↗');
-        source.href = axis.sourceUrl;
+      const value = Number.isFinite(criterion.rawValue) ? confidenceNumber.format(criterion.rawValue) + (criterion.unit ?? '').replace(/^[a-z]/i, ' $&') : '';
+      if (value) item.append(node('p', '', 'Measured ' + value));
+      if (criterion.detail) item.append(node('p', '', criterion.detail));
+      if (criterion.sourceUrl?.startsWith('https://') && criterion.source) {
+        const source = node('a', 'sw-terrain__coordinate-source', criterion.source + ' ↗');
+        source.href = criterion.sourceUrl;
         source.target = '_blank';
         source.rel = 'noopener noreferrer';
         item.append(source);
@@ -629,6 +681,19 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
 
   function renderRouteEvidence() {
     const route = scores?.[pathId];
+    const readings = paths[pathId].legs.map(({ from, to }) => {
+      const step = route?.steps.find((item) => item.from === from && item.to === to);
+      return [concepts[from].label + ' → ' + concepts[to].label, step?.score];
+    });
+    const readingKey = JSON.stringify(readings);
+    if (readingKey !== arrowKey) {
+      arrowKey = readingKey;
+      arrowReadings.replaceChildren(...readings.map(([label, score]) => {
+        const item = node('li');
+        item.append(node('span', '', label), node('strong', '', score == null ? 'Awaiting evidence' : `${confidenceNumber.format(score)} / 100`));
+        return item;
+      }));
+    }
     for (const step of route?.steps ?? []) {
       const row = stepRows.get(step.from + ':' + step.to);
       if (!row) continue;
@@ -663,14 +728,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
     scores = nextScores;
     if (evidence && evidence !== milestoneEvidence) {
       milestoneEvidence = evidence;
-      for (const [id, button] of markerButtons) {
-        const reading = evidence[id];
-        if (!reading) continue;
-        scenePoints.set(id, reading.axes.map(({ percent }) => plotValue(percent)));
-        button.title = reading.axes.map(({ axis, percent }) => `${axis.toUpperCase()} ${confidenceNumber.format(percent)}%`).join(' · ');
-      }
-      stage.toggleAttribute('data-waiting', !scenePoints.size);
-      renderCoordinates();
+      renderMeasurements();
     }
     if (verdicts && verdicts !== milestoneVerdicts) {
       milestoneVerdicts = verdicts;
@@ -857,6 +915,7 @@ export function renderTerrain(container, { mode = 'breadth', onSelect, stageMoun
       cancelAnimationFrame(frame);
       if (stageMount) {
         stage.remove();
+        chartKey.remove();
         stageMount.classList.remove('sw-terrain');
       }
       container.replaceChildren();

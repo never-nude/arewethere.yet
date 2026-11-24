@@ -77,10 +77,12 @@
   background: #33244980;
 }
 
-.hist-plot__coordinates dt, .hist-plot__legend {
+.hist-plot__legend {
   color: var(--subtle);
   font: 400 10px/1.35 var(--mono);
 }
+
+.hist-plot__coordinates dt { color: #ecdefb; font: 600 12px/1.4 Geist, sans-serif; }
 
 .hist-plot__coordinates dd {
   margin: 3px 0 0;
@@ -408,6 +410,5 @@
   .hist-plot { padding: 9px; }
   .hist-plot__coordinates { gap: 4px; }
   .hist-plot__coordinates > div { padding: 5px; }
-  .hist-plot__coordinates dt { font-size: 9px; }
   .hist-plot__coordinates dd { font-size: 11px; }
 }

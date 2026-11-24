@@ -169,10 +169,10 @@ function renderTrend(points, unit) {
   svg.prepend(svgNode('path', { d: line, class: 'organization-signals__trace' }));
   const plot = node('div', 'organization-signals__plot');
   const scale = node('div', 'organization-signals__y-axis');
-  scale.append(node('span', '', number.format(peak)), node('span', '', '0'));
+  scale.append(node('span', '', number.format(peak)), node('span', '', number.format(peak / 2)), node('span', '', '0'));
   const dates = node('div', 'organization-signals__x-axis');
-  dates.append(node('span', '', dated(iso(first))), node('span', '', 'Date'), node('span', '', dated(iso(last))));
-  plot.append(scale, svg, dates);
+  dates.append(node('span', '', dated(iso(first))), node('span', '', dated(iso(last))));
+  plot.append(scale, svg, dates, node('p', 'organization-signals__axis-title organization-signals__axis-date', 'X · Date (UTC)'));
   const history = node('details', 'organization-signals__history');
   history.append(node('summary', '', 'View dated leaders and margins'));
   const items = node('ol', '');
@@ -187,8 +187,8 @@ function renderTrend(points, unit) {
     items.append(row);
   }
   history.append(items);
-  figure.append(node('p', 'organization-signals__note', 'Height shows the leader’s margin in ' + unit + '. Each date uses the selected release window.'),
-    plot, history);
+  figure.append(node('p', 'organization-signals__axis-title', 'Y · Margin over second place (' + unit + ')'),
+    plot, node('p', 'organization-signals__note', 'Each date uses the selected release window.'), history);
   return figure;
 }
 
@@ -243,8 +243,12 @@ function renderRanking(panel, state, lane, end, metric, observations) {
     list.append(entry);
   }
   if (rows.length) {
-    panel.append(node('p', 'organization-signals__note', 'Bar length shows the measured result from 0 to '
-      + number.format(leader.value) + ' ' + lane.unit + ', the highest result shown.'), list);
+    const axes = node('div', 'organization-signals__bar-axes');
+    axes.append(node('p', 'organization-signals__axis-title', 'Y · Developer rank'));
+    const scale = node('div', 'organization-signals__bar-scale');
+    scale.append(node('span', '', '0'), node('span', '', number.format(leader.value)));
+    axes.append(node('p', 'organization-signals__axis-title', 'X · Measured result (' + lane.unit + ')'), scale);
+    panel.append(axes, list);
     if (rows.length < LIMIT) panel.append(node('p', 'organization-signals__note',
       'Additional places require comparable public measurements within this period.'));
   }

@@ -88,6 +88,7 @@
 }
 .milestone-progress__available { background: var(--progress-gate); }
 .milestone-progress__fill { background: var(--progress-accent); }
+.milestone-progress__scale { display: flex; justify-content: space-between; gap: 5px; margin-top: 4px; color: var(--dim); font: 400 11px/1.4 var(--mono); }
 .milestone-progress__coverage {
   margin-top: 5px;
   color: var(--subtle);

@@ -94,6 +94,9 @@
 .organization-signals__x-axis { grid-column: 2; }
 .organization-signals__x-axis span:last-child { text-align: right; }
 .organization-signals__y-axis { flex-direction: column; align-items: end; }
+.organization-signals__axis-title { color: #ecdefb; font: 600 12px/1.4 Geist, sans-serif; }
+.organization-signals__axis-date { grid-column: 2; text-align: center; }
+.organization-signals .organization-signals__axis-title { margin-bottom: 4px; }
 .organization-signals__grid { fill: none; stroke: #46395e; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .organization-signals__trace { fill: none; stroke: #83e6cf; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .organization-signals__mark { fill: #83e6cf; }
@@ -103,6 +106,14 @@
 .organization-signals__history li { display: grid; grid-template-columns: 100px 1fr; gap: 5px; padding: 3px 0; }
 .organization-signals__history time { color: #d9cbf1; }
 .organization-signals__leaderboard, .organization-signals__records { list-style: none; padding: 0; margin: 0 0 7px; }
+.organization-signals__bar-axes { margin: 10px 0 0 29px; }
+.organization-signals__bar-scale {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #66557e;
+  color: var(--dim);
+  font: 400 11px/1.5 var(--mono);
+}
 .organization-signals__entry {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr) auto;
@@ -152,6 +163,7 @@
 .organization-signals__corroboration:empty { display: none; }
 .organization-signals__corroboration p:last-child { margin-bottom: 0; }
 @media (max-width: 420px) {
+  .organization-signals__bar-axes { margin-left: 22px; }
   .organization-signals__entry { grid-template-columns: 15px minmax(0, 1fr) auto; }
   .organization-signals__readout { padding: 6px; }
   .organization-signals__history li { grid-template-columns: 82px 1fr; }
