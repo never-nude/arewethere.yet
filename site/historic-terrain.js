@@ -111,7 +111,7 @@ function paintTrace(ctx, project, points, selected, currentX) {
 export function mountHistoricTerrain(container, onSelect) {
   container.innerHTML = `
     <div class="hist-plot__top">
-      <div><h4>History in 3D</h4><p>The dashed path connects documented events in date order.</p></div>
+      <div><h4>History in 3D</h4><p>Height counts how many evidence landmarks had been documented by each date. The dashed path connects events in date order.</p></div>
       <div class="hist-plot__actions" role="group" aria-label="Historical 3D view controls">
         <button class="calendar-step" type="button" data-hist-action="out" aria-label="Zoom out of history">−</button>
         <button class="calendar-step" type="button" data-hist-action="in" aria-label="Zoom into history">+</button>
@@ -119,8 +119,8 @@ export function mountHistoricTerrain(container, onSelect) {
       </div>
     </div>
     <dl class="hist-plot__coordinates">
-      <div><dt>X · Time</dt><dd data-hist-time></dd></div>
-      <div><dt>Y · Documented landmarks</dt><dd data-hist-count></dd></div>
+      <div><dt>X · Calendar date</dt><dd data-hist-time></dd></div>
+      <div><dt>Y · Landmarks reached</dt><dd data-hist-count></dd></div>
       <div><dt>Z · Evidence category</dt><dd data-hist-lane></dd></div>
     </dl>
     <div class="hist-plot__stage">

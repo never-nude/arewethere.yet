@@ -148,11 +148,13 @@ function paintChart(state) {
   const { plot, frames, selected, events } = state;
   if (!frames?.length) return;
   const width = Math.max(254, plot.clientWidth);
-  const height = 238;
-  const start = 39;
+  const height = 255;
+  const start = 43;
   const end = width - 17;
   const top = 19;
   const bottom = 147;
+  const eventBandTop = 157;
+  const eventBandBottom = 231;
   const x = (index) => frames.length > 1 ? start + index * (end - start) / (frames.length - 1) : (start + end) / 2;
   const values = frames.map((frame) => frame.score).filter(Number.isFinite);
   const low = values.length ? Math.max(0, Math.floor(Math.min(...values) - .5)) : 0;
@@ -160,8 +162,12 @@ function paintChart(state) {
   const y = (value) => bottom - (value - low) / (high - low) * (bottom - top);
   const graph = svgItem('svg', {
     viewBox: `0 0 ${width} ${height}`, role: 'img',
-    'aria-label': 'Daily evidence index and activity markers. Use the day slider to select a date.',
+    'aria-label': `Evidence index points from ${number.format(low)} to ${number.format(high)} on the vertical axis. Calendar dates on the horizontal axis. Event dots appear in a separate band below the line. Use the day slider to select a date.`,
   });
+  graph.append(
+    svgItem('rect', { x: start, y: eventBandTop, width: end - start, height: eventBandBottom - eventBandTop, rx: 4, class: 'watch-history__event-band' }),
+    svgItem('text', { x: start + 6, y: eventBandTop + 15 }, 'Events by date'),
+  );
   for (const tick of [low, (low + high) / 2, high]) {
     const at = y(tick);
     graph.append(
@@ -195,13 +201,13 @@ function paintChart(state) {
       const visible = matches.filter((kind) => kindsOnDate.has(kind));
       for (const [pin, kind] of visible.entries()) {
         const offset = (pin - (visible.length - 1) / 2) * 5;
-        graph.append(svgItem('circle', { cx: x(index) + offset, cy: 163 + row * 13, r: 3, 'data-kind': kind }));
+        graph.append(svgItem('circle', { cx: x(index) + offset, cy: eventBandTop + 25 + row * 13, r: 3, 'data-kind': kind }));
       }
     }
   }
   const frame = frames[selected];
   const cursorX = x(selected);
-  graph.append(svgItem('line', { x1: cursorX, x2: cursorX, y1: top, y2: 209, class: 'watch-history__cursor' }));
+  graph.append(svgItem('line', { x1: cursorX, x2: cursorX, y1: top, y2: eventBandBottom, class: 'watch-history__cursor' }));
   if (Number.isFinite(frame?.score)) graph.append(svgItem('circle', { cx: cursorX, cy: y(frame.score), r: 4.5, class: 'watch-history__current' }));
   if (!values.length) graph.append(svgItem('text', { x: width / 2, y: 77, 'text-anchor': 'middle' }, 'No index readings in this window'));
   plot.replaceChildren(graph);
@@ -232,6 +238,8 @@ function describeDay(state) {
   const anomaly = state.anomalies.get(frame.date);
   state.daySummary.textContent = `${datedEvents.length} new ${datedEvents.length === 1 ? 'record' : 'records'}` +
     (ongoing ? ` · ${ongoing} ongoing ${ongoing === 1 ? 'incident' : 'incidents'}` : '');
+  const announcement = `${date}. ${state.daySummary.textContent}. ${Number.isFinite(frame.score) ? `Evidence index ${number.format(frame.score)} points out of 100.` : 'Evidence index unavailable.'}`;
+  if (state.announcement.textContent !== announcement) state.announcement.textContent = announcement;
   state.anomaly.hidden = !anomaly;
   if (anomaly) {
     const factors = (anomaly.factors ?? []).map(({ label, delta, coverage }) => `${label} ${change(delta)} ${Math.abs(delta) === 1 ? 'point' : 'points'}${coverage ? ` (${coverage})` : ''}`);
@@ -278,13 +286,13 @@ function reframe(state) {
   state.end.min = earliest;
   state.end.max = latest;
   state.end.value = endDate;
-  state.latest.disabled = endDate === latest;
   state.window.textContent = startDate === endDate ? dayLabel(endDate) : `${dayLabel(startDate, monthDay)} – ${dayLabel(endDate)} · UTC`;
   state.slider.max = state.frames.length - 1;
 
   state.events = new Map(state.frames.map((frame) => [frame.date, (state.indexed.get(frame.date) ?? [])
     .filter((event) => !state.provider.value || event.provider === state.provider.value)]));
   const activeDates = state.frames.filter((frame) => state.events.get(frame.date).length || state.anomalies.has(frame.date)).reverse();
+  const focused = state.list.contains(document.activeElement) ? document.activeElement.value : null;
   state.list.replaceChildren(...activeDates.map((frame) => {
     const button = item('button', dayLabel(frame.date, monthDay));
     button.type = 'button';
@@ -293,10 +301,10 @@ function reframe(state) {
     button.addEventListener('click', () => selectDay(state, state.frames.indexOf(frame)));
     return button;
   }));
+  if (focused) [...state.list.children].find((button) => button.value === focused)?.focus({ preventScroll: true });
   state.activity.hidden = !activeDates.length;
   const selected = state.frames.findIndex((frame) => frame.date === state.selectedDate);
-  const preferred = state.frames.indexOf(activeDates.find((frame) => state.events.get(frame.date).length) ?? activeDates[0]);
-  selectDay(state, selected >= 0 ? selected : preferred >= 0 ? preferred : state.frames.length - 1);
+  selectDay(state, selected >= 0 ? selected : state.frames.length - 1);
 }
 
 function renderSources(state, sources = []) {
@@ -318,15 +326,21 @@ function mount(container) {
   container.innerHTML = `
     <p class="watch-history__loading">Waiting for dated signals…</p>
     <div class="watch-history__content" hidden>
+      <p class="watch-history__note">Choose a time range, then click the chart or move the slider to read about a day.</p>
       <div class="watch-history__toolbar">
         <div class="watch-history__periods" role="group" aria-label="Chart range">
-          ${periods.map((days) => `<button type="button" data-days="${days}" aria-pressed="${days === 14}">${days}D</button>`).join('')}
+          ${periods.map((days) => `<button type="button" data-days="${days}" aria-pressed="${days === 14}">${days} days</button>`).join('')}
         </div>
-        <label>Window ending <input type="date" data-field="end"></label>
-        <button type="button" data-field="latest">Latest</button>
-        <label>Activity provider <select data-field="provider"><option value="">All providers</option></select></label>
+        <label>End date <input type="date" data-field="end"></label>
+        <button type="button" data-field="latest">Go to latest day</button>
+        <label>Show activity from <select data-field="provider"><option value="">All providers</option></select></label>
       </div>
       <div class="watch-history__chart-heading"><h3>Daily evidence index</h3><p data-field="window"></p></div>
+      <div class="watch-history__axes">
+        <p><strong>Vertical axis</strong> Evidence index (0–100 points)</p>
+        <p><strong>Horizontal axis</strong> Calendar date (UTC)</p>
+      </div>
+      <p class="watch-history__note">The vertical scale zooms in on the scores for the dates you selected. The dots in the lower band mark events by date.</p>
       <div class="watch-history__plot"></div>
       <ul class="watch-history__legend" aria-label="Activity markers">
         <li data-kind="release">Model release</li><li data-kind="gain">Benchmark gain</li><li data-kind="drop">Benchmark drop</li>
@@ -342,6 +356,7 @@ function mount(container) {
       <div class="watch-history__day">
         <div class="watch-history__day-heading"><h3 data-field="date"></h3><p><strong data-field="score"></strong> <span class="change" data-field="delta"></span></p></div>
         <p class="watch-history__note" data-field="daySummary"></p>
+        <span class="watch-history__announcement" data-field="announcement" role="status"></span>
         <div class="watch-history__anomaly" data-field="anomaly" hidden></div>
         <div class="watch-history__source-counts" data-field="sourceCounts" hidden><p>New records by source</p><ul class="watch-history__counts" data-field="counts"></ul></div>
         <ul class="watch-history__records" data-field="daily"></ul>
@@ -375,17 +390,21 @@ function mount(container) {
     state.selectedDate = null;
     reframe(state);
   });
-  state.latest.addEventListener('click', () => {
-    state.endDate = null;
-    state.selectedDate = null;
-    reframe(state);
-  });
-  state.provider.addEventListener('change', () => { state.selectedDate = null; reframe(state); });
+  state.latest.addEventListener('click', () => showLatestWatchDay(container));
+  state.provider.addEventListener('change', () => reframe(state));
   state.slider.addEventListener('input', () => selectDay(state, Number(state.slider.value)));
   state.previous.addEventListener('click', () => selectDay(state, state.selected - 1));
   state.next.addEventListener('click', () => selectDay(state, state.selected + 1));
   new ResizeObserver(() => paintChart(state)).observe(state.plot);
   return state;
+}
+
+export function showLatestWatchDay(container) {
+  const state = states.get(container);
+  if (!state?.index) return;
+  state.endDate = null;
+  state.selectedDate = state.index.history.at(-1).date;
+  reframe(state);
 }
 
 export function renderWatchHistory(container, { index, payload } = {}) {

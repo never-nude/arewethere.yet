@@ -17,7 +17,7 @@
   background: #231b33;
   box-shadow: 0 8px 24px #0b0813aa;
   color: var(--ink);
-  font: 400 13px/1.4 Geist, system-ui, sans-serif;
+  font: 400 14px/1.5 Geist, system-ui, sans-serif;
 }
 
 .glossary-popup strong { display: block; margin-bottom: 3px; color: #e3d2ff; font-weight: 660; }

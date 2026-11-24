@@ -67,7 +67,7 @@
   padding: 8px;
   background: #1c162a;
 }
-.organization-signals__readout > span, .organization-signals__axis, .organization-signals__records small {
+.organization-signals__readout > span, .organization-signals__records small {
   color: var(--dim);
   font: 400 10px/1.35 var(--mono);
 }
@@ -82,7 +82,17 @@
 }
 .organization-signals__trend figcaption { margin-bottom: 4px; font-size: 12px; font-weight: 650; }
 .organization-signals__trend svg { display: block; width: 100%; height: 74px; }
-.organization-signals__axis { display: flex; justify-content: space-between; gap: 8px; }
+.organization-signals__plot { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 6px; }
+.organization-signals__x-axis, .organization-signals__y-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  color: var(--dim);
+  font: 400 11px/1.2 var(--mono);
+}
+.organization-signals__x-axis { grid-column: 2; }
+.organization-signals__x-axis span:last-child { text-align: right; }
+.organization-signals__y-axis { flex-direction: column; align-items: end; }
 .organization-signals__grid { fill: none; stroke: #46395e; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .organization-signals__trace { fill: none; stroke: #83e6cf; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .organization-signals__mark { fill: #83e6cf; }

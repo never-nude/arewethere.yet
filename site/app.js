@@ -13,7 +13,7 @@ import { renderDependencyTimeline } from './dependency-timeline.js';
 import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-confidence.js';
 import { renderOrigins } from './origins.js';
 import { renderWatchtower } from './watchtower.js';
-import { renderWatchHistory } from './watch-history.js';
+import { renderWatchHistory, showLatestWatchDay } from './watch-history.js';
 import { renderLabs } from './labs.js';
 import { installGlossary } from './glossary.js';
 
@@ -460,6 +460,7 @@ async function reload() {
 }
 
 byId('refresh').addEventListener('click', reload);
+byId('watchdog-today').addEventListener('click', () => showLatestWatchDay(byId('watchdog-board')));
 byId('range-buttons').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-days]');
   if (!button || !index) return;

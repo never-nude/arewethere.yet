@@ -157,9 +157,12 @@ function renderTrend(points, unit) {
     svg.append(svgNode('circle', { cx: x(current.time), cy: y(current.gap), r: 2.5, class: 'organization-signals__mark' }));
   }
   svg.prepend(svgNode('path', { d: line, class: 'organization-signals__trace' }));
-  const dates = node('div', 'organization-signals__axis');
-  dates.append(node('span', '', dated(iso(first))), node('span', '', dated(iso(last))));
-  const scale = node('p', 'organization-signals__axis', 'Margin scale 0–' + number.format(peak) + ' ' + unit);
+  const plot = node('div', 'organization-signals__plot');
+  const scale = node('div', 'organization-signals__y-axis');
+  scale.append(node('span', '', number.format(peak)), node('span', '', '0'));
+  const dates = node('div', 'organization-signals__x-axis');
+  dates.append(node('span', '', dated(iso(first))), node('span', '', 'Date'), node('span', '', dated(iso(last))));
+  plot.append(scale, svg, dates);
   const history = node('details', 'organization-signals__history');
   history.append(node('summary', '', 'View dated leaders and margins'));
   const items = node('ol', '');
@@ -174,7 +177,8 @@ function renderTrend(points, unit) {
     items.append(row);
   }
   history.append(items);
-  figure.append(scale, svg, dates, history);
+  figure.append(node('p', 'organization-signals__note', 'Height shows the leader’s margin in ' + unit + '. Each date uses the selected release window.'),
+    plot, history);
   return figure;
 }
 
@@ -221,8 +225,10 @@ function renderRanking(panel, state, lane, end, metric, observations) {
     list.append(entry);
   }
   if (rows.length) {
-    panel.append(list, node('p', 'organization-signals__note',
-      rows.length < LIMIT ? 'Additional places require comparable public measurements within this period.' : 'Bars start at zero and are scaled to the highest displayed result.'));
+    panel.append(node('p', 'organization-signals__note', 'Bar length shows the measured result from 0 to '
+      + number.format(leader.value) + ' ' + lane.unit + ', the highest result shown.'), list);
+    if (rows.length < LIMIT) panel.append(node('p', 'organization-signals__note',
+      'Additional places require comparable public measurements within this period.'));
   }
 }
 

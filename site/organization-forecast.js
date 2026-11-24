@@ -96,10 +96,11 @@ function listItem(row, position, model) {
   const item = element('li', 'org-forecast__item');
   const rank = element('span', 'org-forecast__rank', String(position + 1));
   const identity = element('div', 'org-forecast__identity');
-  const caption = [row.latest.model, dateFormat.format(row.latest.time), row.months + ' measured months'].filter(Boolean);
+  const caption = [row.latest.model, 'released ' + dateFormat.format(row.latest.time), row.months + ' measured months'].filter(Boolean);
   identity.append(element('strong', '', row.organization),
     element('span', '', 'Latest monthly high ' + number.format(row.latest.value) + ' ECI · ' + caption.join(' · ')));
   const reading = element('strong', 'org-forecast__estimated', number.format(row.score));
+  reading.append(element('span', 'org-forecast__unit', ' ECI'));
   reading.title = 'Projected ECI under the selected scenario';
   const pace = element('span', 'org-forecast__pace', signed.format(row.pace * 30) + ' / 30d');
   pace.dataset.direction = row.pace === 0 ? 'flat' : row.pace < 0 ? 'down' : 'up';
@@ -145,7 +146,8 @@ function update(state) {
         : 'No organization has enough recent data to project a pace.';
     table.replaceChildren(...rows.map((row, position) => listItem(row, position, model)));
     scale.hidden = !rows.length;
-    scale.textContent = 'Bars share a ' + number.format(model.min) + '–' + number.format(model.max) + ' ECI scale. Each white tick marks the latest monthly high.';
+    scale.textContent = 'The end of each colored bar marks the projected ECI score. The scale starts at ' + number.format(model.min)
+      + ' and ends at ' + number.format(model.max) + '. A white tick marks that developer’s latest measured monthly high.';
   }
   state.onDateChange?.(days);
 }
@@ -177,14 +179,14 @@ function mount(container) {
       <output class="org-forecast__date" for="org-forecast-days"></output>
     </div>
     <div class="org-forecast__control">
-      <label for="org-forecast-days">Projection horizon</label>
+      <label for="org-forecast-days">Choose a date to project</label>
       <input type="range" id="org-forecast-days" min="0" max="${horizon}" step="1" value="90">
       <div class="org-forecast__ticks" aria-hidden="true"></div>
       <p class="org-forecast__end"></p>
     </div>
     <p class="org-forecast__lead"></p>
-    <ol class="org-forecast__table" aria-label="Organizations ranked by projected ECI"></ol>
     <p class="org-forecast__scale"></p>
+    <ol class="org-forecast__table" aria-label="Organizations ranked by projected ECI"></ol>
     <details class="org-forecast__method">
       <summary>Projection method and data gaps</summary>
       <p>For each organization, the scenario takes monthly high scores from the last 365 days. It uses the median daily change across pairs of months and extends that pace from the last measured high. A slope requires three measured months spanning at least 60 days and a latest score within 120 days of the snapshot. The date slider extends observed Epoch benchmark performance under a constant pace assumption.</p>

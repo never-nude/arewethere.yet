@@ -25,7 +25,7 @@
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to observatory</a>
+  <a class="skip-link" href="#main">Skip to main content</a>
   <header class="topbar">
     <div class="wrap header-inner">
       <a href="#main" class="wordmark"><span class="wordmark-icon" aria-hidden="true">✧</span> Singularity Watch</a>
@@ -48,7 +48,8 @@
         <div class="score-content">
           <p class="eyebrow">AI PROGRESS OBSERVATORY</p>
           <h1 id="overview-heading">How close is the Singularity?</h1>
-          <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? Check what researchers have measured and put the headlines in context.</p>
+          <p class="lede" id="definition">What happens if AI gets good enough at building better AI that each new generation comes faster? The watch follows public measurements and explains what they cover.</p>
+          <a class="watchdog-today" id="watchdog-today" href="#watchdog">See what changed today ↓</a>
           <p class="term-help">Hover or tap a dotted term for a definition. Try ECI.</p>
           <div class="watch-clock">
             <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
@@ -92,7 +93,7 @@
           <a class="agi-jump" id="agi-jump" href="#agi" hidden>AGI trajectory ↓</a>
         </div>
         <div id="atlas-modes" class="atlas-modes segmented" role="group" aria-label="Milestone map view">
-          <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">Relationships</button>
+          <button type="button" data-view="relationships" aria-controls="relationships" aria-pressed="true">2D relationships</button>
           <button type="button" data-view="routes" aria-controls="terrain" aria-pressed="false">3D evidence</button>
         </div>
         <div id="relationships">
@@ -139,38 +140,6 @@
       </div>
       <div id="watchdog-board"><p class="placeholder">Loading the daily record…</p></div>
       <p class="small-note">The watchdog uses peer-reviewed research and independent evaluations for measurements, official records for service incidents, and vetted reporting for context. <a class="evidence-jump" href="#evidence">See the source standards ↓</a></p>
-    </section>
-
-    <section id="human-evidence" class="section panel human-evidence" aria-labelledby="human-evidence-heading">
-      <div class="section-heading">
-        <div><h2 id="human-evidence-heading">Empathy and trust</h2><p>How AI responds to people matters, and so does how people use its advice. These studies measure specific behaviors under stated conditions.</p></div>
-      </div>
-      <div class="human-evidence-grid">
-        <article>
-          <h3>Empathic communication</h3>
-          <p>Measure the share of replies that independent raters judge empathetic or very empathetic.</p>
-          <dl aria-label="Replies rated empathetic or very empathetic">
-            <div><dt>Chatbot replies</dt><dd>45.1%</dd></div>
-            <div><dt>Physician replies</dt><dd>4.6%</dd></div>
-          </dl>
-          <p>Clinicians rated written answers to 195 public medical forum questions in 2023. The chatbot answers were longer. The ratings describe how the text came across in that setting. <sup class="evidence-citations"><a href="#ref-20" aria-label="Reference 20">[20]</a></sup></p>
-        </article>
-        <article>
-          <h3>Knowing when to trust AI</h3>
-          <p>Check how often people use correct AI advice and set aside wrong advice when it conflicts with their first answer.</p>
-          <dl aria-label="How participants responded to AI advice on logical reasoning questions">
-            <div><dt>Used correct advice</dt><dd>66%</dd></div>
-            <div><dt>Set aside wrong advice</dt><dd>44%</dd></div>
-          </dl>
-          <p>These rates come from one group in a 2025 logical-reasoning experiment. Researchers controlled how often advice was correct so they could measure what people did with it. <sup class="evidence-citations"><a href="#ref-21" aria-label="Reference 21">[21]</a></sup></p>
-        </article>
-        <article>
-          <h3>What makes AI trustworthy</h3>
-          <p>Evaluate how often it gets things right, how it handles errors, and whether safeguards hold for different people and situations. <sup class="evidence-citations"><a href="#ref-22" aria-label="Reference 22">[22]</a></sup></p>
-          <p>In a 2026 study of advice about personal disagreements, people trusted overly agreeable AI more and reported less willingness to repair conflicts. That's a reason to measure reliability alongside perceived trust. <sup class="evidence-citations"><a href="#ref-23" aria-label="Reference 23">[23]</a></sup></p>
-        </article>
-      </div>
-      <p class="small-note">The figures describe individual studies. Tracking change over time would require repeated tests on comparable tasks, with the same rating rules and clearly identified models.</p>
     </section>
 
     <section id="watch" class="section panel" aria-label="Acceleration watch">
@@ -292,6 +261,11 @@
             <h3>The 75-point watch line</h3>
             <p>The dashboard uses 75 out of 100 as a cue to check the evidence more closely. At that point, we’d look for researchers outside the AI companies to verify that AI can handle longer tasks, do whole research projects, and keep speeding up the next round of AI improvements.</p>
             <p>Even if all the other signals earned full points, reaching 75 would still require at least 25 points for what AI can do and 10 points for its role in AI research.</p>
+          </div>
+          <div class="watch-line-explainer" id="human-evidence">
+            <h3>Social behavior in evaluations</h3>
+            <p>In a broad capability test, independent raters can check whether an AI recognizes a concern and responds appropriately in unfamiliar situations. Studies of how people use accurate or mistaken advice answer a different question. <sup class="evidence-citations"><a href="#ref-20" aria-label="Reference 20">[20]</a><a href="#ref-21" aria-label="Reference 21">[21]</a></sup></p>
+            <p>The self-improvement milestone calls for repeatable experiments that show what the AI contributed. <a href="#evidence-human">Related research and methods ↓</a></p>
           </div>
         </div>
         <div>

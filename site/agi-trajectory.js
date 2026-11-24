@@ -120,30 +120,24 @@ function svgNode(tag, attributes, text) {
 
 function trajectoryChart({ start, asOf, baseline, latest, recent, projection }) {
   const width = 620;
-  const left = 36;
-  const right = 32;
-  const bottom = 106;
-  const top = 16;
+  const height = 116;
   const timespan = projection.time - start;
   const values = [baseline.value, ...recent.map((point) => point.value), projection.value];
   const minimum = Math.floor((Math.min(...values) - 1) / 5) * 5;
   const maximum = Math.ceil((Math.max(...values) + 1) / 5) * 5;
-  const x = (time) => left + (time - start) / timespan * (width - left - right);
-  const y = (value) => bottom - (value - minimum) / (maximum - minimum) * (bottom - top);
+  const middle = (minimum + maximum) / 2;
+  const x = (time) => (time - start) / timespan * width;
+  const y = (value) => height - (value - minimum) / (maximum - minimum) * height;
   const svg = svgNode('svg', {
-    viewBox: `0 0 ${width} 134`,
+    viewBox: `0 0 ${width} ${height}`,
+    preserveAspectRatio: 'none',
     role: 'img',
-    'aria-label': `Epoch frontier index moved from ${num.format(baseline.value)} to ${num.format(latest.value)} in 180 days. If that pace holds, it would reach ${num.format(projection.value)} 90 days later.`,
+    'aria-label': `Epoch Capabilities Index in points by date (UTC). The vertical scale shows ${num.format(minimum)} to ${num.format(maximum)} points. The measured score moved from ${num.format(baseline.value)} to ${num.format(latest.value)} in 180 days. If that pace holds, it would reach ${num.format(projection.value)} 90 days later.`,
   });
-  for (const value of [minimum, maximum]) {
-    svg.append(
-      svgNode('line', { x1: left, x2: width - right, y1: y(value), y2: y(value), class: 'agi-gridline' }),
-      svgNode('text', { x: left - 7, y: y(value) + 4, 'text-anchor': 'end' }, num.format(value)),
-    );
-  }
   svg.append(
-    svgNode('rect', { x: x(asOf), y: top, width: width - right - x(asOf), height: bottom - top, class: 'agi-projection-zone' }),
-    svgNode('line', { x1: x(asOf), x2: x(asOf), y1: top, y2: bottom, class: 'agi-gridline' }),
+    svgNode('rect', { x: x(asOf), y: 0, width: width - x(asOf), height, class: 'agi-projection-zone' }),
+    svgNode('line', { x1: x(asOf), x2: x(asOf), y1: 0, y2: height, class: 'agi-gridline' }),
+    ...[maximum, middle, minimum].map((value) => svgNode('line', { x1: 0, x2: width, y1: y(value), y2: y(value), class: 'agi-gridline' })),
   );
   const observed = [`M ${x(start)} ${y(baseline.value)}`];
   for (const point of recent) observed.push(`H ${x(point.time)} V ${y(point.value)}`);
@@ -154,10 +148,19 @@ function trajectoryChart({ start, asOf, baseline, latest, recent, projection }) 
     svgNode('circle', { cx: x(asOf), cy: y(latest.value), r: 3.8, class: 'agi-observed-dot' }),
     svgNode('circle', { cx: x(projection.time), cy: y(projection.value), r: 3.8, class: 'agi-projected-dot' }),
   );
-  for (const [time, anchor] of [[start, 'start'], [asOf, 'middle'], [projection.time, 'end']]) {
-    svg.append(svgNode('text', { x: x(time), y: 125, 'text-anchor': anchor }, shortDate.format(time)));
-  }
-  return svg;
+  const yTicks = node('div', '', 'agi-y-ticks');
+  const dates = node('div', '', 'agi-x-ticks');
+  yTicks.setAttribute('aria-hidden', 'true');
+  dates.setAttribute('aria-hidden', 'true');
+  yTicks.append(...[maximum, middle, minimum].map((value) => node('span', num.format(value))));
+  dates.append(...[start, asOf, projection.time].map((time) => node('span', shortDate.format(time))));
+  dates.style.setProperty('--agi-present', `${x(asOf) / width * 100}%`);
+  const plot = node('div', '', 'agi-plot');
+  plot.append(yTicks, svg, dates);
+  const chart = node('div');
+  chart.append(node('p', 'Y · Epoch Capabilities Index (ECI points)', 'agi-axis-title'), plot,
+    node('p', 'X · Date (UTC)', 'agi-axis-title agi-axis-date'));
+  return chart;
 }
 
 function reading(title, value, note, className) {
@@ -194,7 +197,7 @@ export function renderAgiTrajectory(panel, dataset, forecast) {
   spark.hidden = !projection;
   chartKey.hidden = !projection;
   method.textContent = projection
-    ? `Epoch’s index aggregates benchmarks. The solid line shows frontier readings by model date, with ${model.recent.length} updates in the last 180 days. The dashed line extends that change at a constant pace. It projects a benchmark reading only.`
+    ? `Epoch combines results from multiple tests. The vertical scale fits the scores shown. The solid line shows scores by model release date, with ${model.recent.length} updates in the last 180 days. The dashed line shows how the score would change if that pace continued.`
     : 'Epoch’s index aggregates benchmarks. A trajectory needs a dated frontier reading from before the 180-day window and a newer one inside it.';
   if (market) {
     const marketReading = node('strong', `${num.format(market.value)}%`);
