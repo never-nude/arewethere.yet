@@ -37,7 +37,7 @@ export const evidenceGroups = [
   {
     id: 'evidence-agi-timing',
     title: 'AGI timing and possible paths',
-    claim: 'The market quote reflects one public event under its own rules. The diagram’s two paths use evidence points and stated weights to show possible sequences.',
+    claim: 'The market quote reflects one public event under its own rules. The 3D map’s two paths use evidence points and stated weights to show possible sequences.',
     sources: [
       {
         title: 'Will we get AGI before 2030?',
