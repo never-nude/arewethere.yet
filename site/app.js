@@ -1,12 +1,17 @@
 import { buildIndex, projectThreshold } from './index-model.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
+import { scoreRoutes, getLiveRouteInputs, routeConfidenceMethod } from './route-confidence.js';
+import { renderOrigins } from './origins.js';
+import { renderWatchtower } from './watchtower.js';
+import { renderLabs } from './labs.js';
 
 const byId = (id) => document.getElementById(id);
 const formatter = new Intl.NumberFormat('en', { maximumFractionDigits: 2 });
 const longDate = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const shortDate = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 const checkTime = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short' });
+const shortTime = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' });
 const checkUrl = new URL('./data/signals.json', import.meta.url);
 const dayMs = 86_400_000;
 const pageSize = 5;
@@ -18,6 +23,9 @@ let rangeDays = 90;
 let filter = 'All';
 let newsLimit = pageSize;
 let refreshing = false;
+let forecast;
+let liveMarketChecked = false;
+let lastAttempt = 0;
 
 function element(tag, className = '', text) {
   const item = document.createElement(tag);
@@ -169,19 +177,37 @@ function renderScenario() {
 
 function renderGates() {
   const labels = { met: 'MET', watching: 'WATCHING', partial: 'PARTIAL EVIDENCE', open: 'OPEN', unknown: 'UNKNOWN' };
+  const everyday = {
+    workday: [
+      'An assistant reconciles a day’s invoices, finds mismatches, and drafts corrections across a series of steps.',
+      'People could hand off longer administrative chores and spend less time checking in between steps.',
+    ],
+    research: [
+      'A research assistant reads prior work, proposes a change, runs controlled experiments, and checks the results before a human reviews them.',
+      'New features or fixes could arrive sooner as more of the development process runs in parallel.',
+    ],
+    compounding: [
+      'One generation of tools helps produce the next. The new tools then shorten the next development cycle and improve what it can deliver.',
+      'Software tools could change more often than teams have time to get used to each version.',
+    ],
+  };
+  const opened = new Set([...byId('evidence-gates').querySelectorAll('details[open]')].map((gate) => gate.dataset.gate));
   const gates = index.threshold.criteria.map((criterion, position) => {
     const row = element('li');
     row.dataset.met = criterion.status === 'met';
     const marker = element('span', 'gate-marker', criterion.status === 'met' ? '✓' : position + 1);
     marker.setAttribute('aria-hidden', 'true');
-    const detail = element('div');
-    const title = element('div', 'gate-topline');
-    title.append(element('h4', '', criterion.label), element('span', '', labels[criterion.status]));
+    const detail = element('details');
+    detail.dataset.gate = criterion.id;
+    detail.open = opened.has(criterion.id);
+    const title = element('summary', 'gate-topline');
+    title.append(element('strong', '', criterion.label), element('span', '', labels[criterion.status]));
     const copy = element('p', '', criterion.detail);
     if (Number.isFinite(criterion.value)) {
       copy.append(' Current signal ', externalLink(criterion.sourceUrl, rawValue(criterion.value, criterion.unit) + ' from ' + criterion.source + ' ↗'));
     }
-    detail.append(title, copy);
+    const example = everyday[criterion.id];
+    detail.append(title, copy, element('p', '', 'Everyday example · ' + example[0]), element('p', '', 'What you might notice · ' + example[1]));
     row.append(marker, detail);
     return row;
   });
@@ -189,6 +215,23 @@ function renderGates() {
   byId('gates-note').textContent = index.threshold.observed
     ? 'The final qualifying evidence was dated ' + date(index.threshold.crossingDate) + '.'
     : 'An observed singularity date will appear when all three evidence criteria are documented.';
+}
+
+function renderPathConfidence() {
+  if (!index) return;
+  const openBreadth = dataset.metrics.find(({ id }) => id === 'open-breadth');
+  const closedBreadth = dataset.metrics.find(({ id }) => id === 'closed-breadth');
+  const savedForecast = dataset.metrics.find(({ id }) => id === 'forecast');
+  const liveIsNewer = forecast && (!forecast.observedAt || forecast.observedAt >= (savedForecast?.asOf ?? ''));
+  const selectedForecast = liveIsNewer ? forecast : undefined;
+  const score = scoreRoutes(index, { forecast: selectedForecast, openBreadth, closedBreadth });
+  const lastTrade = selectedForecast?.observedAt ?? savedForecast?.asOf;
+  const updates = liveMarketChecked ? 'Checked ' + shortTime.format(forecast.checkedAt ? new Date(forecast.checkedAt) : lastAttempt) : 'Market check unavailable · showing saved evidence';
+  const trade = lastTrade ? ' · Market reading ' + checkTime.format(new Date(lastTrade)) : '';
+  terrain.updateConfidence(score, {
+    status: updates + trade,
+    method: routeConfidenceMethod + ' The market is checked every minute while this page is open. Benchmark and research readings change when results are published. Scores show evidence support in points.',
+  });
 }
 
 function renderFactors() {
@@ -292,7 +335,14 @@ function renderSources() {
 async function reload() {
   if (refreshing) return;
   refreshing = true;
+  lastAttempt = Date.now();
   byId('refresh').setAttribute('aria-busy', 'true');
+  const liveCheck = getLiveRouteInputs().then((reading) => {
+    forecast = reading.forecast;
+    liveMarketChecked = true;
+  }, () => {
+    liveMarketChecked = false;
+  });
   try {
     const response = await fetch(checkUrl, { cache: 'no-store', signal: AbortSignal.timeout(18_000) });
     if (!response.ok) throw new Error('Source response unavailable');
@@ -310,6 +360,10 @@ async function reload() {
       renderGates();
       renderFactors();
       renderNews();
+      renderOrigins(byId('origins'), { index });
+      renderWatchtower(byId('watchtower'), { index, payload: dataset });
+      renderLabs(byId('labs-board'), { index, payload: dataset });
+      renderPathConfidence();
     }
     renderSources();
   } catch (error) {
@@ -318,8 +372,10 @@ async function reload() {
     if (!dataset) byId('observed').textContent = 'Source data unavailable';
     console.warn('Signal refresh:', error.message);
   } finally {
+    await liveCheck;
     refreshing = false;
     byId('refresh').removeAttribute('aria-busy');
+    renderPathConfidence();
   }
 }
 
@@ -367,6 +423,12 @@ const plots = new ResizeObserver(() => {
 plots.observe(byId('history-chart'));
 plots.observe(byId('scenario-chart'));
 
-renderTerrain(byId('terrain'));
+const terrain = renderTerrain(byId('terrain'));
+renderOrigins(byId('origins'));
+renderWatchtower(byId('watchtower'));
+renderLabs(byId('labs-board'));
 reload();
 setInterval(() => { if (!document.hidden) reload(); }, 60_000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - lastAttempt >= 60_000) reload();
+});

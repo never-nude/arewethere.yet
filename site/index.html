@@ -11,6 +11,9 @@
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./terrain.css">
+  <link rel="stylesheet" href="./origins.css">
+  <link rel="stylesheet" href="./watchtower.css">
+  <link rel="stylesheet" href="./labs.css">
   <script type="module" src="./app.js"></script>
 </head>
 <body>
@@ -20,6 +23,7 @@
       <a href="#main" class="wordmark"><span class="wordmark-icon" aria-hidden="true">✧</span> Singularity Watch</a>
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#atlas">3D Map</a>
+        <a href="#watch">Watch</a>
         <a href="#history">History</a>
         <a href="#scenario">Scenarios</a>
         <a href="#signals">Signals</a>
@@ -62,10 +66,15 @@
       <div id="tape" class="tape" tabindex="0"><p class="placeholder">Loading measurements…</p></div>
     </div>
 
+    <section id="watch" class="section panel" aria-label="Acceleration watch">
+      <div id="watchtower"><p class="placeholder">Checking acceleration signals…</p></div>
+    </section>
+
     <section id="history" class="section" aria-labelledby="history-heading">
       <div class="section-heading">
-        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Scrub through the public record to see what rose, fell, or stayed put.</p></div>
+        <div><p class="eyebrow">THE EVIDENCE</p><h2 id="history-heading">Watch it move</h2><p>Explore the milestones since 1958 and replay recent changes in the evidence index.</p></div>
       </div>
+      <div id="origins" class="panel history-origins"></div>
       <div class="history-grid">
         <div class="panel graph-panel">
           <div class="panel-heading">
@@ -93,6 +102,13 @@
           <div id="replay-events" class="replay-events"></div>
         </section>
       </div>
+    </section>
+
+    <section id="labs" class="section" aria-labelledby="labs-heading">
+      <div class="section-heading">
+        <div><h2 id="labs-heading">Who’s moving the frontier?</h2><p>Compare developers’ strongest recent models and see how labs use AI to build AI.</p></div>
+      </div>
+      <div id="labs-board"></div>
     </section>
 
     <section id="scenario" class="section" aria-labelledby="scenario-heading">

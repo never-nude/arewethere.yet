@@ -149,18 +149,20 @@ function eciMetric(id, observations) {
 
 async function getCapability(fetcher) {
   const csv = await read(fetcher, "https://epoch.ai/data/eci_scores.csv", "text");
-  const rows = csvColumns(csv, ["Display name", "date", "eci", "eci_ci_low", "eci_ci_high", "Accessibility group"]);
-  const observations = rows.map(([label, date, value, low, high, access]) => ({
+  const rows = csvColumns(csv, ["Display name", "date", "eci", "eci_ci_low", "eci_ci_high", "Accessibility group", "Organization"]);
+  const observations = rows.map(([label, date, value, low, high, access, organization]) => ({
     label,
     date,
     value: numberOrNull(value),
     low: numberOrNull(low),
     high: numberOrNull(high),
     access,
+    organization,
   })).filter(point => point.label && datePattern.test(point.date) && point.value !== null).sort(modelOrder);
   return {
     breadth: eciMetric("breadth", observations),
     openBreadth: eciMetric("open-breadth", observations.filter(point => point.access === "Open weights")),
+    closedBreadth: eciMetric("closed-breadth", observations.filter(point => point.access === "Closed weights")),
   };
 }
 
@@ -377,6 +379,7 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
   const forecast = metricResult(manifold, "forecast");
   const breadth = eci.value?.breadth ?? snapshot.metrics.find(metric => metric.id === "breadth");
   const openBreadth = eci.value?.openBreadth ?? snapshot.metrics.find(metric => metric.id === "open-breadth");
+  const closedBreadth = eci.value?.closedBreadth ?? snapshot.metrics.find(metric => metric.id === "closed-breadth");
   const eventsByUrl = new Map();
   const releaseKey = event => event.source + ":" + event.date;
   const releasesByDay = new Map();
@@ -405,7 +408,7 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
 
   return {
     checkedAt,
-    metrics: [horizon, reliability, compute, forecast, breadth, openBreadth, ...publishedResearch],
+    metrics: [horizon, reliability, compute, forecast, breadth, openBreadth, closedBreadth, ...publishedResearch],
     events,
     releaseEvents,
     releaseStart,

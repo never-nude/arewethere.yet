@@ -97,6 +97,15 @@ export const metricDefinitions = {
     sourceUrl: sourceDefinitions.epochEci.url,
     intervalLabel: "90% credible interval",
   },
+  "closed-breadth": {
+    id: "closed-breadth",
+    label: "Closed-weight capability",
+    unit: "ECI",
+    detail: "Epoch Capabilities Index for the highest-scoring model in its closed-weights category.",
+    source: "Epoch AI",
+    sourceUrl: sourceDefinitions.epochEci.url,
+    intervalLabel: "90% credible interval",
+  },
   "research-autonomy": {
     id: "research-autonomy",
     label: "Unassisted research tasks",
@@ -276,7 +285,8 @@ const forecast = {
 };
 
 function eciSnapshot(id, rows, observations = rows) {
-  const toPoint = ([date, label, value, low, high]) => ({ date, label, value, low, high });
+  const toPoint = ([date, label, value, low, high, access, organization]) =>
+    ({ date, label, value, low, high, access, organization });
   const history = rows.map(toPoint);
   const { date, label, value, low, high } = history.at(-1);
   return {
@@ -294,22 +304,25 @@ function eciSnapshot(id, rows, observations = rows) {
 }
 
 const breadthFrontier = [
-  ["2024-06-20", "Claude 3.5 Sonnet", 130, 130, 130],
-  ["2025-08-07", "GPT-5", 150, 150, 150],
-  ["2026-09-03", "GPT-6 Astra", 169.21, 166.41, 172.49],
-  ["2026-11-09", "Claude Fable 5.2", 173.4, 170.04, 177.22],
+  ["2024-06-20", "Claude 3.5 Sonnet", 130, 130, 130, "Closed weights", "Anthropic"],
+  ["2025-08-07", "GPT-5", 150, 150, 150, "Closed weights", "OpenAI"],
+  ["2026-09-03", "GPT-6 Astra", 169.21, 166.41, 172.49, "Closed weights", "OpenAI"],
+  ["2026-11-09", "Claude Fable 5.2", 173.4, 170.04, 177.22, "Closed weights", "Anthropic"],
 ];
-const breadth = eciSnapshot("breadth", breadthFrontier, [
+const closedEci = [
   ...breadthFrontier,
-  ["2026-11-10", "Gemini 4 Carbon", 169.68, 166.58, 173.14],
-  ["2026-11-12", "Gemini 4 Hydrogen", 166.81, 163.99, 170.1],
-  ["2026-11-17", "GPT-6.2 Astra", 172.82, 169.37, 176.94],
-]);
-const openBreadth = eciSnapshot("open-breadth", [
-  ["2026-07-16", "Kimi K3", 158.61, 156.66, 160.8],
-  ["2026-10-17", "DeepSeek V4.1 Flash 1017", 159.41, 157.13, 161.91],
-  ["2026-10-23", "Kimi K3.1 Pro", 161.2, 158.95, 163.74],
-]);
+  ["2026-11-10", "Gemini 4 Carbon", 169.68, 166.58, 173.14, "Closed weights", "Google DeepMind"],
+  ["2026-11-12", "Gemini 4 Hydrogen", 166.81, 163.99, 170.1, "Closed weights", "Google DeepMind"],
+  ["2026-11-17", "GPT-6.2 Astra", 172.82, 169.37, 176.94, "Closed weights", "OpenAI"],
+];
+const openEci = [
+  ["2026-07-16", "Kimi K3", 158.61, 156.66, 160.8, "Open weights", "Moonshot AI"],
+  ["2026-10-17", "DeepSeek V4.1 Flash 1017", 159.41, 157.13, 161.91, "Open weights", "DeepSeek"],
+  ["2026-10-23", "Kimi K3.1 Pro", 161.2, 158.95, 163.74, "Open weights", "Moonshot AI"],
+];
+const breadth = eciSnapshot("breadth", breadthFrontier, [...closedEci, ...openEci]);
+const openBreadth = eciSnapshot("open-breadth", openEci);
+const closedBreadth = eciSnapshot("closed-breadth", breadthFrontier, closedEci);
 
 export const publishedResearch = [
   {
@@ -347,7 +360,7 @@ const sourceDates = {
 
 export const snapshot = {
   checkedAt: "2026-11-24T05:10:01.779Z",
-  metrics: [horizon, reliability, compute, forecast, breadth, openBreadth, ...publishedResearch],
+  metrics: [horizon, reliability, compute, forecast, breadth, openBreadth, closedBreadth, ...publishedResearch],
   events: referenceEvents,
   releaseEvents: referenceEvents.filter(event => event.category === "Release"),
   releaseStart: null,

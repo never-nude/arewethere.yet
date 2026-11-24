@@ -1,0 +1,180 @@
+.sw-watch {
+  --watch-accent: #b4a9d0;
+  min-width: 0;
+  color: var(--ink, #f1edf9);
+}
+.sw-watch[data-state='watch'] { --watch-accent: #ffcb8c; }
+.sw-watch[data-state='surge'] { --watch-accent: #73e8cc; }
+.sw-watch[data-state='quiet'] { --watch-accent: #bdabff; }
+
+.sw-watch__heading {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  align-items: start;
+  gap: 9px;
+}
+
+.sw-watch__beacon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border: 1px solid color-mix(in srgb, var(--watch-accent) 48%, transparent);
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+.sw-watch__beacon::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--watch-accent);
+  box-shadow: 0 0 11px color-mix(in srgb, var(--watch-accent) 60%, transparent);
+}
+
+.sw-watch__label,
+.sw-watch__lookback {
+  color: var(--watch-accent);
+  font: 500 10px/1.4 var(--mono, ui-monospace, monospace);
+  letter-spacing: .07em;
+}
+
+.sw-watch__heading h2 {
+  color: var(--ink, #f1edf9);
+  font-size: clamp(18px, 2.8vw, 26px);
+  font-weight: 660;
+  letter-spacing: -.04em;
+  margin: 3px 0;
+}
+
+.sw-watch__explanation,
+.sw-watch__method {
+  color: var(--dim, #b8afc9);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sw-watch__windows,
+.sw-watch__access-grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sw-watch__window,
+.sw-watch__access-card {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #39304b;
+  border-radius: 8px;
+  background: #171224;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+}
+
+.sw-watch__window[data-state='watch'] { --watch-accent: #ffcb8c; }
+.sw-watch__window[data-state='surge'] { --watch-accent: #73e8cc; }
+.sw-watch__window[data-state='quiet'] { --watch-accent: #bdabff; }
+.sw-watch__window[data-state='limited'] { --watch-accent: #b4a9d0; }
+.sw-watch__window strong,
+.sw-watch__access-card strong {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.sw-watch__window > span:last-child,
+.sw-watch__access-card a {
+  color: var(--dim, #b8afc9);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+.sw-watch__findings,
+.sw-watch__reason-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 9px;
+}
+
+.sw-watch__findings li {
+  display: grid;
+  gap: 2px;
+  border-left: 2px solid var(--watch-accent);
+  padding-left: 8px;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.sw-watch__findings span { color: var(--dim, #b8afc9); }
+.sw-watch a { color: var(--violet, #bdabff); }
+.sw-watch a:hover { text-decoration: underline; }
+.sw-watch__details {
+  margin-top: 10px;
+  border-top: 1px solid #39304b;
+  padding-top: 8px;
+}
+
+.sw-watch__details summary {
+  cursor: pointer;
+  color: var(--violet, #bdabff);
+  font-size: 12px;
+  font-weight: 630;
+}
+
+.sw-watch__rationale {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.sw-watch__reason-window h4 {
+  color: var(--ink, #f1edf9);
+  font-size: 12px;
+  margin: 0;
+}
+
+.sw-watch__reason-list li {
+  color: var(--dim, #b8afc9);
+  font-size: 11px;
+  line-height: 1.45;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+
+.sw-watch__reason-list strong { color: var(--ink, #f1edf9); }
+.sw-watch__method { margin-top: 7px; font-size: 11px; }
+
+.sw-watch__access {
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid #39304b;
+}
+
+.sw-watch__access h3 {
+  color: var(--ink, #f1edf9);
+  font-size: 14px;
+  letter-spacing: -.024em;
+}
+
+.sw-watch__access-grid { margin-top: 7px; }
+.sw-watch__access-card:nth-child(odd) .sw-watch__lookback { color: var(--teal, #73e8cc); }
+.sw-watch__access-card:nth-child(even) .sw-watch__lookback { color: var(--violet, #bdabff); }
+
+.sw-watch__access-gap {
+  color: var(--ink, #f1edf9);
+  font-size: 11px;
+  margin-top: 6px;
+}
+
+@media (max-width: 420px) {
+  .sw-watch__rationale { grid-template-columns: minmax(0, 1fr); }
+}
