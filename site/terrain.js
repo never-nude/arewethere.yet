@@ -435,10 +435,14 @@ function positionMarkers(ctx, positions, markers, width, height) {
   }
 }
 
-export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
+export function renderTerrain(container, { mode = 'breadth', onSelect, stageMount } = {}) {
   container.classList.add('sw-terrain');
   container.innerHTML = sceneMarkup();
   const stage = container.querySelector('.sw-terrain__stage');
+  if (stageMount) {
+    stageMount.classList.add('sw-terrain');
+    stageMount.replaceChildren(stage);
+  }
   const canvas = stage.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   const markerButtons = new Map([...stage.querySelectorAll('[data-concept]')].map((button) => [button.dataset.concept, button]));
@@ -851,6 +855,10 @@ export function renderTerrain(container, { mode = 'breadth', onSelect } = {}) {
       viewObserver?.disconnect();
       sizeObserver?.disconnect();
       cancelAnimationFrame(frame);
+      if (stageMount) {
+        stage.remove();
+        stageMount.classList.remove('sw-terrain');
+      }
       container.replaceChildren();
       container.classList.remove('sw-terrain');
     },

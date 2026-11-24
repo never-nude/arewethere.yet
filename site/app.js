@@ -515,7 +515,7 @@ plots.observe(byId('scenario-chart'));
 
 const terrainConcepts = new Set(['agi', 'asi', 'rsi', 'singularity']);
 const mapSelection = { relationships: 'singularity', routes: 'singularity' };
-let mapView = 'relationships';
+let mapView = 'routes';
 
 function updateAgiVisibility() {
   const show = mapSelection[mapView] === 'agi';
@@ -524,6 +524,7 @@ function updateAgiVisibility() {
 }
 
 const terrain = renderTerrain(byId('terrain'), {
+  stageMount: byId('terrain-stage'),
   onSelect(id) {
     mapSelection.routes = id;
     mapSelection.relationships = id;
@@ -546,6 +547,7 @@ function setMapView(view) {
   setPressed('atlas-modes', 'view', mapView);
   byId('relationships').hidden = mapView !== 'relationships';
   byId('terrain').hidden = mapView !== 'routes';
+  byId('terrain-stage').hidden = mapView !== 'routes';
   updateAgiVisibility();
 }
 
