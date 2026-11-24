@@ -1,5 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect x=".5" y=".5" width="31" height="31" rx="8.5" fill="#28203f" stroke="#7966ac"/>
-  <path d="M9 6.5h14M9 25.5h14M10.5 7v3c0 2.4 2.2 4 4.5 6-2.3 2-4.5 3.6-4.5 6v3m11-18v3c0 2.4-2.2 4-4.5 6 2.3 2 4.5 3.6 4.5 6v3" fill="none" stroke="#efe6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M12.8 10.5h6.4L16 13.7zm0 12.3 3.2-3.3 3.2 3.3z" fill="#be9dff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>Singularity Watch</title>
+  <rect width="64" height="64" rx="14" fill="#201a32"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#d1c2ff" stroke-width="3.5">
+      <ellipse cx="32" cy="11.5" rx="19.5" ry="4"/>
+      <path d="M12.8 12.5c2.4 6.4 7.5 10.7 14.4 14.4m24-14.4c-2.4 6.4-7.5 10.7-14.4 14.4"/>
+      <path d="M12.8 51.5c2.4-6.4 7.5-10.7 14.4-14.4m24 14.4c-2.4-6.4-7.5-10.7-14.4-14.4"/>
+      <ellipse cx="32" cy="52.5" rx="19.5" ry="4"/>
+    </g>
+    <path d="M20.5 21q11.5 4 23 0m-23 22q11.5-4 23 0" stroke="#a998ee" stroke-width="2.4"/>
+  </g>
+  <circle cx="32" cy="32" r="4.7" fill="#82f3cf"/>
 </svg>
