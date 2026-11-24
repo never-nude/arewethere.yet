@@ -459,7 +459,7 @@ function positionMarkers(ctx, positions, markers, width, height, axisLabels) {
   const spacing = 6;
   const occupied = [...axisLabels];
   let previousTop = -Infinity;
-  for (const point of positions) {
+  for (const [index, point] of positions.entries()) {
     const button = markers.get(point.id);
     const buttonWidth = button.offsetWidth;
     const buttonHeight = button.offsetHeight;
@@ -476,12 +476,14 @@ function positionMarkers(ctx, positions, markers, width, height, axisLabels) {
       candidate.right + spacing < other.left || candidate.left - spacing > other.right ||
       candidate.bottom + spacing <= other.top || candidate.top - spacing >= other.bottom);
     const baseline = place(0, near);
+    const maxTop = height - 56 - buttonHeight - 12 * (positions.length - 1 - index);
     let label = null;
     let bestCost = Infinity;
     for (const dy of [near, far, near - 12, near + 12, near - 28, near + 28, near - 52, near + 52, near - 92, near + 92]) {
       for (const dx of [0, -12, 12, -28, 28, -halfWidth - 16, halfWidth + 16, -buttonWidth, buttonWidth]) {
         const candidate = place(dx, dy);
-        const cost = Math.hypot(candidate.x - baseline.x, candidate.top - baseline.top) + (candidate.top < previousTop + 10 ? height : 0);
+        const orderPenalty = candidate.top < previousTop + 10 || candidate.top > maxTop ? height : 0;
+        const cost = Math.hypot(candidate.x - baseline.x, candidate.top - baseline.top) + orderPenalty;
         if (cost < bestCost && clear(candidate)) {
           bestCost = cost;
           label = candidate;
