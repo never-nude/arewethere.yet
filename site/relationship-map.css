@@ -413,4 +413,5 @@
 
 @media (max-width: 520px) {
   .srm { padding-inline: 12px; }
+  .srm__connection-list button, .srm__related button { min-height: 44px; }
 }

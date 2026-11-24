@@ -25,17 +25,20 @@ function projector(camera, width, height) {
   const sy = Math.sin(camera.yaw);
   const cp = Math.cos(camera.pitch);
   const sp = Math.sin(camera.pitch);
-  const scale = Math.min(width / 7.2, height / 3.95) * camera.zoom;
+  const compact = width < 380;
+  const scale = Math.min(width / (compact ? 8.6 : 7.2), height / 3.95) * camera.zoom;
+  const verticalScale = scale * (compact ? 1.3 : 1);
+  const baseline = height * (compact ? .69 : .77);
   return ([x, y, z]) => {
     const horizontal = x * cy - z * sy;
     const depth = x * sy + z * cy;
     const vertical = y * cp + depth * sp;
     const factor = 9 / (9 + depth * cp - y * sp);
-    return [width * .5 + camera.x + horizontal * scale * factor, height * .77 + camera.y - vertical * scale * factor];
+    return [width * .5 + camera.x + horizontal * scale * factor, baseline + camera.y - vertical * verticalScale * factor];
   };
 }
 
-function paintGrid(ctx, project, dateX, model) {
+function paintGrid(ctx, project, dateX, model, width) {
   ctx.lineWidth = 1;
   ctx.font = '10px IBM Plex Mono, monospace';
   ctx.textBaseline = 'middle';
@@ -49,8 +52,9 @@ function paintGrid(ctx, project, dateX, model) {
 
   const yearLast = Number(model.lastDate.slice(0, 4));
   const labels = [{ date: model.firstDate, label: model.firstDate.slice(0, 4) }];
+  const endGap = width < 380 ? 12 : 5;
   for (const year of [1980, 2000, 2020]) {
-    if (yearLast - year > 5) labels.push({ date: year + '-01-01', label: String(year) });
+    if (yearLast - year > endGap) labels.push({ date: year + '-01-01', label: String(year) });
   }
   labels.push({ date: model.lastDate, label: String(yearLast) });
   for (const { date, label } of labels) {
@@ -81,9 +85,9 @@ function paintGrid(ctx, project, dateX, model) {
 function paintAxisLabels(ctx, project, total, width, height) {
   const narrow = width < 370;
   const labels = [
-    [narrow ? 'X · Date' : 'X · Calendar date', [0, 0, axisFront], 29],
+    [narrow ? 'X · Date' : 'X · Calendar date', [0, 0, axisFront], narrow ? 34 : 29],
     [narrow ? 'Y · Landmarks' : 'Y · Landmarks documented', [axis.start, axis.step * total, axisFront], -17],
-    [narrow ? 'Z · Category' : 'Z · Evidence category', [axis.end, 0, axisBack], -15],
+    [narrow ? 'Z · Category' : 'Z · Evidence category', [axis.end, 0, axisBack], narrow ? 16 : -15],
   ];
   ctx.font = '600 12px Geist, sans-serif';
   ctx.textAlign = 'center';
@@ -210,7 +214,7 @@ export function mountHistoricTerrain(container, onSelect) {
     fog.addColorStop(1, '#3d285d00');
     ctx.fillStyle = fog;
     ctx.fillRect(0, 0, width, height);
-    paintGrid(ctx, project, dateX, model);
+    paintGrid(ctx, project, dateX, model, width);
     paintTrace(ctx, project, points, selected, dateX(model.selectedDate));
     paintAxisLabels(ctx, project, model.total, width, height);
     const occupied = [];
@@ -230,6 +234,9 @@ export function mountHistoricTerrain(container, onSelect) {
         .find((candidate) => inView(candidate) && separated(candidate)) ?? [x, y];
       button.style.left = hx + 'px';
       button.style.top = hy + 'px';
+      const captionHalfWidth = point.label.length * 2.9 + 6;
+      const captionOffset = width < 380 ? clamp(hx, captionHalfWidth, width - captionHalfWidth) - hx : 0;
+      button.style.setProperty('--hist-caption-offset', captionOffset + 'px');
       button.dataset.crowded = String(occupied.some(([ox, oy]) => Math.abs(hx - ox) < 54 && Math.abs(hy - oy) < 18));
       occupied.push([hx, hy]);
       if (hx !== x || hy !== y) {

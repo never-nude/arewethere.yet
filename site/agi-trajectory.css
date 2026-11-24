@@ -126,6 +126,8 @@
 
 @media (max-width: 540px) {
   .agi-panel { margin: 0 10px 10px; padding: 12px 10px; }
+  .agi-reading .glossary-term { display: inline; color: inherit; font: inherit; }
+  .agi-news summary { min-height: 44px; align-content: center; }
 }
 
 @media (max-width: 375px) {

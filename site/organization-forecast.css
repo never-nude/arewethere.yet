@@ -176,6 +176,7 @@
   .org-forecast__axes { margin-left: 21px; }
   .org-forecast { padding: 11px; }
   .org-forecast__header { flex-direction: column; gap: 4px; }
+  .org-forecast__control input { min-height: 44px; }
   .org-forecast__item { grid-template-columns: 16px minmax(0, 1fr) max-content 64px; column-gap: 5px; }
   .org-forecast__estimated { font-size: 11px; }
   .org-forecast__pace { font-size: 9px; }

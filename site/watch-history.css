@@ -70,4 +70,5 @@
   .watch-history__toolbar label:last-child { margin-left: 0; }
   .watch-history__toolbar select { max-width: 176px; }
   .watch-history__periods { flex-basis: 100%; }
+  .watch-history__scrub input { min-height: 44px; }
 }

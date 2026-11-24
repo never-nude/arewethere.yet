@@ -65,6 +65,7 @@
 .sw-terrain__axis-readings dd { margin: 0; max-width: 57%; text-align: right; font-weight: 640; }
 .sw-terrain__arrow-readings strong { flex: none; font-variant-numeric: tabular-nums; font-weight: 640; }
 .sw-terrain__chart-key .sw-terrain__relationship { margin-top: 7px; }
+.sw-terrain__detail-jump { display: none; }
 .sw-terrain__arrow-readings { list-style: none; }
 .sw-terrain__arrow-key a { display: inline-block; margin-top: 4px; }
 .sw-terrain__legend { display: grid; gap: 5px; padding: 10px 18px 0; color: #ded3ef; font-size: 11px; line-height: 1.4; }
@@ -142,6 +143,8 @@
   font: 400 10px/1.35 var(--mono, ui-monospace, monospace);
   pointer-events: none;
 }
+
+.sw-terrain__touch-guide { display: none; }
 
 .sw-terrain__camera {
   position: absolute;
@@ -322,7 +325,10 @@
 }
 
 @media (max-width: 640px) {
-  .sw-terrain__stage { min-height: 23rem; }
+  .sw-terrain__stage { min-height: 23rem; margin-inline: 4px; }
+  .sw-terrain__chart-key { margin-inline: 4px; font-size: 14px; }
+  .sw-terrain__chart-key h2 { font-size: 15px; }
+  .sw-terrain__detail-jump { display: inline-grid; align-items: center; min-height: 44px; }
   .sw-terrain__toolbar, .sw-terrain__legend { padding-inline: 12px; }
   .sw-terrain__readout { grid-template-columns: minmax(0, 1fr); padding-inline: 12px; }
   .sw-terrain__concept { grid-row: 1; }
@@ -337,6 +343,9 @@
 
 @media (pointer: coarse) {
   .sw-terrain__canvas { touch-action: pan-y; }
-  .sw-terrain__marker { min-height: 36px; }
-  .sw-terrain__camera button, .sw-terrain__orbit { min-width: 40px; min-height: 40px; }
+  .sw-terrain__guide > span:first-child { display: none; }
+  .sw-terrain__touch-guide { display: inline; }
+  .sw-terrain__guide { max-width: calc(100% - 159px); }
+  .sw-terrain__marker { min-height: 44px; }
+  .sw-terrain__camera button, .sw-terrain__orbit { min-width: 44px; min-height: 44px; }
 }

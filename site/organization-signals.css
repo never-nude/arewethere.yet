@@ -186,3 +186,9 @@
   accent-color: var(--teal);
   cursor: pointer;
 }
+
+@media (max-width: 540px) {
+  .organization-signals__tabs button,
+  .organization-signals__date input,
+  .organization-signals__scrubber input { min-height: 44px; }
+}

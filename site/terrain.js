@@ -124,7 +124,7 @@ function sceneMarkup() {
       <div class="sw-terrain__markers" role="group" aria-label="Explore AI concepts">
         ${conceptEntries.map(([id, concept]) => `<button type="button" class="sw-terrain__marker" data-concept="${id}" style="--node-color:${concept.color}" aria-label="${concept.title}" aria-pressed="false"><span aria-hidden="true"></span>${concept.label}</button>`).join('')}
       </div>
-      <div class="sw-terrain__guide">Left-drag to rotate · Right-drag or Shift-drag to pan</div>
+      <div class="sw-terrain__guide"><span>Left-drag to rotate · Right-drag or Shift-drag to pan</span><span class="sw-terrain__touch-guide">Swipe across to rotate. Use two fingers to pan or zoom.</span></div>
       <div class="sw-terrain__camera" role="group" aria-label="View controls">
         <button type="button" data-camera="far" aria-label="Zoom out" title="Zoom out">−</button>
         <button type="button" data-camera="close" aria-label="Zoom in" title="Zoom in">+</button>
@@ -139,6 +139,7 @@ function sceneMarkup() {
           ${axes.map(({ id, label, color }) => `<div data-axis="${id}" style="--axis-color:${color}"><dt><b>${id.toUpperCase()}</b> ${label}</dt><dd></dd></div>`).join('')}
         </dl>
         <p class="sw-terrain__relationship"></p>
+        <a class="sw-terrain__detail-jump evidence-jump" href="#terrain-concept">Definition and measurements ↓</a>
       </div>
       <div class="sw-terrain__arrow-key">
         <h2>Arrow fill · evidence for each step</h2>
@@ -162,7 +163,7 @@ function sceneMarkup() {
           <ul class="sw-terrain__contributions"></ul>
         </details>
       </div>
-      <div class="sw-terrain__concept" aria-live="polite" aria-atomic="true">
+      <div class="sw-terrain__concept" id="terrain-concept" aria-live="polite" aria-atomic="true">
         <p class="sw-terrain__overline">Selected concept</p>
         <h3></h3>
         <div class="sw-terrain__coordinates" hidden>

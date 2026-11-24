@@ -147,7 +147,7 @@
 .hist-plot__points button span {
   position: absolute;
   bottom: calc(100% - 2px);
-  left: 50%;
+  left: calc(50% + var(--hist-caption-offset, 0px));
   display: block;
   transform: translateX(-50%);
   padding: 3px 4px;
@@ -408,7 +408,9 @@
   .origins-header { display: grid; gap: 5px; }
   .origins-date { font-size: 11px; }
   .hist-plot { padding: 9px; }
+  .hist-plot__stage { height: 215px; }
   .hist-plot__coordinates { gap: 4px; }
   .hist-plot__coordinates > div { padding: 5px; }
   .hist-plot__coordinates dd { font-size: 11px; }
+  .origins .origins-range { min-height: 44px; }
 }
