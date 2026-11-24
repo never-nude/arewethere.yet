@@ -1,0 +1,13 @@
+{
+  "name": "singularity-watch",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build-pages.mjs"
+  }
+}
