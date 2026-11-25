@@ -89,3 +89,28 @@ test('observed milestones stay fixed; missing and explicitly open years stay dis
   assert.equal(scenarioTimeline({...partial, milestones: [rsi]}).selected, 'observed');
   assert.equal(scenarioTimeline(null), null);
 });
+
+test('acceleration is a separate selectable published scenario and retains the issued reference arithmetic', () => {
+  const v2=structuredClone(outlook);
+  v2.version='2.0.0';
+  v2.pace={milestones:v2.milestones.map(m=>({id:m.id,baselineYear:m.centralYear,referenceYear:m.centralYear,reason:'Kept the survey anchor.'})),
+    referenceInputs:{referenceGates:[{label:'Research',year:2035},{label:'Spread',year:2045},{label:'Wider change',year:2062}]}};
+  for(const m of v2.milestones)m.scenarios.push({label:'Sustained acceleration',year:m.centralYear-10});
+  const guide=calculationGuide(base,v2);
+  assert.equal(guide.conditions.at(-1).year,2062);
+  assert.equal(scenarioTimeline(v2).milestones[0].values.acceleration,2052);
+  assert.equal(scenarioTimeline(v2).selected,'reference');
+});
+
+test('only a live edition with a matching checkpoint and evidence hash accepts a new forecast bulletin',async()=>{
+  const {selectOutlook}=await import('../site/observatory-acceleration.js');
+  const sha256='a'.repeat(64);
+  const edition={checkpointAt:'2026-11-25T14:30:00.000Z',arrivalOutlook:outlook};
+  const bulletin={basedOnCheckpoint:edition.checkpointAt,basedOnSha256:sha256,outlook:{version:'2.0.0'}};
+  const manifest={currentRecord:{checkpointAt:edition.checkpointAt,sha256},supplementalPaceOutlook:bulletin};
+  assert.equal(selectOutlook(edition,manifest).outlook,bulletin.outlook);
+  assert.equal(selectOutlook(edition,manifest,true).outlook,outlook);
+  assert.equal(selectOutlook(edition,{...manifest,currentRecord:{...manifest.currentRecord,sha256:'b'.repeat(64)}}).outlook,outlook);
+  assert.equal(selectOutlook({...edition,checkpointAt:'2026-11-25T05:00:00.000Z'},manifest).outlook,outlook);
+  assert.equal(selectOutlook({checkpointAt:edition.checkpointAt},{...manifest,supplementalPaceOutlook:null,supplementalOutlook:bulletin}).outlook,bulletin.outlook);
+});

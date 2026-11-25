@@ -1,9 +1,10 @@
 const entries = [
   ['ECI|Epoch Capabilities Index', 'Epoch Capabilities Index', 'Epoch AI combines many tests into one scale. Higher scores indicate stronger overall test performance. The scale can go above 100, and its points are useful for comparing tested models.'],
-  ['AGI|artificial general intelligence', 'Artificial general intelligence', 'Here, AI that can perform at least as well as skilled people across many kinds of unfamiliar work.'],
-  ['ASI|artificial superintelligence', 'Artificial superintelligence', 'Here, AI that consistently beats leading human experts across many kinds of unfamiliar work. It also meets the AGI bar.'],
-  ['RSI|recursive self-improvement', 'Recursive self-improvement', 'AI helps make a better successor, which in turn helps improve the next generation.'],
-  ['technological singularity', 'Technological Singularity', 'Here, sustained acceleration in AI development caused by successive AI systems improving the process of building better AI.'],
+  ['general intelligence', 'General intelligence', 'The ability to learn across different kinds of problems and apply that learning in an unfamiliar situation.'],
+  ['AGI|artificial general intelligence', 'Artificial general intelligence', 'An AI that reliably performs at the level of skilled people across many kinds of unfamiliar work.'],
+  ['ASI|artificial superintelligence', 'Artificial superintelligence', 'An AI that reliably and substantially outperforms leading human experts across many intellectual fields. Under the Watch’s definition it also meets the AGI requirements.'],
+  ['RSI|recursive self-improvement', 'Recursive self-improvement', 'An AI helps build a better successor. That successor then uses its improved abilities to help build a better one in turn.'],
+  ['singularity|AI singularity|technological singularity', 'The singularity', 'For this Watch, AI systems help build better successors, and that cycle keeps speeding up technological progress beyond the lab.'],
   ['AI R&D|R&D|research and development', 'Research and development', 'The work of discovering, testing, and applying improvements. AI research and development includes experiments to build and evaluate AI systems.'],
   ['FLOP|FLOPs', 'Floating-point operation', 'One arithmetic operation on numbers that can have a fractional part. Here it is used to count the computation needed to train a model.'],
   ['METR', 'Model Evaluation and Threat Research', 'An independent nonprofit that develops tests of AI capabilities and evaluates risks.'],
@@ -35,7 +36,7 @@ const entries = [
 
 const termSelector = '.glossary-term';
 const controls = 'a[href], button, summary, label, [role="button"], [role="tab"], [role="option"], [role="slider"]';
-const excludedContent = `${termSelector}, .glossary-popup, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
+const excludedContent = `${termSelector}, .glossary-popup, [data-glossary-exclude], script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
 
 export function installGlossary(root, { additionalEntries = [], skipSelector = '', inlineButtons = false } = {}) {
   const excluded = skipSelector ? excludedContent + ', ' + skipSelector : excludedContent;

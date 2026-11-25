@@ -1,7 +1,6 @@
-import { installGlossary } from './glossary.js';
+import { installGlossary } from './glossary.js?v=20261125-terms';
 
 const briefingTerms = [
-  ['singularity|AI singularity|technological singularity', 'The singularity', 'The Watch uses this term for a sustained cycle in which AI helps build its successor and research progress speeds up across several generations.'],
   ['superhuman AI researcher|superhuman AI researchers', 'Superhuman AI researcher', 'For this forecast, an AI would automate all coding on an AI research project and choose experiments as well as its best human researchers.'],
   ['evidence score|evidence index|evidence points', 'Evidence score', 'A milestone can earn a score after independent reviewers assess every required criterion for the same system or lineage. Each criterion counts equally.'],
   ['compute|training compute|computing power', 'Compute', 'The computing work used to train or run AI. The Watch tracks how much calculation went into training a leading model.'],

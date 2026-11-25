@@ -16,7 +16,7 @@ import { collectModelResources } from './model-resources.mjs';
 import firstResources from '../site/data/first-training-resources.js';
 import { loadCandidateQueue } from './candidate-observations.mjs';
 import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, readArchive, nextRecord } from './checkpoint-archive.mjs';
-import firstOutlook from '../site/data/first-arrival-outlook.json' with { type: 'json' };
+import { firstOutlook, firstPaceOutlook, previouslyIssuedOutlook } from './issued-outlooks.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const archiveDir = path.resolve(process.env.OBSERVATORY_ARCHIVE_DIR ?? path.join(repo, '.observatory-archive'));
@@ -131,8 +131,7 @@ if (plan) {
   const assessment = buildObservatoryAssessment(signals, {
     checkpointAt, validatedAt, previous: previous?.assessment ?? null, includeIndicatorForecasts: plan.kind === 'official',
     includeArrivalOutlook: plan.kind === 'official',
-    previousOutlook: previous?.assessment.arrivalOutlook ??
-      (latest?.sha256 === firstOutlook.basedOnSha256 ? firstOutlook.outlook : null),
+    previousOutlook: previouslyIssuedOutlook(previous?.assessment, latest?.sha256),
   });
   assessment.kind = plan.kind;
   if (plan.trigger) assessment.trigger = plan.trigger;
@@ -177,6 +176,13 @@ if (records.some(row => row.sha256 === firstOutlook.basedOnSha256 && row.checkpo
   if (!record.assessment.arrivalOutlook && latest.sha256 === firstOutlook.basedOnSha256) feed.supplementalOutlook = firstOutlook;
 }
 
+if (records.some(row => row.sha256 === firstPaceOutlook.basedOnSha256 && row.checkpointAt === firstPaceOutlook.basedOnCheckpoint)) {
+  feed.firstPaceOutlookUrl = firstPaceOutlook.url;
+  if (latest.sha256 === firstPaceOutlook.basedOnSha256 && !record.assessment.arrivalOutlook?.pace) {
+    feed.supplementalPaceOutlook = firstPaceOutlook;
+  }
+}
+
 const firstResourceUrl = 'data/first-training-resources.json';
 feed.firstTrainingResourcesUrl = firstResourceUrl;
 if (!record.assessment.modelResources && record.assessment.checkpointAt === firstResources.forEdition) {
@@ -206,7 +212,9 @@ if (legacyBytes) await writeFile(new URL('data/legacy-v1.json', target), legacyB
 await writeFile(new URL(firstResourceUrl, target), JSON.stringify(firstResources));
 await writeFile(new URL('data/observatory.json', target), JSON.stringify(feed));
 await writeFile(new URL('data/signals.json', target), JSON.stringify(record.signals));
-const publicCompanion = feed.supplementalOutlook ? { ...record.companion, supplementalOutlook: firstOutlook } : record.companion;
+const publicCompanion = {...record.companion};
+if (feed.supplementalOutlook) publicCompanion.supplementalOutlook = feed.supplementalOutlook;
+if (feed.supplementalPaceOutlook) publicCompanion.supplementalPaceOutlook = feed.supplementalPaceOutlook;
 await writeFile(new URL('data/companion.json', target), JSON.stringify(publicCompanion));
 await writeFile(new URL('.nojekyll', target), '');
 console.log('Pages bundle ready. ' + record.kind + ' edition ' + latest.checkpointAt + '; ' + feed.archive.length + ' official records retained.');

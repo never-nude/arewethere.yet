@@ -1,0 +1,39 @@
+.term-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  flex-wrap: wrap;
+}
+.term-heading a,
+.term-guide-more { font-size: 14px; }
+.term-list { margin: 12px 0 0; }
+.term-list > div {
+  display: grid;
+  grid-template-columns: minmax(170px, .8fr) minmax(0, 2fr);
+  gap: 6px 24px;
+  padding-block: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-block-start: 18px;
+}
+.term-list dt {
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.35;
+  font-weight: 650;
+}
+.term-list dd { margin: 0; max-width: 68ch; }
+.term-list dd p {
+  margin: 6px 0 0;
+  color: var(--dim);
+}
+.term-guide-more { display: inline-block; margin-top: 6px; }
+.term-sequence {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin: 2px 0 0;
+  color: var(--dim);
+}
+@media (max-width: 640px) {
+  .term-list > div { grid-template-columns: 1fr; gap: 2px; }
+}

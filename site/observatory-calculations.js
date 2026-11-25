@@ -2,9 +2,9 @@ import {outlookAnchors as anchors} from './observatory-outlook-sources.js';
 
 const ids = ['agi', 'rsi', 'asi', 'singularity'];
 const names = {
-  agi: 'General intelligence',
+  agi: 'Artificial general intelligence',
   rsi: 'Recursive self-improvement',
-  asi: 'Superintelligence',
+  asi: 'Artificial superintelligence',
   singularity: 'Singularity',
 };
 
@@ -32,6 +32,30 @@ export function calculationGuide(assessment, outlook) {
     return {id, year: m.centralYear, status: m.status, equation: '', explanation: m.basis, assumption: ''};
   });
   const guide = {rows, conditions: []};
+  if (outlook?.version === '2.0.0' && outlook.pace?.milestones) {
+    const inputs = outlook.pace.referenceInputs;
+    const previous = calculationGuide(assessment, {...outlook,version:'1.0.0'});
+    for (const row of rows) {
+      const change = outlook.pace.milestones.find(m=>m.id===row.id);
+      const original = previous.rows.find(m=>m.id===row.id);
+      if (change && change.baselineYear === row.year && change.referenceYear === row.year && original) {
+        row.equation = original.equation;
+        row.assumption = original.assumption;
+      }
+      if (row.id === 'rsi' && !row.equation && row.status==='Scenario estimate' && Number.isInteger(inputs?.rsiFloor) && inputs.rsiFloor===row.year) {
+        row.equation='Research and successor-cycle forecast · '+row.year;
+      }
+      if (change?.reason && change.reason !== row.explanation) row.assumption = [row.assumption,change.reason].filter(Boolean).join(' ');
+    }
+    const singularity = rows.find(m=>m.id==='singularity');
+    const gates = inputs?.referenceGates;
+    if (singularity?.status === 'Scenario estimate' && gates?.length && gates.every(g=>Number.isInteger(g.year)) &&
+      Math.max(...gates.map(g=>g.year))===singularity.year) {
+      guide.conditions = gates.map(g=>({label:g.label,math:g.math ?? '',year:g.year}));
+      singularity.equation = 'Latest of '+gates.map(g=>g.year).join(', ')+' = '+singularity.year;
+    }
+    return guide;
+  }
   if (outlook?.version !== '1.0.0') return guide;
   const byId = Object.fromEntries(rows.map(row => [row.id, row]));
   const {agi, rsi, asi, singularity} = byId;
@@ -135,7 +159,7 @@ function drawConditions(root, conditions, outlook) {
   figure.append(list, el('figcaption', `Bars run from ${start} to ${last}. Each shows a projected calendar year.`));
   root.append(figure);
   const limiting = conditions.filter(c => c.year === last);
-  if (limiting.length === 1 && last < outlook.horizonYear) {
+  if (limiting.length === 1 && limiting[0].input && last < outlook.horizonYear) {
     root.append(el('p', `If ${limiting[0].input} moved one year later and the other inputs held, the singularity estimate would move from ${last} to ${last + 1}.`, 'calc-example'));
   }
 }
@@ -154,6 +178,7 @@ function detailsFor(row, compact) {
 const paths = [
   {key: 'fast', label: 'Faster', issued: 'Faster development'},
   {key: 'reference', label: 'Reference', issued: 'Reference scenario'},
+  {key: 'acceleration', label: 'Sustained acceleration', issued: 'Sustained acceleration'},
   {key: 'slow', label: 'Slower', issued: 'Slower development'},
   {key: 'stalled', label: 'Stalled', issued: 'Stalled or never realized'},
 ];
@@ -191,6 +216,7 @@ function timelineExplorer(root, timeline) {
   const selectedInputs = el('fieldset', null, 'calc-tabs');
   selectedInputs.append(el('legend', 'Development scenario'));
   const controls = el('div', null, 'calc-tab-options');
+  if (options.length > 4) controls.classList.add('calc-five-paths');
   selectedInputs.append(controls);
   const chart = el('figure', null, 'calc-timeline');
   chart.setAttribute('aria-label', 'Milestone years on a shared calendar scale');

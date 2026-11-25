@@ -1,0 +1,61 @@
+#acceleration { min-width:0; }
+.pace-select { display:flex; flex-wrap:wrap; gap:4px; }
+.pace-select button { border:1px solid #564765; background:#211b2e; color:var(--ink); border-radius:6px; min-height:40px; padding:6px 12px; font-family:inherit; font-weight:550; font-size:.9rem; line-height:1.25; }
+.pace-select button[aria-pressed="true"] { border-color:var(--teal); color:#a6f4df; background:#223132; }
+.pace-views { margin-block:.85rem 1.05rem; padding-block-end:1rem; border-block-end:1px solid var(--line); }
+.pace-views button { min-height:43px; font-weight:600; }
+.pace-body > .pace-select { margin-block-end:.8rem; }
+.pace-inner { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:clamp(1rem,3vw,2.75rem); align-items:start; }
+.pace-figure,.pace-chart,.pace-summary { min-width:0; }
+.pace-chart svg { display:block; width:100%; height:auto; max-height:225px; overflow:visible; }
+.pace-chart svg text { fill:var(--dim); font:11px var(--mono); }
+.pace-chart { margin:0; }
+.pace-chart .pace-gridline {stroke:var(--line);stroke-width:1;}
+.pace-chart .pace-line {stroke:#78c8bb;stroke-width:1.75;}
+.pace-chart .pace-mark {fill:#88c9c1;}
+.pace-chart .pace-mark.selected {fill:#ccfff0;stroke:var(--teal);stroke-width:2.5;}
+.pace-chart .pace-cursor {stroke:#b5a0d2;stroke-width:1;stroke-dasharray:3 4;}
+.pace-chart input {width:100%; accent-color:var(--teal); min-height:32px; margin:0; }
+.pace-readout {display:flex; flex-wrap:wrap; gap:3px 12px; align-items:baseline; font-size:.91rem; }
+.pace-readout strong { font:500 1.12rem var(--mono); color:var(--teal); }
+.pace-readout span,.pace-unit,.pace-note {color:var(--dim);}
+.pace-note,.pace-unit,#acceleration .pace-note,#acceleration .pace-unit {font-size:.88rem;line-height:1.5;}
+#acceleration .pace-unit {margin-block:.5rem .1rem;}
+#acceleration .pace-summary h3,#acceleration .pace-impacts h3 {margin-block:0 .35rem;}
+.pace-summary>p,.pace-impacts p {margin-block:.3rem .55rem;}
+#acceleration a,.pace-hero-reading a {color:var(--violet); text-decoration:underline;text-underline-offset:.18em;}
+.pace-summary a,.pace-impacts a,#acceleration .pace-body>a {font-size:.86rem;}
+.pace-errors {margin:.5rem 0 0;}
+.pace-errors>div {display:grid;grid-template-columns:minmax(5rem,1fr) minmax(2rem,.75fr) minmax(2rem,auto);gap:.5rem;align-items:center;border-block-start:1px solid var(--line);padding:.35rem 0;}
+.pace-errors dt,.pace-errors dd {margin:0;font-size:.82rem;}
+.pace-errors dd {text-align:end;font-family:var(--mono);}
+.pace-error-track {height:5px;background:#42394d;border-radius:3px;}
+.pace-error-track i {height:100%;display:block;background:#c2a4e9;border-radius:3px;}
+.pace-impacts {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px;}
+.pace-impacts article {padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#211b2c;}
+.pace-impacts .pace-impact-value {font:500 clamp(1.2rem,2.3vw,1.6rem) var(--mono);color:var(--teal);}
+.pace-effect {width:100%;border-collapse:collapse;text-align:start;table-layout:fixed;}
+.pace-effect caption {font-weight:600;text-align:start;padding-block-end:.45rem;}
+.pace-effect th,.pace-effect td {text-align:start;padding:.4rem .35rem;border-block-start:1px solid var(--line);font-size:.88rem;}
+.pace-effect th:first-child {width:39%;}
+.pace-effect th:nth-child(2) {width:21%;}
+.pace-effect td {color:var(--teal);font-family:var(--mono);}
+.pace-effect td small {display:block;color:var(--dim);font:normal .75rem/1.3 var(--sans,system-ui);}
+.pace-hero-reading { border-inline-start:2px solid var(--teal);padding-inline-start:.75rem;margin-block:.55rem; }
+.obs-clock-context .pace-hero-reading p {margin:0;}
+.pace-hero-reading strong {color:var(--teal);font-family:var(--mono);}
+.pace-hero-reading small {display:inline-block;margin-inline-start:.5rem;color:var(--dim);}
+.pace-hero-reading a {font-size:.82rem;}
+@media(max-width:690px){
+ .pace-inner {grid-template-columns:1fr;gap:1rem;}
+ .pace-views {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+ .pace-select button {min-height:44px;padding:6px 9px;font-size:.82rem;}
+ .pace-chart svg text {font-size:14px;}
+ .pace-effect th,.pace-effect td {font-size:.8rem;}
+}
+#acceleration .pace-rate {color:var(--teal);font:500 clamp(1.08rem,2.1vw,1.45rem)/1.3 var(--mono);}
+.pace-events {flex-basis:100%;color:var(--dim);line-height:1.4;}
+.pace-gates {margin:.5rem 0;}
+.pace-gates>div {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;border-block-start:1px solid var(--line);padding:.4rem 0;}
+.pace-gates dd {margin:0;color:var(--teal);font:500 .95rem var(--mono);}
+.pace-gates small {display:block;color:var(--dim);font:normal .77rem var(--sans,system-ui);}

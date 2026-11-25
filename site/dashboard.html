@@ -31,13 +31,15 @@
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
+  <link rel="stylesheet" href="./observatory-terms.css">
   <link rel="stylesheet" href="./observatory.css?v=20261125-visuals">
   <link rel="stylesheet" href="./observatory-field.css?v=20261125-visuals">
-  <link rel="stylesheet" href="./observatory-calculations.css">
+  <link rel="stylesheet" href="./observatory-calculations.css?v=pace1">
+  <link rel="stylesheet" href="./observatory-acceleration.css">
   <link rel="stylesheet" href="./observatory-charts.css">
   <link rel="stylesheet" href="./observatory-investment.css">
   <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./observatory-ui.js?v=20261125-visuals"></script>
+  <script type="module" src="./observatory-ui.js?v=20261125-pace"></script>
 </head>
 <body class="observatory" data-view="dashboard">
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -50,14 +52,52 @@
       <p>Compare model performance, training resources and the assumptions behind each milestone forecast.</p>
     </header>
     <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
-    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#calculations">Forecast calculations</a><a href="#metric-charts">Measured capabilities</a><a href="#model-investment">Training &amp; investment</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#outlook">Benchmark predictions</a><a href="#forecasts">Milestone scenarios</a><a href="#history">Archive</a></nav>
+    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#definitions">Term definitions</a><a href="#calculations">Forecast calculations</a><a href="#acceleration" data-pace-nav hidden>Growth rates</a><a href="#metric-charts">Measured capabilities</a><a href="#model-investment">Training &amp; investment</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#outlook">Benchmark predictions</a><a href="#forecasts">Milestone scenarios</a><a href="#history">Archive</a></nav>
 
     <section id="milestone-progress" class="obs-panel"><h2>Progress and estimated arrival</h2><p id="arrival-intro" class="obs-sub"></p><p id="arrival-note" class="obs-small"></p><div id="assessment-list"></div></section>
     <section id="calculations" class="obs-panel"><h2>Explore the milestone forecasts</h2><div id="calculation-visual"></div></section>
+    <section id="acceleration" class="obs-panel" aria-label="Measured pace of AI" hidden></section>
     <section id="metric-charts" aria-label="Measured AI capabilities"></section>
     <section id="model-investment" aria-label="Model costs and investment"></section>
     <section id="outlook" class="obs-panel"><h2>Measurements and predictions</h2><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div><div id="indicator-outcomes"></div></section>
     <section id="atlas" class="obs-panel obs-field"><h2>Milestone field</h2><div id="observatory-field"></div></section>
+    <section id="definitions" class="obs-panel term-guide term-guide-full" aria-labelledby="definitions-heading" tabindex="-1" data-glossary-exclude>
+      <h2 id="definitions-heading">What the terms mean</h2>
+      <p class="obs-sub">General intelligence describes an ability. The other four terms name the milestones this Watch tracks.</p>
+      <dl class="term-list">
+        <div id="term-general-intelligence">
+          <dt>General intelligence</dt>
+          <dd>The ability to learn across different kinds of problems and apply that learning in an unfamiliar situation.
+            <p>A person who learns to plan a household budget can use the same reasoning to organize a community event. Researchers study this ability in people and other animals. The term itself sets no particular level of skill.</p>
+          </dd>
+        </div>
+        <div id="term-agi">
+          <dt>Artificial general intelligence (AGI)</dt>
+          <dd>An AI that reliably performs at the level of skilled people across many kinds of unfamiliar work.
+            <p>Independent evaluators would give the same system fresh problems in areas such as reasoning, language and practical planning. It would need to apply what it learned to new tasks and repeat its performance.</p>
+          </dd>
+        </div>
+        <div id="term-rsi">
+          <dt>Recursive self-improvement (RSI)</dt>
+          <dd>An AI helps build a better successor. That successor then uses its improved abilities to help build a better one in turn.
+            <p>Suppose one system discovers a better training method. Its successor would have to use its improved capabilities to produce a further gain. A controlled comparison would trace each gain to the system that contributed it.</p>
+          </dd>
+        </div>
+        <div id="term-asi">
+          <dt>Artificial superintelligence (ASI)</dt>
+          <dd>An AI that reliably and substantially outperforms leading human experts across many intellectual fields.
+            <p>Beating a chess champion establishes strength in chess. The Watch would look for the same AI to outperform leading experts on fresh problems across many fields, with independent teams reproducing the results.</p>
+          </dd>
+        </div>
+        <div id="term-singularity">
+          <dt>The singularity</dt>
+          <dd>AI systems help build better successors, and that cycle keeps speeding up technological progress beyond the lab.
+            <p>The Watch would look for AI-led research to make successive generations improve faster, then for that acceleration to spread beyond one lab. Independent teams would need to separate the effect of AI from other changes, such as adding more computing power.</p>
+          </dd>
+        </div>
+      </dl>
+      <p class="term-sequence">Under these definitions, artificial superintelligence includes artificial general intelligence. A specialized system could begin recursive self-improvement earlier. The singularity requires separate evidence that the pace of progress has changed more widely. <a href="#atlas">Explore these connections</a>.</p>
+    </section>
     <div class="obs-bottom-grid"><section id="watchdog" class="obs-panel"><h2>What changed</h2><div id="changes"></div></section><section id="oversight" class="obs-panel"><h2>Human oversight and control</h2><div id="oversight-reading"></div></section></div>
     <section id="signals" class="obs-panel"><h2>Evidence register</h2><p class="obs-sub">Look up a measurement, the system tested and the limits of the finding. Release announcements earn no capability credit.</p><div id="register"></div></section>
     <section id="trends" class="obs-panel"><h2>Measured trends</h2><p class="obs-sub">Compare monthly measurements with the predictions available in this edition.</p><div id="trend-chart"></div></section>

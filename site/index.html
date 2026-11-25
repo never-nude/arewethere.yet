@@ -31,13 +31,15 @@
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
+  <link rel="stylesheet" href="./observatory-terms.css">
   <link rel="stylesheet" href="./observatory.css?v=20261125-visuals">
   <link rel="stylesheet" href="./observatory-field.css?v=20261125-visuals">
   <link rel="stylesheet" href="./observatory-charts.css">
   <link rel="stylesheet" href="./observatory-investment.css">
-  <link rel="stylesheet" href="./observatory-calculations.css">
+  <link rel="stylesheet" href="./observatory-calculations.css?v=pace1">
+  <link rel="stylesheet" href="./observatory-acceleration.css">
   <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./observatory-ui.js?v=20261125-visuals"></script>
+  <script type="module" src="./observatory-ui.js?v=20261125-pace"></script>
 </head>
 <body class="observatory" data-view="brief">
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -53,7 +55,7 @@
     </section>
 
     <section id="milestone-progress" class="obs-panel obs-milestones-brief" aria-labelledby="milestone-heading">
-      <h2 id="milestone-heading">Milestone progress</h2>
+      <div class="term-heading"><h2 id="milestone-heading">Milestone progress</h2><a href="#definitions">Term definitions</a></div>
       <p id="arrival-intro" class="obs-sub"></p>
       <div id="assessment-list"></div>
       <details class="obs-detail obs-reading-note">
@@ -64,10 +66,38 @@
       </details>
     </section>
 
+    <section id="acceleration" class="obs-panel" aria-label="Measured pace of AI" hidden></section>
     <section id="metric-charts" aria-label="Measured AI capabilities"></section>
     <section id="model-investment" aria-label="Model costs and investment"></section>
     <section id="calculations" class="obs-panel"><h2>Explore the milestone forecasts</h2><div id="calculation-visual"></div></section>
     <section id="atlas" class="obs-panel obs-field"><h2>How the milestones connect</h2><div id="observatory-field"></div></section>
+    <section id="definitions" class="obs-panel term-guide term-guide-brief" aria-labelledby="definitions-heading" tabindex="-1" data-glossary-exclude>
+      <h2 id="definitions-heading">What the terms mean</h2>
+      <p class="obs-sub">General intelligence describes an ability. The other four terms name the milestones this Watch tracks.</p>
+      <dl class="term-list">
+        <div id="term-general-intelligence">
+          <dt>General intelligence</dt>
+          <dd>The ability to learn across different kinds of problems and apply that learning in an unfamiliar situation. People and other animals can show it.</dd>
+        </div>
+        <div id="term-agi">
+          <dt>Artificial general intelligence (AGI)</dt>
+          <dd>An AI that reliably performs at the level of skilled people across many kinds of unfamiliar work.</dd>
+        </div>
+        <div id="term-rsi">
+          <dt>Recursive self-improvement (RSI)</dt>
+          <dd>An AI helps build a better successor. That successor then uses its improved abilities to help build a better one in turn.</dd>
+        </div>
+        <div id="term-asi">
+          <dt>Artificial superintelligence (ASI)</dt>
+          <dd>An AI that reliably and substantially outperforms leading human experts across many intellectual fields.</dd>
+        </div>
+        <div id="term-singularity">
+          <dt>The singularity</dt>
+          <dd>AI systems help build better successors, and that cycle keeps speeding up technological progress beyond the lab.</dd>
+        </div>
+      </dl>
+      <a class="term-guide-more" href="./dashboard.html#definitions">Examples and what would count as evidence</a>
+    </section>
     <section class="obs-panel obs-edition-extras">
       <h2>More from this edition</h2>
       <details id="watchdog" class="obs-detail"><summary>What changed since the last check</summary><div id="changes"></div></details>

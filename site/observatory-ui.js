@@ -1,11 +1,12 @@
 import { countdownParts, referenceInstant } from './observatory-clock.js';
 import { renderInvestment } from './observatory-investment.js';
 import { renderMetricCharts } from './observatory-charts.js';
-import { renderCalculations } from './observatory-calculations.js';
+import { renderCalculations } from './observatory-calculations.js?v=pace1';
+import { selectOutlook, renderAcceleration, paceHeadline } from './observatory-acceleration.js';
 import { renderTrends } from './observatory-trends.js';
 import { checkpointWindow, editionLabel } from './checkpoint-schedule.js?v=20261125-visuals';
 import { mountField } from './observatory-field.js?v=20261125-visuals';
-import { installBriefingGlossary } from './front-glossary.js';
+import { installBriefingGlossary } from './front-glossary.js?v=20261125-terms';
 
 const base = new URL('./', import.meta.url);
 const dashboard = document.body.dataset.view === 'dashboard';
@@ -358,7 +359,7 @@ function milestoneInstrument(container, a) {
     control.dataset.milestone = id;
     control.setAttribute('role', 'tab');
     control.setAttribute('aria-controls', 'milestone-reader');
-    const title = el('strong', id === 'agi' ? 'General intelligence' : id === 'asi' ? 'Superintelligence' : shortNames[id]);
+    const title = el('strong', shortNames[id]);
     if (id !== 'singularity') title.append(el('small', labels[id]));
     const year = f ? scenarioYear(f.centralYear, f.horizonYear) : strict?.centralDate ? period(strict.centralDate) : 'Undated';
     const displayYear = el('span', year, 'obs-tab-year');
@@ -413,7 +414,7 @@ function milestoneInstrument(container, a) {
 function renderMilestones(a) {
   const container = byId('assessment-list');
   byId('arrival-intro').textContent = arrivalOutlook
-    ? 'The reference year shows when a milestone could arrive under the model’s main assumptions. The ranges compare faster and slower scenarios. A milestone could also remain out of reach.'
+    ? 'The reference year shows when a milestone could arrive under the model’s main assumptions. The range spans the dated scenarios. A milestone could also remain out of reach.'
     : 'This edition records which criteria were independently assessed. It predates the scenario estimates. An unresolved criterion leaves the evidence score open.';
   if (!dashboard) byId('arrival-intro').textContent = arrivalOutlook
     ? 'Select a milestone to explore its evidence. The years show the reference forecast.'
@@ -421,7 +422,7 @@ function renderMilestones(a) {
   const note = byId('arrival-note');
   note.replaceChildren();
   if (outlookSupplement) {
-    note.append('Forecast bulletin issued ' + time(outlookSupplement.issuedAt) + ' combines ' + editionLabel(a) + ' measurements with the cited research.');
+    note.append('Forecast updated ' + time(outlookSupplement.issuedAt) + ' using measurements from the ' + time(a.checkpointAt) + ' edition.');
     if (outlookSupplement.url) note.append(' ', link('Read the dated record', new URL(outlookSupplement.url, base)));
   } else if (arrivalOutlook) note.textContent = 'Estimates as of ' + time(a.checkpointAt) + '.';
   if (arrivalOutlook) {
@@ -782,7 +783,7 @@ function clock(a) {
     const reference = el('div', null, 'obs-clock-reference');
     if (yearBased) {
       const rangeNote = details('Scenario range ' + scenarioRange(scenario),
-        el('p', 'The endpoints compare the faster and slower paths for sustained, AI-driven technological acceleration. Their spread shows how much the timing depends on the assumptions.'));
+        el('p', 'The endpoints are the earliest and latest dated scenarios in this edition. Their spread shows how much the timing depends on the assumptions.'));
       rangeNote.className = 'obs-clock-range';
       if (scenario.beyondHorizonPathCount) rangeNote.append(el('p', 'In the stalled scenario, the milestone remains out of reach through ' + scenario.horizonYear + '.'));
       reference.append(el('strong', String(scenario.centralYear)), ' reference year');
@@ -796,6 +797,8 @@ function clock(a) {
     context.append(el('p', yearBased ? 'This forecast has no reference date.' : 'This edition has too little independently verified evidence to date the singularity.'));
   }
   if (selectedArchive) context.append(small('Archived reading · time held at ' + time(a.checkpointAt) + '.'));
+  const pace = paceHeadline(arrivalOutlook);
+  if (pace) context.append(pace);
   const actions = el('nav', null, 'obs-hero-actions');
   actions.setAttribute('aria-label', 'Explore the forecast');
   actions.append(link('Compare AI systems', '#metric-charts'), link('Explore the calculation', '#calculations'));
@@ -1098,9 +1101,9 @@ function linkedSection() {
 }
 function paint(a) {
   assessment = a;
-  const bulletin = manifest.supplementalOutlook;
-  outlookSupplement = !a.arrivalOutlook && !selectedArchive && bulletin?.basedOnCheckpoint === a.checkpointAt ? bulletin : null;
-  arrivalOutlook = a.arrivalOutlook ?? outlookSupplement?.outlook;
+  const selected = selectOutlook(a, manifest, selectedArchive);
+  outlookSupplement = selected.bulletin;
+  arrivalOutlook = selected.outlook;
   records.clear();
   for (const o of a.observations) records.set(o.id, o);
   metadata();
@@ -1108,6 +1111,8 @@ function paint(a) {
   clock(a);
   renderInvestment(byId('model-investment'), a, { archived: selectedArchive, detailed: dashboard });
   renderMetricCharts(byId('metric-charts'), a, { detailed: dashboard, arrivalOutlook });
+  renderAcceleration(byId('acceleration'), arrivalOutlook, {detailed:dashboard});
+  for (const nav of document.querySelectorAll('[data-pace-nav]')) nav.hidden = !arrivalOutlook?.pace;
   renderCalculations(byId('calculation-visual'), a, arrivalOutlook, { compact: !dashboard });
   measuredLead(a);
   indicatorPredictions(a);
@@ -1134,7 +1139,7 @@ function paint(a) {
     renderArrivalForecasts(a);
   } else renderBrief(a);
   if (selectedArchive) {
-    for (const anchor of document.querySelectorAll('.view-switch a, .obs-footer a, #assessment-list a, #arrival-note a, #clock-reading a, #calculation-visual a, #metric-charts a, #indicator-forecasts a, #brief-evidence a, #observatory-field a')) {
+    for (const anchor of document.querySelectorAll('.view-switch a, .obs-footer a, #assessment-list a, #arrival-note a, #clock-reading a, #calculation-visual a, #acceleration a, #definitions a, #metric-charts a, #indicator-forecasts a, #brief-evidence a, #observatory-field a')) {
       const u = new URL(anchor.href, base);
       if (u.origin !== base.origin || ![base.pathname, base.pathname + 'dashboard.html'].includes(u.pathname)) continue;
       u.searchParams.set('assessment', a.checkpointAt);
@@ -1165,7 +1170,8 @@ async function refresh() {
       : null;
     if (selected && !row) throw Error('Requested archive edition unavailable');
     const a = row ? await loadAssessment(row) : data.assessment;
-    if (assessment?.checkpointAt === a.checkpointAt && (row || manifest?.supplementalOutlook?.issuedAt === data.supplementalOutlook?.issuedAt)) {
+    if (assessment?.checkpointAt === a.checkpointAt && (row || (manifest?.supplementalOutlook?.issuedAt === data.supplementalOutlook?.issuedAt &&
+      manifest?.supplementalPaceOutlook?.issuedAt === data.supplementalPaceOutlook?.issuedAt))) {
       metadata();
       return;
     }

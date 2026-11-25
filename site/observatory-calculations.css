@@ -273,3 +273,8 @@
   .calc-open-heading { font-size: 0.69rem; }
   .calc-marker span { font-size: 0.71rem; padding: 0.14rem 0.24rem; }
 }
+.calc-tab-options.calc-five-paths {grid-template-columns:repeat(5,minmax(0,1fr));}
+.calc-five-paths label span {text-align:center;}
+@media (max-width:680px) {
+  .calc-tab-options.calc-five-paths {grid-template-columns:repeat(3,minmax(0,1fr));}
+}

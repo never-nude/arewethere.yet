@@ -1,0 +1,1258 @@
+{
+  "kind": "pace-outlook",
+  "schemaVersion": 1,
+  "title": "First acceleration-adjusted milestone outlook",
+  "issuedAt": "2026-11-25T18:38:06.839Z",
+  "basedOnCheckpoint": "2026-11-25T14:30:00.000Z",
+  "basedOnSha256": "c8ff1ba2a57e81c4aa4f7580c55629c175ee9e3a88f76ff1c37ca0bd5148021e",
+  "url": "data/first-pace-outlook.json",
+  "modelFileSha256": {
+    "observatory-outlook-model.js": "9bbbaecd992b34c5b8ad31a5842032336f2266c289bca9acbf24961971ad11e5",
+    "observatory-outlook-sources.js": "54161f0130fbe30a7b18791797c563461b3ba20002634fd953985fe73cad4aac",
+    "observatory-pace-model.js": "974587fe367f9f65535683f53c4aaf50e9f0fee41396dd2e224b37bbc52c0e15",
+    "observatory-pace-fit.js": "0156865b864e3208091efca76729e0c33383c09cb9aabf86d2c0cb96227c4249",
+    "observatory-event-pace.js": "eb3f2365a967700659978cb8011adf946a9cf1b72d66932b13fa080ad3ab452d",
+    "observatory-scored-models.js": "00648724c0fd343c5724ad8bbdda8c94b31c0a74fe8167bc87ec83a5bf7b7216",
+    "observatory-criteria.js": "39b519c2d3bdb6e784ae30307e9d17c39dc31bc2640c11129dbdb759a347c6a3"
+  },
+  "outlook": {
+    "version": "2.0.0",
+    "asOf": "2026-11-25T14:37:14.555Z",
+    "horizonYear": 2100,
+    "method": "Five calendar-year scenarios retain the published survey anchors and add a sustained-acceleration path. A short-range task projection enters the reference only when it wins earlier model selection and two later prediction tests. Observations and strict criterion-based dates take precedence.",
+    "limitations": "The central estimate is the reference scenario. The early and late dates show how assumptions change the answer. Scenario counts carry no measured probability. There is no historical sample of these four transitions against which to validate coverage.",
+    "sources": [
+      {
+        "id": "espai-2024",
+        "title": "AI Impacts · Survey of machine-learning researchers",
+        "url": "https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",
+        "publishedOn": "2026-09",
+        "availableBy": "2026-09-25",
+        "surveyedOn": "2024-12",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "The survey obtained 1,580 valid responses. Its combined forecasts put a 10% chance on machines doing every task better and more cheaply by 2027 and 50% by 2042. The halfway year was 2036 for doing research and writing a machine-learning conference paper, and 2052 for automating the occupation of AI researcher.",
+        "limitation": "Respondents answered subsets of questions and assumed no major disruption to science. Conditional on human-level machines, median respondents assigned 10% within two years and 60% within thirty years to vastly superhuman performance across professions. For a dramatic AI-driven acceleration of global technology, those figures were 20% and 80%. The Watch requires independent tests and evidence of a repeating causal loop.",
+        "locator": "Sections 2.3 and 3.2, Table 2, and Appendices E and F"
+      },
+      {
+        "id": "leap-8",
+        "title": "Forecasting Research Institute · Longitudinal Expert AI Panel, wave 8",
+        "url": "https://leap.forecastingresearch.org/reports/wave8",
+        "publishedOn": "2026-06-02",
+        "surveyedOn": "2026-04-20/2026-05-11",
+        "milestones": [
+          "agi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "The median expert gave an 80% chance of majority panel agreement on expert-level AGI before 2100. Given that recognition, the quarter, halfway and three-quarter dates were 2039, 2050 and 2065. A separate question on recognizing rapid progress gave 68% before 2100 and a conditional halfway year of 2045.",
+        "limitation": "The AGI question requires a commercial system that beats 90th-percentile professionals on at least 90% of nonphysical tasks in every primarily nonphysical occupation, at up to five times the equivalent labor cost. Its rapid-progress scenario also involves physical capabilities. Neither question stipulates the Watch’s testing or causal rules."
+      },
+      {
+        "id": "metaculus-agi",
+        "title": "Metaculus · When will a general AI system be publicly announced?",
+        "url": "https://www.metaculus.com/questions/5121/date-of-artificial-general-intelligence/",
+        "publishedOn": null,
+        "availableBy": "2026-11-24",
+        "dataThrough": "2026-11-24",
+        "milestones": [
+          "agi"
+        ],
+        "finding": "On November 24, the community forecast centered on 2030 for the first general AI system to be built, tested and publicly announced under the question’s rules.",
+        "limitation": "This crowd forecast can change as people update their predictions. Its public announcement date offers a comparison with the Watch’s estimate for independently demonstrated ability across domains. It has no weight in the Watch’s calculation.",
+        "locator": "Question 5121, community estimate checked November 24, 2026"
+      },
+      {
+        "id": "ai-futures-nov",
+        "title": "AI Futures Project · November timelines update",
+        "url": "https://blog.aifutures.org/p/q35-timelines-update-looks-like-the",
+        "publishedOn": "2026-11-10",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "All six authors placed their halfway date for a superhuman AI researcher in 2027. Five placed the date for AI that outperforms top experts across virtually all cognitive tasks in 2028 and one in 2027.",
+        "limitation": "The authors assume no substantial deliberate slowdown and draw heavily on the same METR report about Anthropic. Their research milestone requires automated coding and experiment selection on par with the best human researcher. It can be reached before anyone independently verifies a repeating successor lineage.",
+        "dataUrl": "https://datawrapper.dwcdn.net/e6bKu/9/dataset.csv"
+      },
+      {
+        "id": "fri-fast-year",
+        "title": "Forecasting Research Institute · Measuring a year of unusually fast gains",
+        "url": "https://forecastingresearch.org/research/recursive-self-improvement",
+        "publishedOn": "2026-11-24",
+        "dataThrough": "2026-11-20",
+        "milestones": [
+          "rsi",
+          "singularity"
+        ],
+        "finding": "The researchers modeled a rise of at least 30 points in the best Epoch Capabilities Index score within twelve months. Their statistical model put its chance at 12% by the end of 2027 and 38% by the end of 2030.",
+        "limitation": "Under other plausible assumptions about volatility, their 2030 figure ranged from 7% to 59%. One year of gains on an index leaves the cause, persistence across generations and effect on technology beyond AI open.",
+        "locator": "Section 2.3 and its second endnote, November 2026 revision"
+      },
+      {
+        "id": "leap-growth",
+        "title": "Forecasting Research Institute · Economic growth under rapid AI progress",
+        "url": "https://leap.forecastingresearch.org/reports/wave10",
+        "publishedOn": "2026-07-28",
+        "surveyedOn": "2026-06-16/2026-07-07",
+        "milestones": [
+          "singularity"
+        ],
+        "finding": "Even assuming rapid AI progress, the expert panel’s median forecast for annual growth in advanced economies in 2050 was 5%, against a roughly 2% historical pace. The median among tournament forecasters was 3%.",
+        "limitation": "Economic output reflects financing, adoption, physical production and regional conditions. A jump in research capability can take years to reach these measures. GDP growth alone cannot identify a repeating improvement cycle or its cause."
+      },
+      {
+        "id": "metr-research",
+        "title": "METR · AI research and development at Anthropic",
+        "url": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+        "publishedOn": "2026-11-05",
+        "milestones": [
+          "rsi",
+          "singularity"
+        ],
+        "finding": "At Anthropic, measured gains on the lab’s capability index came 1.9 times as fast after October 2025 as in the earlier period. The reported 95% interval was 1.5–2.8 times. METR judged that AI probably accounted for most of the recent acceleration.",
+        "limitation": "The attribution is a judgment under substantial uncertainty. Staff changes, compute, the choice of tasks and the earlier growth rate can also affect this one lab’s comparison."
+      },
+      {
+        "id": "metr-horizons",
+        "title": "METR · Duration of AI tasks in the Q4 capability evaluation",
+        "url": "https://metr.org/blog/2026-11-20-q4-2026-capability-update/",
+        "publishedOn": "2026-11-20",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi"
+        ],
+        "finding": "Across two task suites, METR estimated that the human-expert working time corresponding to 50% AI success doubled every 3.61 months. The 95% interval on the doubling time was 2.08–4.94 months.",
+        "limitation": "These tasks emphasize software and research work. Longer tasks, higher reliability, transfer to unfamiliar domains and open-ended research each need their own measurements.",
+        "locator": "Section 3.C.1"
+      },
+      {
+        "id": "sakana-dgm",
+        "title": "Sakana AI and UBC · Darwin Gödel Machine",
+        "url": "https://sakana.ai/dgm/",
+        "publishedOn": "2025-05-30",
+        "milestones": [
+          "rsi"
+        ],
+        "finding": "Researchers reported a coding agent that repeatedly edited agent code and tested successors. The resulting system’s SWE-bench score rose from 20% to 50%, with a separate coding benchmark improving from 14.2% to 30.7%.",
+        "limitation": "This developer experiment changed the software around a foundation model. A public, independently verified lineage would need to connect specific successive changes to the Watch’s required capability gains."
+      },
+      {
+        "id": "dgm-followup",
+        "title": "Wang and colleagues · Testing self-improving coding agents",
+        "url": "https://arxiv.org/abs/2510.21614",
+        "publishedOn": "2025-10-24",
+        "milestones": [
+          "rsi"
+        ],
+        "finding": "A second team reran the Darwin Gödel Machine method with different underlying models and a common starting agent. The starting agent solved 40% of a 60-task software test. Its selected successor scored 53.3%.",
+        "limitation": "This independently tests whether the method can discover better coding agents. The initial-to-final comparison does not identify how much each of two successive generations contributed on independent held-out tasks.",
+        "locator": "Section 4.2, Table 2"
+      },
+      {
+        "id": "arc-agi-3",
+        "title": "ARC Prize · GPT-6.2 Astra on interactive reasoning tasks",
+        "url": "https://arcprize.org/results/openai-gpt-6-2-astra",
+        "publishedOn": null,
+        "availableBy": "2026-11-24",
+        "dataThrough": "2026-11-24",
+        "modelReleaseOn": "2026-11-17",
+        "milestones": [
+          "agi",
+          "asi"
+        ],
+        "finding": "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests.",
+        "limitation": "The tested setup matters even for the same model. The score describes a specific collection of interactive puzzles. Evidence from other domains and independent tests of transfer are still needed.",
+        "locator": "Verified scores table, Max row"
+      },
+      {
+        "id": "epoch-frontiermath",
+        "title": "Epoch AI · Attribution of solutions to open mathematics problems",
+        "url": "https://epoch.ai/frontiermath/open-problems",
+        "publishedOn": "2026-09-16",
+        "milestones": [
+          "asi"
+        ],
+        "dataThrough": "2026-11-24",
+        "finding": "Of 49 open mathematical challenges in the register on November 24, Epoch credited five solutions to AI alone and five to people working with AI. The distinction records who contributed the ideas behind each solution.",
+        "limitation": "A solution establishes a particular mathematical result. Judging broad superiority to leading experts requires repeatable comparisons across multiple disciplines.",
+        "locator": "Changelog for September 16, 2026"
+      },
+      {
+        "id": "epoch-work",
+        "title": "Epoch AI · Can AI automate Epoch?",
+        "url": "https://epoch.ai/publications/can-ai-automate-epoch",
+        "publishedOn": "2026-10-08",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi"
+        ],
+        "finding": "Epoch gave six models tasks drawn from its own work. Stronger systems could suggest research directions but struggled to design experiments that would resolve the question or to catch flaws in their own experimental setup.",
+        "limitation": "The evaluators used one organization’s tasks and quality standards. The experiment identifies practical gaps without establishing a universal ceiling."
+      }
+    ],
+    "milestones": [
+      {
+        "id": "agi",
+        "label": "Artificial general intelligence",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2046,
+        "yearsRemaining": 20,
+        "range": {
+          "low": 2027,
+          "high": 2065
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 5,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2027
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2046
+          },
+          {
+            "label": "Slower development",
+            "year": 2065
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          },
+          {
+            "label": "Sustained acceleration",
+            "year": 2028
+          }
+        ],
+        "basis": "The reference retains the midpoint of the two broad-capability forecasts (2042 and 2050). An independently reviewed eight-hour task result or validated short-range crossing can impose a later floor. The acceleration path uses the 2028 top-expert AI forecast and assumes its capability transfers across unfamiliar fields.",
+        "assumptions": [
+          "The early case uses the AI researcher survey’s 10% year (2027). The slow case uses LEAP’s conditional 75th-percentile year (2065). The finite span combines different questions and has no assigned probability.",
+          "The 8-hour reference waypoint uses the 80%-success suite. An unverified crossing outside the tested forecast lead stays illustrative."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "leap-8",
+          "metr-horizons",
+          "metaculus-agi",
+          "arc-agi-3",
+          "ai-futures-nov"
+        ],
+        "progress": {
+          "summary": "GPT-6 Astra reached 80% success on selected tasks taking an expert about 5.44 hours. Reliable transfer across unfamiliar domains remains open.",
+          "evidence": [
+            "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests.",
+            "On METR’s latest measured release month, GPT-6 Astra reached an estimated 80% success rate on selected tasks taking a human expert about 5.44 hours (2026-09-03 model release)."
+          ],
+          "sourceIds": [
+            "arc-agi-3",
+            "metr-horizons"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 3
+          }
+        },
+        "previousYear": 2046,
+        "change": "The reference held steady. This edition adds a sustained-acceleration scenario."
+      },
+      {
+        "id": "rsi",
+        "label": "Recursive self-improvement",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2034,
+        "yearsRemaining": 8,
+        "range": {
+          "low": 2028,
+          "high": 2056
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 5,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2028
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2034
+          },
+          {
+            "label": "Slower development",
+            "year": 2056
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          },
+          {
+            "label": "Sustained acceleration",
+            "year": 2028
+          }
+        ],
+        "basis": "The reference retains the research-automation panel and the 2036 research-paper survey anchor. It requires two successor cycles after research automation, or one after an independently verified first cycle. A supported 40-hour task date can delay the modeled start. The acceleration path uses the faster research panel and its original two half-year cycle assumptions.",
+        "assumptions": [
+          "The faster case starts at the research panel’s estimate with six months per cycle. The slower case starts at the surveyed AI-researcher job date (2052) with two years per cycle. These durations are modeling choices. Successor cycles could fail altogether.",
+          "The 40-hour reference waypoint uses the 80%-success suite. An unverified crossing outside the tested forecast lead stays illustrative."
+        ],
+        "sourceIds": [
+          "ai-futures-nov",
+          "espai-2024",
+          "metr-horizons",
+          "sakana-dgm",
+          "dgm-followup",
+          "epoch-work"
+        ],
+        "progress": {
+          "summary": "A second team reproduced gains in a self-editing coding agent. The contribution of each successive generation on independent tests remains open.",
+          "evidence": [
+            "Researchers reported a coding agent that repeatedly edited agent code and tested successors. The resulting system’s SWE-bench score rose from 20% to 50%, with a separate coding benchmark improving from 14.2% to 30.7%.",
+            "A second team reran the Darwin Gödel Machine method with different underlying models and a common starting agent. The starting agent solved 40% of a 60-task software test. Its selected successor scored 53.3%.",
+            "Epoch gave six models tasks drawn from its own work. Stronger systems could suggest research directions but struggled to design experiments that would resolve the question or to catch flaws in their own experimental setup.",
+            "OpenAI reported that its AI systems completed 35% of its selected internal research tasks without assistance in the period ending 2026-10-31."
+          ],
+          "sourceIds": [
+            "sakana-dgm",
+            "dgm-followup",
+            "epoch-work"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 2
+          }
+        },
+        "previousYear": 2034,
+        "change": "The reference held steady. This edition adds a sustained-acceleration scenario."
+      },
+      {
+        "id": "asi",
+        "label": "Artificial superintelligence",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2070,
+        "yearsRemaining": 44,
+        "range": {
+          "low": 2028,
+          "high": 2095
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 5,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2028
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2070
+          },
+          {
+            "label": "Slower development",
+            "year": 2095
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          },
+          {
+            "label": "Sustained acceleration",
+            "year": 2028
+          }
+        ],
+        "basis": "The reference adds the surveyed post-AGI delay of about 24 years. In the acceleration path, independently reproducing the panel’s forecast of broad superiority to top experts could establish AGI and ASI together.",
+        "assumptions": [
+          "Respondents’ median conditional probabilities were 10% after two years and 60% after thirty. Straight-line interpolation in elapsed years gives the reference delay. Interpolating in log time gives about 17 years instead. Neither calculation is a measured takeoff rate.",
+          "The fast case uses the AI Futures panel’s top-expert-dominating AI date (2028), subject to the fast AGI date. The slow case adds 30 years to slow AGI. Some systems that reach AGI may never achieve broad expert superiority."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "ai-futures-nov",
+          "leap-8",
+          "epoch-frontiermath",
+          "arc-agi-3"
+        ],
+        "progress": {
+          "summary": "Epoch credited AI alone with five open mathematics solutions in its November 2026 register. Comparable superiority across other disciplines remains open.",
+          "evidence": [
+            "Of 49 open mathematical challenges in the register on November 24, Epoch credited five solutions to AI alone and five to people working with AI. The distinction records who contributed the ideas behind each solution.",
+            "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests."
+          ],
+          "sourceIds": [
+            "epoch-frontiermath",
+            "arc-agi-3"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 4
+          }
+        },
+        "previousYear": 2070,
+        "change": "The reference held steady. This edition adds a sustained-acceleration scenario."
+      },
+      {
+        "id": "singularity",
+        "label": "Technological singularity",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2062,
+        "yearsRemaining": 36,
+        "range": {
+          "low": 2029,
+          "high": 2095
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 5,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2029
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2062
+          },
+          {
+            "label": "Slower development",
+            "year": 2095
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          },
+          {
+            "label": "Sustained acceleration",
+            "year": 2045
+          }
+        ],
+        "basis": "The reference waits for a further successor cycle, the 2045 widespread-progress forecast and the survey-implied 16 years after AGI. The acceleration path retains the worldwide constraint, models one subsequent lab-speed cycle, and uses log-time interpolation of the same survey responses (about 8 years after AGI).",
+        "assumptions": [
+          "Survey respondents’ median conditional probabilities for a dramatic technology speedup were 20% within two years and 80% within thirty. Straight-line interpolation gives a delay of 16 years after AGI. Interpolation in log time gives about 8. The LEAP question includes physical progress and does not require AI causation. Both are proxies.",
+          "In the faster case, the next six-month research interval after RSI already establishes accelerating gains and broad spillover. In the slower case, the transition takes at least 30 years after slow AGI and another two-year interval after slow RSI. Even advanced AI might produce no sustained, independently attributable change in the wider pace of technology.",
+          "If one additional twelve-month research interval after recursive improvement could run at the whole rate measured at Anthropic, its duration would be 12 months divided by that rate. Staffing and computing changes also contributed. This is a one-cycle sensitivity."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "leap-8",
+          "ai-futures-nov",
+          "metr-research",
+          "fri-fast-year",
+          "leap-growth"
+        ],
+        "progress": {
+          "summary": "METR observed faster capability gains at one lab. Independent evidence of a sustained AI-driven speedup across wider technology remains open.",
+          "evidence": [
+            "METR estimated that progress on the measured benchmarks at Anthropic ran at 1.9 times its earlier rate (reported range 1.5–2.8). This comparison includes changes in compute, staffing and other inputs.",
+            "The researchers modeled a rise of at least 30 points in the best Epoch Capabilities Index score within twelve months. Their statistical model put its chance at 12% by the end of 2027 and 38% by the end of 2030.",
+            "Even assuming rapid AI progress, the expert panel’s median forecast for annual growth in advanced economies in 2050 was 5%, against a roughly 2% historical pace. The median among tournament forecasters was 3%."
+          ],
+          "sourceIds": [
+            "metr-research",
+            "fri-fast-year",
+            "leap-growth"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 3
+          }
+        },
+        "previousYear": 2062,
+        "change": "The reference held steady. This edition adds a sustained-acceleration scenario."
+      }
+    ],
+    "pace": {
+      "version": "1.0.0",
+      "series": [
+        {
+          "id": "horizon80",
+          "label": "Reliable task length · 80% success",
+          "unit": "expert hours",
+          "success": 80,
+          "points": [
+            {
+              "date": "2026-02-05",
+              "value": 0.19778500000000002,
+              "system": "Claude Opus 4.6"
+            },
+            {
+              "date": "2026-03-05",
+              "value": 0.33455833333333335,
+              "system": "GPT-5.4"
+            },
+            {
+              "date": "2026-04-23",
+              "value": 1.6625333333333332,
+              "system": "GPT-5.5"
+            },
+            {
+              "date": "2026-05-28",
+              "value": 0.9286333333333334,
+              "system": "Claude Opus 4.8"
+            },
+            {
+              "date": "2026-06-09",
+              "value": 1.9878166666666668,
+              "system": "Claude Fable 5"
+            },
+            {
+              "date": "2026-07-24",
+              "value": 3.0057833333333335,
+              "system": "Claude Opus 5"
+            },
+            {
+              "date": "2026-09-03",
+              "value": 5.437983333333333,
+              "system": "GPT-6 Astra"
+            }
+          ],
+          "fit": {
+            "winner": null,
+            "supported": false,
+            "holdouts": 0,
+            "selectionCount": 0,
+            "errors": {
+              "persistence": null,
+              "linear": null,
+              "exponential": null
+            },
+            "selectionErrors": null,
+            "fixedErrors": null,
+            "doublingDays": null,
+            "maxLeadDays": null,
+            "description": "7 measured release months. Comparing the trends requires four initial months and at least two separate months each for selection and evaluation."
+          },
+          "publishedOn": "2026-11-20",
+          "sourceUrl": "https://metr.org/blog/2026-11-20-q4-2026-capability-update/#80-time-horizon"
+        },
+        {
+          "id": "horizon50",
+          "label": "Task length · 50% success",
+          "unit": "expert hours",
+          "success": 50,
+          "points": [
+            {
+              "date": "2024-05-13",
+              "value": 0.11854066666666667,
+              "system": "GPT-4o"
+            },
+            {
+              "date": "2024-12-05",
+              "value": 0.5875016666666667,
+              "system": "o1"
+            },
+            {
+              "date": "2025-08-07",
+              "value": 3.0093166666666664,
+              "system": "GPT-5"
+            },
+            {
+              "date": "2025-11-24",
+              "value": 4.58955,
+              "system": "Claude Opus 4.5"
+            },
+            {
+              "date": "2026-02-05",
+              "value": 6.4008,
+              "system": "Claude Opus 4.6"
+            },
+            {
+              "date": "2026-03-05",
+              "value": 5.944466666666667,
+              "system": "GPT-5.4"
+            },
+            {
+              "date": "2026-04-23",
+              "value": 11.072383333333333,
+              "system": "GPT-5.5"
+            },
+            {
+              "date": "2026-05-28",
+              "value": 11.84355,
+              "system": "Claude Opus 4.8"
+            },
+            {
+              "date": "2026-06-09",
+              "value": 15.579,
+              "system": "Claude Fable 5"
+            },
+            {
+              "date": "2026-07-24",
+              "value": 19.9135,
+              "system": "Claude Opus 5"
+            },
+            {
+              "date": "2026-09-03",
+              "value": 40.272166666666664,
+              "system": "GPT-6 Astra"
+            }
+          ],
+          "fit": {
+            "winner": "Exponential",
+            "supported": true,
+            "holdouts": 4,
+            "selectionCount": 3,
+            "errors": {
+              "persistence": 7.29995,
+              "linear": 11.2489,
+              "exponential": 5.12274
+            },
+            "selectionErrors": {
+              "persistence": 2.46517,
+              "linear": 2.21825,
+              "exponential": 1.98477
+            },
+            "fixedErrors": {
+              "persistence": 10.8297,
+              "linear": 13.244,
+              "exponential": 5.06266
+            },
+            "doublingDays": 110.539,
+            "maxLeadDays": 133,
+            "description": "Exponential trend had the lowest average error on both the later one-step comparisons and the multi-month projection from their common starting date."
+          },
+          "publishedOn": "2026-11-20",
+          "sourceUrl": "https://metr.org/blog/2026-11-20-q4-2026-capability-update/#3c1-across-th11-and-th2-we-find-that-capabilities-are-doubling-roughly-every-36-months",
+          "publishedEstimate": {
+            "doublingMonths": 3.61,
+            "lowMonths": 2.08,
+            "highMonths": 4.94,
+            "interval": "95% confidence interval",
+            "description": "METR’s own analysis combines TH1.1 and TH2 task suites and includes additional modeling choices."
+          }
+        }
+      ],
+      "waypoints": [
+        {
+          "hours": 8,
+          "latestHours": 5.437983333333333,
+          "latestDate": "2026-09-03",
+          "estimatedDate": null,
+          "illustrativeDate": "2026-09-22",
+          "status": "No qualified projection",
+          "reason": "The 80% series has no validated growth rule. Extending its fitted exponential curve illustrates a possibility only. The illustrative date has passed without a qualifying measurement in this edition."
+        },
+        {
+          "hours": 40,
+          "latestHours": 5.437983333333333,
+          "latestDate": "2026-09-03",
+          "estimatedDate": null,
+          "illustrativeDate": "2027-01-07",
+          "status": "No qualified projection",
+          "reason": "The 80% series has no validated growth rule. Extending its fitted exponential curve illustrates a possibility only."
+        }
+      ],
+      "eventPace": {
+        "version": "1.0.0",
+        "asOf": "2026-11-25T14:37:14.555Z",
+        "windowDays": 30,
+        "periods": [
+          {
+            "start": "2025-11-30",
+            "end": "2025-12-29",
+            "releaseDays": 2,
+            "releaseEvents": [
+              {
+                "publisher": "OpenAI",
+                "date": "2025-12-11",
+                "title": "Introducing GPT-5.2",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-2"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2025-12-18",
+                "title": "Introducing GPT-5.2-Codex",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-2-codex"
+              }
+            ],
+            "scoredModels": 5,
+            "scoreChanges": [
+              {
+                "date": "2025-12-11",
+                "from": 153.04,
+                "to": 157.35,
+                "gain": 4.31,
+                "models": [
+                  "GPT-5.2 Pro"
+                ]
+              }
+            ],
+            "frontierGain": 4.31
+          },
+          {
+            "start": "2025-12-30",
+            "end": "2026-01-28",
+            "releaseDays": 0,
+            "releaseEvents": [],
+            "scoredModels": 1,
+            "scoreChanges": [],
+            "frontierGain": 0
+          },
+          {
+            "start": "2026-01-29",
+            "end": "2026-02-27",
+            "releaseDays": 4,
+            "releaseEvents": [
+              {
+                "publisher": "OpenAI",
+                "date": "2026-02-05",
+                "title": "Introducing GPT-5.3-Codex",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-3-codex"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-02-05",
+                "title": "Anthropic releases Claude Opus 4.6",
+                "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-6"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-02-12",
+                "title": "Introducing GPT-5.3-Codex-Spark",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-3-codex-spark"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-02-17",
+                "title": "Anthropic releases Claude Sonnet 4.6",
+                "sourceUrl": "https://www.anthropic.com/news/claude-sonnet-4-6"
+              }
+            ],
+            "scoredModels": 10,
+            "scoreChanges": [],
+            "frontierGain": 0
+          },
+          {
+            "start": "2026-02-28",
+            "end": "2026-03-29",
+            "releaseDays": 1,
+            "releaseEvents": [
+              {
+                "publisher": "OpenAI",
+                "date": "2026-03-05",
+                "title": "Introducing GPT-5.4",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-4"
+              }
+            ],
+            "scoredModels": 5,
+            "scoreChanges": [
+              {
+                "date": "2026-03-05",
+                "from": 157.35,
+                "to": 160.31,
+                "gain": 2.96,
+                "models": [
+                  "GPT-5.4 Pro"
+                ]
+              }
+            ],
+            "frontierGain": 2.96
+          },
+          {
+            "start": "2026-03-30",
+            "end": "2026-04-28",
+            "releaseDays": 2,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-04-16",
+                "title": "Anthropic releases Claude Opus 4.7",
+                "sourceUrl": "https://www.anthropic.com/news/claude-opus-4-7"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-04-23",
+                "title": "Introducing GPT-5.5",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-5-5"
+              }
+            ],
+            "scoredModels": 17,
+            "scoreChanges": [
+              {
+                "date": "2026-04-23",
+                "from": 160.31,
+                "to": 162.78,
+                "gain": 2.47,
+                "models": [
+                  "GPT-5.5 Pro"
+                ]
+              }
+            ],
+            "frontierGain": 2.47
+          },
+          {
+            "start": "2026-04-29",
+            "end": "2026-05-28",
+            "releaseDays": 1,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-05-28",
+                "title": "Anthropic releases Claude Opus 4.8",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#may-28-2026"
+              }
+            ],
+            "scoredModels": 3,
+            "scoreChanges": [],
+            "frontierGain": 0
+          },
+          {
+            "start": "2026-05-29",
+            "end": "2026-06-27",
+            "releaseDays": 1,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-06-09",
+                "title": "Anthropic releases Claude Fable 5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#june-9-2026"
+              }
+            ],
+            "scoredModels": 6,
+            "scoreChanges": [
+              {
+                "date": "2026-06-09",
+                "from": 162.78,
+                "to": 164.18,
+                "gain": 1.4,
+                "models": [
+                  "Claude Fable 5"
+                ]
+              }
+            ],
+            "frontierGain": 1.4
+          },
+          {
+            "start": "2026-06-28",
+            "end": "2026-07-27",
+            "releaseDays": 3,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-06-30",
+                "title": "Anthropic releases Claude Sonnet 5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#june-30-2026"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-07-09",
+                "title": "GPT-5.6: Frontier intelligence that scales with your ambition",
+                "sourceUrl": "https://openai.com/index/gpt-5-6"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-07-24",
+                "title": "Anthropic releases Claude Opus 5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#july-24-2026"
+              }
+            ],
+            "scoredModels": 12,
+            "scoreChanges": [
+              {
+                "date": "2026-07-24",
+                "from": 164.18,
+                "to": 164.72,
+                "gain": 0.54,
+                "models": [
+                  "Claude Opus 5"
+                ]
+              }
+            ],
+            "frontierGain": 0.54
+          },
+          {
+            "start": "2026-07-28",
+            "end": "2026-08-26",
+            "releaseDays": 0,
+            "releaseEvents": [],
+            "scoredModels": 9,
+            "scoreChanges": [],
+            "frontierGain": 0
+          },
+          {
+            "start": "2026-08-27",
+            "end": "2026-09-25",
+            "releaseDays": 4,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-09-01",
+                "title": "Anthropic releases Claude Fable 5.1",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#september-1-2026"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-09-03",
+                "title": "GPT-6 Astra: A new generation of intelligence",
+                "sourceUrl": "https://openai.com/index/gpt-6-astra"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-09-22",
+                "title": "Introducing GPT-6 Sol and Luna",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-6-sol-and-luna"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-09-22",
+                "title": "Anthropic releases Claude Opus 5.5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#september-22-2026"
+              }
+            ],
+            "scoredModels": 10,
+            "scoreChanges": [
+              {
+                "date": "2026-09-01",
+                "from": 164.72,
+                "to": 167.06,
+                "gain": 2.34,
+                "models": [
+                  "Claude Fable 5.1"
+                ]
+              },
+              {
+                "date": "2026-09-03",
+                "from": 167.06,
+                "to": 169.21,
+                "gain": 2.15,
+                "models": [
+                  "GPT-6 Astra"
+                ]
+              }
+            ],
+            "frontierGain": 4.49
+          },
+          {
+            "start": "2026-09-26",
+            "end": "2026-10-25",
+            "releaseDays": 3,
+            "releaseEvents": [
+              {
+                "publisher": "Anthropic",
+                "date": "2026-09-28",
+                "title": "Anthropic releases Claude Sonnet 5.5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#september-28-2026"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-09-29",
+                "title": "Introducing GPT-6.1 Sol",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-6-1-sol"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-10-07",
+                "title": "Anthropic releases Claude Haiku 5.5",
+                "sourceUrl": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026"
+              }
+            ],
+            "scoredModels": 10,
+            "scoreChanges": [],
+            "frontierGain": 0
+          },
+          {
+            "start": "2026-10-26",
+            "end": "2026-11-24",
+            "releaseDays": 3,
+            "releaseEvents": [
+              {
+                "publisher": "OpenAI",
+                "date": "2026-10-26",
+                "title": "Introducing GPT-6.1 Terra",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-6-1-terra"
+              },
+              {
+                "publisher": "Anthropic",
+                "date": "2026-11-09",
+                "title": "Anthropic releases Claude Fable 5.2 and Mythos 5.2",
+                "sourceUrl": "https://www.anthropic.com/claude-fable-and-mythos-5-2"
+              },
+              {
+                "publisher": "OpenAI",
+                "date": "2026-11-17",
+                "title": "OpenAI introduces GPT-6.2 Astra and Sol",
+                "sourceUrl": "https://openai.com/index/introducing-gpt-6-2-astra-sol/"
+              }
+            ],
+            "scoredModels": 6,
+            "scoreChanges": [
+              {
+                "date": "2026-11-09",
+                "from": 169.21,
+                "to": 173.4,
+                "gain": 4.19,
+                "models": [
+                  "Claude Fable 5.2"
+                ]
+              }
+            ],
+            "frontierGain": 4.19
+          }
+        ],
+        "activityFit": {
+          "status": "Exponential fit led on later windows, but a flat rate is plausible",
+          "supported": false,
+          "windows": 12,
+          "holdouts": 4,
+          "perWindowPercent": 6.5611,
+          "perWindowInterval": {
+            "low": -5.2609,
+            "high": 19.8584,
+            "label": "Approximate 95% rate interval assuming independent Poisson counts. Clustering can widen it."
+          },
+          "bestHeldout": "exponential",
+          "doublingDays": null,
+          "halvingDays": null,
+          "errors": {
+            "exponential": 1.4777,
+            "linear": 1.5154,
+            "constant": 1.6213
+          },
+          "errorUnit": "Mean absolute error per 30-day window",
+          "stabilityWins": 3
+        },
+        "scoredReleaseFit": {
+          "status": "A flat or linear fit matched or beat the exponential fit",
+          "supported": false,
+          "windows": 12,
+          "holdouts": 4,
+          "perWindowPercent": 4.5874,
+          "perWindowInterval": {
+            "low": -1.4036,
+            "high": 10.9425,
+            "label": "Approximate 95% rate interval assuming independent Poisson counts. Clustering can widen it."
+          },
+          "bestHeldout": "constant",
+          "doublingDays": null,
+          "halvingDays": null,
+          "errors": {
+            "exponential": 2.8807,
+            "linear": 2.2808,
+            "constant": 2.0674
+          },
+          "errorUnit": "Mean absolute error per 30-day window",
+          "stabilityWins": 0
+        },
+        "coverage": {
+          "releaseStart": "2025-11-25",
+          "releaseThrough": "2026-11-24",
+          "publishers": [
+            "OpenAI",
+            "Anthropic"
+          ],
+          "publisherSourceUrls": [
+            "https://openai.com/news/",
+            "https://platform.claude.com/docs/en/release-notes/overview"
+          ],
+          "scoreStart": "2023-02-24",
+          "scoreThrough": "2026-11-24",
+          "scoreSource": "Epoch AI",
+          "scoreDatasetUrl": "https://epoch.ai/data/eci_scores.csv"
+        },
+        "impacts": [
+          {
+            "id": "anthropic-benchmark-pace",
+            "label": "Anthropic benchmark pace",
+            "value": 1.9,
+            "unit": "×",
+            "fromValue": null,
+            "toValue": 1.9,
+            "fromDate": null,
+            "toDate": "2026-11-05",
+            "publishedOn": "2026-11-05",
+            "low": 1.5,
+            "high": 2.8,
+            "intervalLabel": "95% confidence interval",
+            "source": "METR",
+            "sourceUrl": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+            "scope": "METR compared gains on Anthropic’s internal capability index since October 2025 with the previous pace. The study found substantial uncertainty about how much AI caused the change.",
+            "observationIds": [
+              "research-acceleration:2026-11-05:METR%20assessment%20of%20Anthropic"
+            ]
+          },
+          {
+            "id": "openai-unassisted-tasks",
+            "label": "Research tasks finished without human help",
+            "value": 22,
+            "unit": "percentage points",
+            "fromValue": 13,
+            "toValue": 35,
+            "fromDate": "2026-03-31",
+            "toDate": "2026-10-31",
+            "publishedOn": "2026-11-18",
+            "low": null,
+            "high": null,
+            "intervalLabel": null,
+            "source": "OpenAI",
+            "sourceUrl": "https://openai.com/index/research-acceleration-jagged-frontier/",
+            "scope": "OpenAI estimated completion on selected internal tasks requiring four to eight hours of human work. Both readings come from one company study. Task mix can change.",
+            "observationIds": [
+              "research-autonomy:2026-03-31:March%20estimate",
+              "research-autonomy:2026-10-31:October%20estimate"
+            ]
+          },
+          {
+            "id": "gemini-training-time",
+            "label": "Gemini training time saved",
+            "value": 1,
+            "unit": "% of training time",
+            "fromValue": null,
+            "toValue": 1,
+            "fromDate": null,
+            "toDate": "2025-05-14",
+            "publishedOn": "2025-05-14",
+            "low": null,
+            "high": null,
+            "intervalLabel": null,
+            "source": "Google DeepMind",
+            "sourceUrl": "https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/",
+            "scope": "Google DeepMind reported that AlphaEvolve sped up a matrix-multiplication kernel by 23%, saving about 1% of total training time in this application.",
+            "observationIds": [
+              "alphaevolve-training-efficiency"
+            ]
+          },
+          {
+            "fromValue": null,
+            "toValue": 15,
+            "fromDate": null,
+            "toDate": "2025-02-04",
+            "low": null,
+            "high": null,
+            "intervalLabel": null,
+            "observationIds": [],
+            "basis": "Published study reviewed for this analysis",
+            "id": "service-issues-resolved",
+            "label": "Customer issues resolved each hour",
+            "value": 15,
+            "unit": "% more issues per hour",
+            "publishedOn": "2025-02-04",
+            "source": "Brynjolfsson, Li and Raymond · Quarterly Journal of Economics",
+            "sourceUrl": "https://academic.oup.com/qje/article/140/2/889/7990658",
+            "scope": "A staggered rollout among 5,172 customer-support agents at one company raised average issues resolved per hour by 15%. Gains varied by experience."
+          },
+          {
+            "fromValue": null,
+            "toValue": 19,
+            "fromDate": null,
+            "toDate": "2025-07-10",
+            "low": 2,
+            "high": 39,
+            "intervalLabel": "95% confidence interval",
+            "observationIds": [],
+            "basis": "Published study reviewed for this analysis",
+            "id": "developer-completion-time",
+            "label": "Time spent on software changes",
+            "value": 19,
+            "unit": "% longer per task",
+            "publishedOn": "2025-07-10",
+            "source": "METR",
+            "sourceUrl": "https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/",
+            "scope": "Sixteen experienced developers were randomly allowed to use early-2025 AI tools on 246 tasks in their own repositories. Completion took 19% longer on average. A later study found that selection of participants and tasks made an updated estimate unreliable.",
+            "followupUrl": "https://metr.org/blog/2026-02-24-uplift-update/"
+          }
+        ],
+        "method": "Twelve completed 30-day UTC windows end yesterday. Each tracked publisher counts once on a day with a qualifying model release. Scored releases count distinct model versions in the edition’s Epoch dataset. Benchmark gains are changes in its highest score, reconstructed by release date. Close benchmark differences can fall within score uncertainty. Zero means the covered source recorded no change. Gaps indicate incomplete coverage. Each activity trend is compared with flat and linear predictions on four later windows. A supported exponential fit must retain its lead when any one test window is omitted and have a 95% model-based interval excluding zero growth."
+      },
+      "cycle": {
+        "months": 6.31579,
+        "ratio": 1.9,
+        "sourceUrl": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+        "sourceDate": "2026-11-05",
+        "originalMonths": 12,
+        "lowMonths": 4.28571,
+        "highMonths": 8,
+        "assumption": "If one additional twelve-month research interval after recursive improvement could run at the whole rate measured at Anthropic, its duration would be 12 months divided by that rate. Staffing and computing changes also contributed. This is a one-cycle sensitivity."
+      },
+      "validation": "Within one published suite, keep the highest result in each measured release month at its actual release date. After four training months, select a trend using early consecutive one-step errors. Test it on the remaining months, both stepwise and from one fixed starting date. Errors measure absolute differences in expert hours. All comparisons use the publication vintage available in this edition.",
+      "limitation": "These are retrospective tests of benchmark measurements. A forecast about software tasks cannot establish when a general capability or a worldwide transition will arrive. Source intervals and the choice of tasks add uncertainty beyond the printed error.",
+      "referenceInputs": {
+        "agiFloor": 2046,
+        "agiYear": 2046,
+        "rsiFloor": 2034,
+        "rsiYear": 2034,
+        "asiLagYears": 24.4,
+        "speedupLagYears": 16,
+        "logSpeedupLagYears": 7.74597,
+        "rapidYear": 2045,
+        "referenceGates": [
+          {
+            "label": "One further research cycle",
+            "year": 2035
+          },
+          {
+            "label": "Independent widespread-progress forecast",
+            "year": 2045
+          },
+          {
+            "label": "Technology diffusion after general intelligence",
+            "year": 2062
+          }
+        ],
+        "accelerationGates": [
+          {
+            "label": "One further research cycle",
+            "year": 2029
+          },
+          {
+            "label": "Independent widespread-progress forecast",
+            "year": 2045
+          },
+          {
+            "label": "Technology diffusion after general intelligence",
+            "year": 2036
+          }
+        ],
+        "cycleMonths": 6.31579
+      },
+      "milestones": [
+        {
+          "id": "agi",
+          "baselineYear": 2046,
+          "referenceYear": 2046,
+          "accelerationYear": 2028,
+          "reason": "The reference retains the midpoint of the two broad-capability forecasts (2042 and 2050). An independently reviewed eight-hour task result or validated short-range crossing can impose a later floor. The acceleration path uses the 2028 top-expert AI forecast and assumes its capability transfers across unfamiliar fields."
+        },
+        {
+          "id": "rsi",
+          "baselineYear": 2034,
+          "referenceYear": 2034,
+          "accelerationYear": 2028,
+          "reason": "The reference retains the research-automation panel and the 2036 research-paper survey anchor. It requires two successor cycles after research automation, or one after an independently verified first cycle. A supported 40-hour task date can delay the modeled start. The acceleration path uses the faster research panel and its original two half-year cycle assumptions."
+        },
+        {
+          "id": "asi",
+          "baselineYear": 2070,
+          "referenceYear": 2070,
+          "accelerationYear": 2028,
+          "reason": "The reference adds the surveyed post-AGI delay of about 24 years. In the acceleration path, independently reproducing the panel’s forecast of broad superiority to top experts could establish AGI and ASI together."
+        },
+        {
+          "id": "singularity",
+          "baselineYear": 2062,
+          "referenceYear": 2062,
+          "accelerationYear": 2045,
+          "reason": "The reference waits for a further successor cycle, the 2045 widespread-progress forecast and the survey-implied 16 years after AGI. The acceleration path retains the worldwide constraint, models one subsequent lab-speed cycle, and uses log-time interpolation of the same survey responses (about 8 years after AGI)."
+        }
+      ]
+    }
+  },
+  "basedOnUrl": "https://raw.githubusercontent.com/never-nude/arewethere.yet/b42c7323849489f1129dbf9e6eb6736be5a5ac14/checkpoints/2026-11-25T14-30-00Z/c8ff1ba2a57e81c4aa4f7580c55629c175ee9e3a88f76ff1c37ca0bd5148021e.json"
+}

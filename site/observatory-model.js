@@ -8,6 +8,8 @@ import {
 } from './observatory-evidence.js';
 import { forecastIndicators, forecastMilestones, modelVersion, validateIndicators } from './observatory-forecast.js';
 import { buildArrivalOutlook } from './observatory-outlook-model.js';
+import { buildEventPace } from './observatory-event-pace.js';
+import { buildPaceOutlook } from './observatory-pace-model.js';
 
 export { methodologyVersion, modelVersion };
 
@@ -90,7 +92,7 @@ function changesSince(previous, milestones, observations, forecasts, events, ind
 export function buildObservatoryAssessment(
   payload,
   { checkpointAt, validatedAt = payload?.checkedAt, previous = null, includeIndicatorForecasts = true,
-    includeArrivalOutlook = false, previousOutlook = previous?.arrivalOutlook } = {},
+    includeArrivalOutlook = false, includePaceOutlook = includeArrivalOutlook, previousOutlook = previous?.arrivalOutlook } = {},
 ) {
   if (!dated(checkpointAt) || !dated(validatedAt) || !dated(payload?.checkedAt))
     throw new Error('Valid checkpoint, source and validation times are required.');
@@ -142,15 +144,20 @@ export function buildObservatoryAssessment(
     changes: changesSince(previous, milestones, observations, forecasts, xFactors.events, indicators),
   };
   if (includeArrivalOutlook) {
-    const outlook = buildArrivalOutlook(assessment, {
+    const baseOutlook = buildArrivalOutlook(assessment, {
       previous: previousOutlook, researchForecast: payload.researchForecast,
     });
-    if (!outlook) return assessment;
+    if (!baseOutlook) return assessment;
+    const outlook = includePaceOutlook ? buildPaceOutlook(assessment, baseOutlook, {
+      previous: previousOutlook, researchForecast: payload.researchForecast, eventPace: buildEventPace(assessment, payload),
+    }) : baseOutlook;
     assessment.arrivalOutlook = outlook;
     const changes = outlook.milestones.flatMap(row => {
       const prior = previousOutlook?.milestones.find(old => old.id === row.id);
+      const accelerated = scenario => scenario?.scenarios.find(s => s.label === 'Sustained acceleration')?.year;
       if (prior && prior.centralYear === row.centralYear && prior.status === row.status &&
-        prior.range.low === row.range.low && prior.range.high === row.range.high) return [];
+        prior.range.low === row.range.low && prior.range.high === row.range.high &&
+        accelerated(prior) === accelerated(row)) return [];
       return [row.label + ' outlook · ' + row.change];
     });
     if (changes.length) {
