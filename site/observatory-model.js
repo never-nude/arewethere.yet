@@ -7,6 +7,7 @@ import {
   topicCoverage,
 } from './observatory-evidence.js';
 import { forecastIndicators, forecastMilestones, modelVersion, validateIndicators } from './observatory-forecast.js';
+import { buildArrivalOutlook } from './observatory-outlook-model.js';
 
 export { methodologyVersion, modelVersion };
 
@@ -88,7 +89,8 @@ function changesSince(previous, milestones, observations, forecasts, events, ind
 
 export function buildObservatoryAssessment(
   payload,
-  { checkpointAt, validatedAt = payload?.checkedAt, previous = null, includeIndicatorForecasts = true } = {},
+  { checkpointAt, validatedAt = payload?.checkedAt, previous = null, includeIndicatorForecasts = true,
+    includeArrivalOutlook = false, previousOutlook = previous?.arrivalOutlook } = {},
 ) {
   if (!dated(checkpointAt) || !dated(validatedAt) || !dated(payload?.checkedAt))
     throw new Error('Valid checkpoint, source and validation times are required.');
@@ -121,7 +123,7 @@ export function buildObservatoryAssessment(
         '.';
   }
   const indicators = includeIndicatorForecasts ? forecastIndicators(observations, previous, validatedAt, cutoff) : null;
-  return {
+  const assessment = {
     checkpointAt,
     validatedAt,
     evidenceCutoff: cutoff,
@@ -138,5 +140,23 @@ export function buildObservatoryAssessment(
     topicCoverage: topicCoverage(observations),
     changes: changesSince(previous, milestones, observations, forecasts, xFactors.events, indicators),
   };
+  if (includeArrivalOutlook) {
+    const outlook = buildArrivalOutlook(assessment, {
+      previous: previousOutlook, researchForecast: payload.researchForecast,
+    });
+    if (!outlook) return assessment;
+    assessment.arrivalOutlook = outlook;
+    const changes = outlook.milestones.flatMap(row => {
+      const prior = previousOutlook?.milestones.find(old => old.id === row.id);
+      if (prior && prior.centralYear === row.centralYear && prior.status === row.status &&
+        prior.range.low === row.range.low && prior.range.high === row.range.high) return [];
+      return [row.label + ' outlook · ' + row.change];
+    });
+    if (changes.length) {
+      assessment.changes = assessment.changes.filter(note =>
+        note !== 'The evidence readings, verified criteria and forecast destinations are unchanged.').concat(changes);
+    }
+  }
+  return assessment;
 }
 export const buildAssessment = buildObservatoryAssessment;

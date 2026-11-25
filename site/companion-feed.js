@@ -35,6 +35,7 @@ export function observatoryCompanionReading(assessment) {
     dashboardUrl: 'https://arewethereyet.now/dashboard.html?assessment=' + encodeURIComponent(assessment.checkpointAt),
     milestones: assessment.milestones.map(({ id, score, status, coverage }) => ({ id, score, status, coverage })),
     milestoneForecasts: assessment.forecasts.map(({ id, status, centralDate }) => ({ id, status, centralDate })),
+    ...(assessment.arrivalOutlook && { arrivalOutlook: assessment.arrivalOutlook }),
     indicatorForecasts: assessment.indicatorForecasts ?? [],
     indicatorOutcomes: assessment.indicatorOutcomes ?? [],
   };

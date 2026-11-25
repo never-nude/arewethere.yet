@@ -1,0 +1,463 @@
+{
+  "kind": "milestone-outlook",
+  "schemaVersion": 1,
+  "title": "First milestone arrival outlook",
+  "issuedAt": "2026-11-25T03:02:20.633Z",
+  "basedOnCheckpoint": "2026-11-25T02:30:05.950Z",
+  "basedOnSha256": "844467f1407062fee3350dfd95593438b2e4ca58b2f8768f3105126589e9c5b2",
+  "basedOnUrl": "https://raw.githubusercontent.com/never-nude/arewethere.yet/3cbd75ca01ec9b8d3d58f46b8215d028d83290fd/checkpoints/initial-measurement/844467f1407062fee3350dfd95593438b2e4ca58b2f8768f3105126589e9c5b2.json",
+  "url": "data/first-arrival-outlook.json",
+  "modelFileSha256": {
+    "observatory-outlook-model.js": "9bbbaecd992b34c5b8ad31a5842032336f2266c289bca9acbf24961971ad11e5",
+    "observatory-outlook-sources.js": "54161f0130fbe30a7b18791797c563461b3ba20002634fd953985fe73cad4aac"
+  },
+  "outlook": {
+    "version": "1.0.0",
+    "asOf": "2026-11-25T02:30:05.950Z",
+    "horizonYear": 2100,
+    "method": "Three explicit development paths combine survey judgments, independent measurements and declared assumptions. A fourth path allows progress to stall beyond 2100. Calendar years are rounded. Time remaining is the difference in calendar years.",
+    "limitations": "The central estimate is the reference scenario. The early and late dates show how assumptions change the answer. Scenario counts carry no measured probability. There is no historical sample of these four transitions against which to validate coverage.",
+    "sources": [
+      {
+        "id": "espai-2024",
+        "title": "AI Impacts · Survey of machine-learning researchers",
+        "url": "https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf",
+        "publishedOn": "2026-09",
+        "availableBy": "2026-09-25",
+        "surveyedOn": "2024-12",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "The survey obtained 1,580 valid responses. Its combined forecasts put a 10% chance on machines doing every task better and more cheaply by 2027 and 50% by 2042. The halfway year was 2036 for doing research and writing a machine-learning conference paper, and 2052 for automating the occupation of AI researcher.",
+        "limitation": "Respondents answered subsets of questions and assumed no major disruption to science. Conditional on human-level machines, median respondents assigned 10% within two years and 60% within thirty years to vastly superhuman performance across professions. For a dramatic AI-driven acceleration of global technology, those figures were 20% and 80%. The Watch requires independent tests and evidence of a repeating causal loop.",
+        "locator": "Sections 2.3 and 3.2, Table 2, and Appendices E and F"
+      },
+      {
+        "id": "leap-8",
+        "title": "Forecasting Research Institute · Longitudinal Expert AI Panel, wave 8",
+        "url": "https://leap.forecastingresearch.org/reports/wave8",
+        "publishedOn": "2026-06-02",
+        "surveyedOn": "2026-04-20/2026-05-11",
+        "milestones": [
+          "agi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "The median expert gave an 80% chance of majority panel agreement on expert-level AGI before 2100. Given that recognition, the quarter, halfway and three-quarter dates were 2039, 2050 and 2065. A separate question on recognizing rapid progress gave 68% before 2100 and a conditional halfway year of 2045.",
+        "limitation": "The AGI question requires a commercial system that beats 90th-percentile professionals on at least 90% of nonphysical tasks in every primarily nonphysical occupation, at up to five times the equivalent labor cost. Its rapid-progress scenario also involves physical capabilities. Neither question stipulates the Watch’s testing or causal rules."
+      },
+      {
+        "id": "metaculus-agi",
+        "title": "Metaculus · When will a general AI system be publicly announced?",
+        "url": "https://www.metaculus.com/questions/5121/date-of-artificial-general-intelligence/",
+        "publishedOn": null,
+        "availableBy": "2026-11-24",
+        "dataThrough": "2026-11-24",
+        "milestones": [
+          "agi"
+        ],
+        "finding": "On November 24, the community forecast centered on 2030 for the first general AI system to be built, tested and publicly announced under the question’s rules.",
+        "limitation": "This crowd forecast can change as people update their predictions. Its public announcement date offers a comparison with the Watch’s estimate for independently demonstrated ability across domains. It has no weight in the Watch’s calculation.",
+        "locator": "Question 5121, community estimate checked November 24, 2026"
+      },
+      {
+        "id": "ai-futures-nov",
+        "title": "AI Futures Project · November timelines update",
+        "url": "https://blog.aifutures.org/p/q35-timelines-update-looks-like-the",
+        "publishedOn": "2026-11-10",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi",
+          "singularity"
+        ],
+        "finding": "All six authors placed their halfway date for a superhuman AI researcher in 2027. Five placed the date for AI that outperforms top experts across virtually all cognitive tasks in 2028 and one in 2027.",
+        "limitation": "The authors assume no substantial deliberate slowdown and draw heavily on the same METR report about Anthropic. Their research milestone requires automated coding and experiment selection on par with the best human researcher. It can be reached before anyone independently verifies a repeating successor lineage.",
+        "dataUrl": "https://datawrapper.dwcdn.net/e6bKu/9/dataset.csv"
+      },
+      {
+        "id": "fri-fast-year",
+        "title": "Forecasting Research Institute · Measuring a year of unusually fast gains",
+        "url": "https://forecastingresearch.org/research/recursive-self-improvement",
+        "publishedOn": "2026-11-24",
+        "dataThrough": "2026-11-20",
+        "milestones": [
+          "rsi",
+          "singularity"
+        ],
+        "finding": "The researchers modeled a rise of at least 30 points in the best Epoch Capabilities Index score within twelve months. Their statistical model put its chance at 12% by the end of 2027 and 38% by the end of 2030.",
+        "limitation": "Under other plausible assumptions about volatility, their 2030 figure ranged from 7% to 59%. One year of gains on an index leaves the cause, persistence across generations and effect on technology beyond AI open.",
+        "locator": "Section 2.3 and its second endnote, November 2026 revision"
+      },
+      {
+        "id": "leap-growth",
+        "title": "Forecasting Research Institute · Economic growth under rapid AI progress",
+        "url": "https://leap.forecastingresearch.org/reports/wave10",
+        "publishedOn": "2026-07-28",
+        "surveyedOn": "2026-06-16/2026-07-07",
+        "milestones": [
+          "singularity"
+        ],
+        "finding": "Even assuming rapid AI progress, the expert panel’s median forecast for annual growth in advanced economies in 2050 was 5%, against a roughly 2% historical pace. The median among tournament forecasters was 3%.",
+        "limitation": "Economic output reflects financing, adoption, physical production and regional conditions. A jump in research capability can take years to reach these measures. GDP growth alone cannot identify a repeating improvement cycle or its cause."
+      },
+      {
+        "id": "metr-research",
+        "title": "METR · AI research and development at Anthropic",
+        "url": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment/",
+        "publishedOn": "2026-11-05",
+        "milestones": [
+          "rsi",
+          "singularity"
+        ],
+        "finding": "At Anthropic, measured gains on the lab’s capability index came 1.9 times as fast after October 2025 as in the earlier period. The reported 95% interval was 1.5–2.8 times. METR judged that AI probably accounted for most of the recent acceleration.",
+        "limitation": "The attribution is a judgment under substantial uncertainty. Staff changes, compute, the choice of tasks and the earlier growth rate can also affect this one lab’s comparison."
+      },
+      {
+        "id": "metr-horizons",
+        "title": "METR · Duration of AI tasks in the Q4 capability evaluation",
+        "url": "https://metr.org/blog/2026-11-20-q4-2026-capability-update/",
+        "publishedOn": "2026-11-20",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi"
+        ],
+        "finding": "Across two task suites, METR estimated that the human-expert working time corresponding to 50% AI success doubled every 3.61 months. The 95% interval on the doubling time was 2.08–4.94 months.",
+        "limitation": "These tasks emphasize software and research work. Longer tasks, higher reliability, transfer to unfamiliar domains and open-ended research each need their own measurements.",
+        "locator": "Section 3.C.1"
+      },
+      {
+        "id": "sakana-dgm",
+        "title": "Sakana AI and UBC · Darwin Gödel Machine",
+        "url": "https://sakana.ai/dgm/",
+        "publishedOn": "2025-05-30",
+        "milestones": [
+          "rsi"
+        ],
+        "finding": "Researchers reported a coding agent that repeatedly edited agent code and tested successors. The resulting system’s SWE-bench score rose from 20% to 50%, with a separate coding benchmark improving from 14.2% to 30.7%.",
+        "limitation": "This developer experiment changed the software around a foundation model. A public, independently verified lineage would need to connect specific successive changes to the Watch’s required capability gains."
+      },
+      {
+        "id": "dgm-followup",
+        "title": "Wang and colleagues · Testing self-improving coding agents",
+        "url": "https://arxiv.org/abs/2510.21614",
+        "publishedOn": "2025-10-24",
+        "milestones": [
+          "rsi"
+        ],
+        "finding": "A second team reran the Darwin Gödel Machine method with different underlying models and a common starting agent. The starting agent solved 40% of a 60-task software test. Its selected successor scored 53.3%.",
+        "limitation": "This independently tests whether the method can discover better coding agents. The initial-to-final comparison does not identify how much each of two successive generations contributed on independent held-out tasks.",
+        "locator": "Section 4.2, Table 2"
+      },
+      {
+        "id": "arc-agi-3",
+        "title": "ARC Prize · GPT-6.2 Astra on interactive reasoning tasks",
+        "url": "https://arcprize.org/results/openai-gpt-6-2-astra",
+        "publishedOn": null,
+        "availableBy": "2026-11-24",
+        "dataThrough": "2026-11-24",
+        "modelReleaseOn": "2026-11-17",
+        "milestones": [
+          "agi",
+          "asi"
+        ],
+        "finding": "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests.",
+        "limitation": "The tested setup matters even for the same model. The score describes a specific collection of interactive puzzles. Evidence from other domains and independent tests of transfer are still needed.",
+        "locator": "Verified scores table, Max row"
+      },
+      {
+        "id": "epoch-frontiermath",
+        "title": "Epoch AI · Attribution of solutions to open mathematics problems",
+        "url": "https://epoch.ai/frontiermath/open-problems",
+        "publishedOn": "2026-09-16",
+        "milestones": [
+          "asi"
+        ],
+        "dataThrough": "2026-11-24",
+        "finding": "Of 49 open mathematical challenges in the register on November 24, Epoch credited five solutions to AI alone and five to people working with AI. The distinction records who contributed the ideas behind each solution.",
+        "limitation": "A solution establishes a particular mathematical result. Judging broad superiority to leading experts requires repeatable comparisons across multiple disciplines.",
+        "locator": "Changelog for September 16, 2026"
+      },
+      {
+        "id": "epoch-work",
+        "title": "Epoch AI · Can AI automate Epoch?",
+        "url": "https://epoch.ai/publications/can-ai-automate-epoch",
+        "publishedOn": "2026-10-08",
+        "milestones": [
+          "agi",
+          "rsi",
+          "asi"
+        ],
+        "finding": "Epoch gave six models tasks drawn from its own work. Stronger systems could suggest research directions but struggled to design experiments that would resolve the question or to catch flaws in their own experimental setup.",
+        "limitation": "The evaluators used one organization’s tasks and quality standards. The experiment identifies practical gaps without establishing a universal ceiling."
+      }
+    ],
+    "milestones": [
+      {
+        "id": "agi",
+        "label": "Artificial general intelligence",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2046,
+        "yearsRemaining": 20,
+        "range": {
+          "low": 2027,
+          "high": 2065
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 4,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2027
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2046
+          },
+          {
+            "label": "Slower development",
+            "year": 2065
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          }
+        ],
+        "basis": "The reference takes the calendar-year midpoint of 2042 for machines doing every task better and more cheaply than humans and 2050 for beating 90th-percentile professionals on most tasks in each nonphysical occupation, conditional on recognition by 2100. Each central date gets equal weight. Both targets demand more on some dimensions than our skilled-human test, which could make this reference late. Our requirements for independent proof and transfer can delay recognition.",
+        "assumptions": [
+          "The early case uses the AI researcher survey’s 10% year (2027). The slow case uses LEAP’s conditional 75th-percentile year (2065). The finite span combines different questions and has no assigned probability.",
+          "All three paths assume a system capable of broad, reliable work can also handle a human workday (8 expert hours) on METR’s selected tasks at 80% success. If that extrapolated waypoint falls later than the survey anchor, it delays this estimate. The workday is an illustrative bridge to the forecast.",
+          "The last 7 measured months in the two-year release window imply 8.2 doublings per year on METR’s 80%-success series. This is the median slope between pairs of monthly peaks on a logarithmic scale. The fast and reference cases can also reach the capability by another route at the next slower outside anchor. This limits how far one narrow test can delay them. The slow case has no fallback and can remain unresolved beyond 2100. Sparse results and limited task coverage make continued growth uncertain."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "leap-8",
+          "metr-horizons",
+          "metaculus-agi",
+          "arc-agi-3"
+        ],
+        "progress": {
+          "summary": "GPT-6 Astra reached 80% success on selected tasks taking an expert about 5.44 hours. Reliable transfer across unfamiliar domains remains open.",
+          "evidence": [
+            "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests.",
+            "On METR’s latest measured release month, GPT-6 Astra reached an estimated 80% success rate on selected tasks taking a human expert about 5.44 hours (2026-09-03 model release)."
+          ],
+          "sourceIds": [
+            "arc-agi-3",
+            "metr-horizons"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 3
+          }
+        },
+        "previousYear": null,
+        "change": "First published arrival outlook."
+      },
+      {
+        "id": "rsi",
+        "label": "Recursive self-improvement",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2034,
+        "yearsRemaining": 8,
+        "range": {
+          "low": 2028,
+          "high": 2056
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 4,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2028
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2034
+          },
+          {
+            "label": "Slower development",
+            "year": 2056
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          }
+        ],
+        "basis": "The reference averages the AI Futures panel’s research-automation date (about 2027) with the surveyed 2036 date for autonomously conducting and writing one publishable ML study. It then allows one year each for two successive improvements.",
+        "assumptions": [
+          "The faster case starts at the research panel’s estimate with six months per cycle. The slower case starts at the surveyed AI-researcher job date (2052) with two years per cycle. These durations are modeling choices. Successor cycles could fail altogether.",
+          "Until a first successor improvement is independently established, each path also assumes a 40-expert-hour task at 80% success on METR’s selected suite. A specialist could achieve repeated improvement with shorter tasks. A verified first link replaces the assumed start with its review date and leaves one cycle.",
+          "The last 7 measured months in the two-year release window imply 8.2 doublings per year on METR’s 80%-success series. This is the median slope between pairs of monthly peaks on a logarithmic scale. The fast and reference cases can also reach the capability by another route at the next slower outside anchor. This limits how far one narrow test can delay them. The slow case has no fallback and can remain unresolved beyond 2100. Sparse results and limited task coverage make continued growth uncertain."
+        ],
+        "sourceIds": [
+          "ai-futures-nov",
+          "espai-2024",
+          "metr-horizons",
+          "sakana-dgm",
+          "dgm-followup",
+          "epoch-work"
+        ],
+        "progress": {
+          "summary": "A second team reproduced gains in a self-editing coding agent. The contribution of each successive generation on independent tests remains open.",
+          "evidence": [
+            "Researchers reported a coding agent that repeatedly edited agent code and tested successors. The resulting system’s SWE-bench score rose from 20% to 50%, with a separate coding benchmark improving from 14.2% to 30.7%.",
+            "A second team reran the Darwin Gödel Machine method with different underlying models and a common starting agent. The starting agent solved 40% of a 60-task software test. Its selected successor scored 53.3%.",
+            "Epoch gave six models tasks drawn from its own work. Stronger systems could suggest research directions but struggled to design experiments that would resolve the question or to catch flaws in their own experimental setup.",
+            "OpenAI reported that its AI systems completed 35% of its selected internal research tasks without assistance in the period ending 2026-10-31."
+          ],
+          "sourceIds": [
+            "sakana-dgm",
+            "dgm-followup",
+            "epoch-work"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 2
+          }
+        },
+        "previousYear": null,
+        "change": "First published arrival outlook."
+      },
+      {
+        "id": "asi",
+        "label": "Artificial superintelligence",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2070,
+        "yearsRemaining": 44,
+        "range": {
+          "low": 2028,
+          "high": 2095
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 4,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2028
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2070
+          },
+          {
+            "label": "Slower development",
+            "year": 2095
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          }
+        ],
+        "basis": "Under this definition broad expert superiority includes AGI. The reference adds about 24 years to the AGI reference. That delay interpolates survey responses on how quickly vastly superhuman performance could follow human-level AI.",
+        "assumptions": [
+          "Respondents’ median conditional probabilities were 10% after two years and 60% after thirty. Straight-line interpolation in elapsed years gives the reference delay. Interpolating in log time gives about 17 years instead. Neither calculation is a measured takeoff rate.",
+          "The fast case uses the AI Futures panel’s top-expert-dominating AI date (2028), subject to the fast AGI date. The slow case adds 30 years to slow AGI. Some systems that reach AGI may never achieve broad expert superiority."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "ai-futures-nov",
+          "leap-8",
+          "epoch-frontiermath",
+          "arc-agi-3"
+        ],
+        "progress": {
+          "summary": "Epoch credited AI alone with five open mathematics solutions in its November 2026 register. Comparable superiority across other disciplines remains open.",
+          "evidence": [
+            "Of 49 open mathematical challenges in the register on November 24, Epoch credited five solutions to AI alone and five to people working with AI. The distinction records who contributed the ideas behind each solution.",
+            "On ARC-AGI-3, GPT-6.2 Astra at the same maximum reasoning setting scored 70.3% with the standard setup and 99.8% with the provider’s adapter, which retains the model’s internal reasoning state between requests."
+          ],
+          "sourceIds": [
+            "epoch-frontiermath",
+            "arc-agi-3"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 4
+          }
+        },
+        "previousYear": null,
+        "change": "First published arrival outlook."
+      },
+      {
+        "id": "singularity",
+        "label": "Technological singularity",
+        "status": "Scenario estimate",
+        "timingStatus": "Current",
+        "centralYear": 2062,
+        "yearsRemaining": 36,
+        "range": {
+          "low": 2029,
+          "high": 2095
+        },
+        "horizonYear": 2100,
+        "beyondHorizonPathCount": 1,
+        "scenarioCount": 4,
+        "scenarios": [
+          {
+            "label": "Faster development",
+            "year": 2029
+          },
+          {
+            "label": "Reference scenario",
+            "year": 2062
+          },
+          {
+            "label": "Slower development",
+            "year": 2095
+          },
+          {
+            "label": "Stalled or never realized",
+            "year": null
+          }
+        ],
+        "basis": "The reference waits for all three conditions: another development interval after recursive improvement, the surveyed global technology speedup after human-level AI, and LEAP’s conditional 2045 estimate for widespread rapid progress.",
+        "assumptions": [
+          "Survey respondents’ median conditional probabilities for a dramatic technology speedup were 20% within two years and 80% within thirty. Straight-line interpolation gives a delay of 16 years after AGI. Interpolation in log time gives about 8. The LEAP question includes physical progress and does not require AI causation. Both are proxies.",
+          "In the faster case, the next six-month research interval after RSI already establishes accelerating gains and broad spillover. In the slower case, the transition takes at least 30 years after slow AGI and another two-year interval after slow RSI. Even advanced AI might produce no sustained, independently attributable change in the wider pace of technology."
+        ],
+        "sourceIds": [
+          "espai-2024",
+          "leap-8",
+          "ai-futures-nov",
+          "metr-research",
+          "fri-fast-year",
+          "leap-growth"
+        ],
+        "progress": {
+          "summary": "METR observed faster capability gains at one lab. Independent evidence of a sustained AI-driven speedup across wider technology remains open.",
+          "evidence": [
+            "METR estimated that progress on the measured benchmarks at Anthropic ran at 1.9 times its earlier rate (reported range 1.5–2.8). This comparison includes changes in compute, staffing and other inputs.",
+            "The researchers modeled a rise of at least 30 points in the best Epoch Capabilities Index score within twelve months. Their statistical model put its chance at 12% by the end of 2027 and 38% by the end of 2030.",
+            "Even assuming rapid AI progress, the expert panel’s median forecast for annual growth in advanced economies in 2050 was 5%, against a roughly 2% historical pace. The median among tournament forecasters was 3%."
+          ],
+          "sourceIds": [
+            "metr-research",
+            "fri-fast-year",
+            "leap-growth"
+          ],
+          "coverage": {
+            "met": 0,
+            "assessed": 0,
+            "total": 3
+          }
+        },
+        "previousYear": null,
+        "change": "First published arrival outlook."
+      }
+    ]
+  }
+}

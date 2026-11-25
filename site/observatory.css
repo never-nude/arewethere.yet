@@ -390,3 +390,76 @@
   margin-block: 5px;
   max-width: 80ch;
 }
+.obs-arrival-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .82fr) minmax(0, 1.35fr);
+  gap: 8px clamp(12px, 2.5vw, 36px);
+  align-items: start;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.obs-arrival-name h3 {
+  margin: 0 0 4px;
+}
+.obs-arrival-name p,
+.obs-arrival-progress a {
+  color: var(--dim);
+  font-size: 14px;
+}
+.obs-arrival-time strong,
+.obs-arrival-time span {
+  display: block;
+}
+.obs-arrival-time strong {
+  color: var(--node);
+  font: 600 clamp(24px, 2.3vw, 32px)/1.2 var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.obs-arrival-time .obs-arrival-kicker {
+  font-size: 12px;
+  color: var(--dim);
+}
+.obs-arrival-progress .obs-small,
+.obs-arrival-time .obs-small {
+  margin: 5px 0;
+}
+#arrival-note:not(:empty) {
+  margin: 8px 0 14px;
+}
+.obs-arrival-detail {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 4px;
+}
+.obs-arrival-detail > p {
+  max-width: 78ch;
+}
+.obs-arrival-detail .obs-prediction-value {
+  color: var(--teal);
+  font-weight: 600;
+}
+.obs-scenario-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 25px;
+  margin: 12px 0;
+}
+.obs-scenario-years div {
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid var(--line);
+}
+.obs-scenario-years dt {
+  color: var(--dim);
+  font-size: 14px;
+}
+.obs-scenario-years dd {
+  margin: 1px 0 0;
+  font: 15px/1.5 var(--mono);
+}
+@media (max-width: 720px) {
+  .obs-arrival-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
+    gap: 7px 14px;
+  }
+  .obs-arrival-progress { grid-column: 1/-1; }
+}

@@ -51,6 +51,18 @@ function validateRecord(record) {
     if (forecast.status === 'Not reliably estimable') assert.ok(forecast.centralDate === null && forecast.range === null);
     else assert.ok(['Estimated','Observed'].includes(forecast.status) && Number.isFinite(Date.parse(forecast.centralDate)));
   }
+  if (assessment.arrivalOutlook) {
+    const outlook = assessment.arrivalOutlook;
+    assert.equal(outlook.asOf, assessment.evidenceCutoff, 'Arrival outlook must use this edition’s evidence cutoff.');
+    assert.deepEqual(outlook.milestones.map(row => row.id).sort(), ids);
+    const sourceIds = new Set(outlook.sources.map(source => source.id));
+    for (const row of outlook.milestones) {
+      const years = row.scenarios.map(s => s.year);
+      assert.ok(years.length && years.every(y => y === null || Number.isInteger(y) && y <= outlook.horizonYear));
+      assert.ok(years.includes(row.centralYear), 'Reference year must occur in the published scenarios.');
+      assert.ok(row.sourceIds.every(key => sourceIds.has(key)) && row.progress.summary && row.basis);
+    }
+  }
   const nodes = assessment.field.nodes;
   assert.deepEqual(nodes.map(row=>row.id).sort(), [...ids,'current'].sort());
   for (const node of nodes) assert.ok(node.id === 'current' && node.coordinates === null ||

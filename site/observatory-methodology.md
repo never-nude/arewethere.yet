@@ -1,6 +1,6 @@
 # How the milestone observatory evaluates evidence
 
-**Evidence methodology 2.0.0 · Milestone forecast model 1.0.0 · Monthly indicator forecast model 1.0.0**
+**Evidence methodology 2.0.0 · Direct milestone forecast 1.0.0 · Monthly indicator forecast 1.0.0 · Long-range outlook 1.0.0**
 
 The observatory asks what published evidence establishes about a particular system or successor lineage. These are working definitions. Researchers can reasonably choose other definitions, comparison groups or equivalence margins. The version and individual review rules travel with each checkpoint.
 
@@ -37,6 +37,27 @@ Organization views group the recorded systems by the source's developer attribut
 
 ## Forecasts and validation
 
+### How to read a milestone outlook
+
+The year beside a milestone is the watch’s central scenario. Each alternative asks how that year would change under different assumptions about generalization, successor research, or the spread of improvements across institutions. The watch has no historical series of verified AGI or singularity arrivals against which to calibrate event probabilities. The spread between the earlier and later scenarios therefore measures sensitivity to the assumptions. A separate stalled scenario allows an event to lie beyond 2100 or never occur.
+
+Progress has its own evidence column. A coding agent can improve its successor on a bounded test, an AI can help solve an open mathematics problem, and one laboratory can speed up its research. The watch describes each of those achievements in its original unit. Establishing broad intellectual superiority or a sustained change in technological progress requires a different set of tests. The formal coverage count records how many necessary conditions independent evaluators have actually assessed in one system.
+
+The first outlook is a dated bulletin based on the archived Launch test, with its evidence checkpoint identified by SHA-256. Its issuance leaves the original checkpoint and its December benchmark predictions intact. Later scheduled checkpoints record their own outlook, inputs, changes and evidence cutoff. The dashboard identifies the edition and, for the first bulletin, its separate issue time. [First dated bulletin](https://arewethereyet.now/data/first-arrival-outlook.json)
+
+### Where the four reference years come from
+
+| Milestone | How the November 2026 reference is calculated | What would change the reading |
+| --- | --- | --- |
+| AGI | Average two published calendar years. In a survey of machine-learning researchers, the combined forecast reached 50% in **2042** for machines doing every task better and more cheaply than humans. The LEAP panel gave **2050** as the middle date for its professional-performance definition, conditional on recognition before 2100. Equal weight gives **2046**. Both definitions demand more than skilled human performance in some respects. | A change to the outside assumptions, evidence that models generalize more slowly, or directly measured progress on this watch’s same-system tests. |
+| Recursive self-improvement | Average the AI Futures panel’s roughly **2027** date for automating AI research with the researchers’ **2036** date for conducting and writing a publishable machine-learning study. Allow two successive one-year improvement cycles. The result rounds to **2034**. | A new research-automation panel reading, reliable long-task progress, or independent attribution of a first successor improvement changes the timing inputs. The assumed cycle lengths themselves carry substantial uncertainty. |
+| Superintelligence | Start with the AGI reference. Survey respondents assigned median chances of 10% within two years and 60% within thirty years to vastly superhuman performance after human-level AI. A straight line between those answers crosses 50% after 24.4 years, yielding **2070**. | Using a logarithmic time scale between the same answers gives about 17 years and a **2063** reference. Evidence of repeatable superiority across unrelated fields would carry more weight than either interpolation. |
+| Singularity | Take the latest of a further development interval after recursive improvement, LEAP’s **2045** rapid-progress reference, and an estimate for technological change after AGI. For the last input, researchers gave median chances of 20% within two years and 80% within thirty years. Straight-line interpolation gives a 16-year delay, yielding **2062**. | The same responses on a logarithmic time scale give roughly eight years and a **2054** reference. An economy-wide change may take longer or never materialize, even with strong laboratory gains. |
+
+The watch uses METR’s 80%-success task lengths as a check on the short-range assumptions. It compares monthly peaks within the latest two years of measured releases, using the median growth slope across pairs of months. An eight-hour workday for AGI and a forty-hour workweek for a research cycle are explicitly chosen comparison points. METR measured selected tasks. Its study supplies no universal conversion between task hours and general intelligence. The dashboard shows which inputs set the date in each scenario and gives source-specific limitations. [METR capability evaluation](https://metr.org/blog/2026-11-20-q4-2026-capability-update/)
+
+The two-year and thirty-year survey answers come from roughly 170 researchers per question, a subset of the 1,580 survey respondents. The watch interpolates between the median responses to different questions. Changing the assumed shape of the curve changes the result by years. No combined panel voted on any of the watch’s four reference years. [Expert survey, Table 2](https://aiimpacts.org/wp-content/uploads/2026/09/ESPAI2024.pdf) · [LEAP expert panel](https://leap.forecastingresearch.org/reports/wave8) · [AI Futures research forecast](https://blog.aifutures.org/p/q35-timelines-update-looks-like-the)
+
 ### What a monthly prediction means
 
 Each official edition can issue a prediction about models released in the **next full UTC calendar month**. One question is “What will be the highest Epoch Capabilities Index score among open-weight models released in December?” There is a separate question for closed-weight models. Open-weight models make their learned parameters available to download. Epoch combines many tests into a shared scale on which higher scores indicate stronger overall test performance. Scores can exceed 100. The result applies to models that Epoch tested in the named group and release month. [Epoch's guide to its index](https://epoch.ai/eci)
@@ -49,7 +70,7 @@ An official edition with fresh source data can issue one prediction per series a
 
 The **Launch test** is the owner-requested first official reading after the commissioning baseline. It records the time the watch actually checked its sources. The daily recalibrations that follow are at midnight, 9:30 a.m. and 4 p.m. in New York.
 
-### Historical comparisons and milestone arrival dates
+### Historical comparisons and direct milestone forecasts
 
 For the measured indicator series, the engine compares three families: persistence at the last observed value, linear change per calendar day, and log-linear change where values are positive. It uses the strongest observation on each date and then the highest value in each observed calendar month. Data-free months stay empty. A monthly peak can fall in a subsequent month. METR's 50% and 80% task horizons have different meanings and separate models.
 
@@ -63,7 +84,7 @@ A milestone projection has a stricter evidence requirement:
 4. Check sensitivity to linear versus log-linear fits, the signal's recent versus full history, and the larger 90th percentile of the one-step and fixed-origin absolute held-out errors. The range spans those scenarios. A scenario which fails to cross within five years leaves the upper range open. Stagnation and extraordinary disruptions can put arrival outside the horizon with no assigned probability. The model reports calendar months and uses month end for the countdown convention.
 5. An independently documented change in the *net critical-path schedule* can shift an eligible criterion's date. This requires a new, system-specific observation in calendar days linked to the event and the criterion, newer than the capability measurements used in the fit. The latest net measurement replaces older ones for the same path, avoiding repeated charges for overlapping outages. Infrastructure, research or investment observations lacking such a mapping remain visible context.
 
-The five-year horizon, sample minimums and split are declared modeling choices. An average error on historical benchmark observations cannot validate the date of an unprecedented transition. In particular, the range is a conditional sensitivity envelope. No calibrated 90% or 95% probability is implied. When the data cannot support the complete chain of inference, the published result is **Not reliably estimable**. The optional clock then has no destination. When every criterion is independently met, the archive records the first checkpoint at which that result was verified.
+The five-year horizon, sample minimums and split are declared modeling choices. An average error on historical benchmark observations cannot validate the date of an unprecedented transition. In particular, the range is a conditional sensitivity envelope. No calibrated 90% or 95% probability is implied. When the data cannot support the complete chain of inference, the published result is **Not reliably estimable**. For editions with a long-range outlook, readers can reveal a year-scale countdown to the central scenario. Earlier archived editions retain the original clock behavior. When every criterion is independently met, the archive records the first checkpoint at which that result was verified.
 
 ## Extraordinary events
 

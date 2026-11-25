@@ -14,6 +14,7 @@ import { deriveField } from '../site/observatory-field-model.js';
 import { checkTimes, checkTimeZone, checkpointForRun, checkpointWindow } from '../site/checkpoint-schedule.js';
 import { loadCandidateQueue } from './candidate-observations.mjs';
 import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, readArchive, nextRecord } from './checkpoint-archive.mjs';
+import firstOutlook from '../site/data/first-arrival-outlook.json' with { type: 'json' };
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const archiveDir = path.resolve(process.env.OBSERVATORY_ARCHIVE_DIR ?? path.join(repo, '.observatory-archive'));
@@ -123,6 +124,9 @@ if (plan) {
   if (scheduled) assert.equal(checkpointWindow(validatedAt).previous, scheduled, 'Verification crossed into a later assessment window.');
   const assessment = buildObservatoryAssessment(signals, {
     checkpointAt, validatedAt, previous: previous?.assessment ?? null, includeIndicatorForecasts: plan.kind === 'official',
+    includeArrivalOutlook: plan.kind === 'official',
+    previousOutlook: previous?.assessment.arrivalOutlook ??
+      (latest?.sha256 === firstOutlook.basedOnSha256 ? firstOutlook.outlook : null),
   });
   assessment.kind = plan.kind;
   if (plan.trigger) assessment.trigger = plan.trigger;
@@ -162,6 +166,10 @@ const feed = {
   commissioning: commissioning ? publicRow(commissioning) : null,
   archive: records.filter(item => item.kind === 'official').map(archiveRow),
 };
+if (records.some(row => row.sha256 === firstOutlook.basedOnSha256 && row.checkpointAt === firstOutlook.basedOnCheckpoint)) {
+  feed.firstOutlookUrl = firstOutlook.url;
+  if (!record.assessment.arrivalOutlook && latest.sha256 === firstOutlook.basedOnSha256) feed.supplementalOutlook = firstOutlook;
+}
 
 const genesis = latest === records[0] ? record : JSON.parse(await readFile(records[0].file, 'utf8'));
 const legacyBytes = genesis.legacyV1 ? JSON.stringify(genesis.legacyV1) : null;
@@ -185,6 +193,7 @@ for (const row of bundled) {
 if (legacyBytes) await writeFile(new URL('data/legacy-v1.json', target), legacyBytes);
 await writeFile(new URL('data/observatory.json', target), JSON.stringify(feed));
 await writeFile(new URL('data/signals.json', target), JSON.stringify(record.signals));
-await writeFile(new URL('data/companion.json', target), JSON.stringify(record.companion));
+const publicCompanion = feed.supplementalOutlook ? { ...record.companion, supplementalOutlook: firstOutlook } : record.companion;
+await writeFile(new URL('data/companion.json', target), JSON.stringify(publicCompanion));
 await writeFile(new URL('.nojekyll', target), '');
 console.log('Pages bundle ready. ' + record.kind + ' edition ' + latest.checkpointAt + '; ' + feed.archive.length + ' official records retained.');
