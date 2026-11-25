@@ -1,0 +1,244 @@
+/* The visual front page at /clock. Self-contained: it shares the site's night
+   surface, typeface and focus colour, and nothing else from styles.css.
+   Two voices carry the data. Violet is what has been measured and where that
+   pace points. Amber is what surveyed experts expect. Text never takes either. */
+@font-face {
+  font-family: Geist;
+  src: url('./assets/geist.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --night: #100e1a;
+  --dusk: #191627;
+  --rule: #2a2438;
+  --edge: #453c5f;
+  --chalk: #f1edf9;
+  --haze: #b8afc9;
+  --mist: #a39ab7;
+  --violet: #9887ef;
+  --amber: #d28e05;
+  --span: #6a5f95;
+  --teal: #73e8cc;
+  --gutter: clamp(16px, 4.5vw, 56px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-width: 300px;
+  background: var(--night);
+  color: var(--chalk);
+  font: 400 18px/1.5 Geist, system-ui, sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, p, ul, ol, figure { margin: 0; }
+h1, h2 { font: inherit; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-decoration-line: underline; text-decoration-color: var(--edge); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+a:hover { text-decoration-color: var(--teal); }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; border-radius: 2px; }
+[hidden] { display: none !important; }
+#main:focus { outline: none; }
+.wrap { width: min(1180px, 100% - 2 * var(--gutter)); margin-inline: auto; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: fixed; z-index: 9; top: 10px; left: 10px; padding: 10px 13px; border-radius: 6px; background: var(--teal); color: var(--night); transform: translateY(-160%); }
+.skip:focus { transform: none; }
+
+/* Masthead */
+.top { border-bottom: 1px solid var(--rule); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+.mark { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 650; letter-spacing: -.02em; text-decoration: none; white-space: nowrap; }
+.more { display: inline-flex; align-items: center; min-height: 44px; color: var(--haze); font-size: 16px; white-space: nowrap; }
+@media (max-width: 380px) {
+  .top .wrap { gap: 10px; }
+  .mark { gap: 8px; font-size: 16px; }
+  .more { font-size: 15px; }
+}
+
+/* Questions are quiet and answers are loud, all the way down the page. */
+.ask, h2 { color: var(--haze); font-size: clamp(20px, 2.3vw, 30px); font-weight: 500; line-height: 1.2; letter-spacing: -.015em; }
+.ask { display: block; }
+.reply { display: block; margin: .05em 0 0 -.045em; font-size: max(min(25.5vw, 92px), min(15.4vw, 208px)); font-weight: 780; line-height: .86; letter-spacing: -.065em; }
+.answer { max-width: 15em; margin-top: .14em; font-size: clamp(34px, 5.4vw, 76px); font-weight: 720; line-height: 1; letter-spacing: -.045em; text-wrap: balance; }
+.detail { max-width: 34em; margin-top: 18px; color: var(--haze); font-size: clamp(18px, 1.7vw, 22px); line-height: 1.4; text-wrap: pretty; }
+
+.hero { padding-top: clamp(28px, 5vw, 64px); }
+.lead { max-width: 27em; margin-top: clamp(18px, 3vw, 36px); font-size: clamp(20px, 2.45vw, 30px); font-weight: 440; line-height: 1.28; letter-spacing: -.012em; text-wrap: pretty; }
+@media (min-width: 1000px) {
+  .hero-head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; column-gap: clamp(40px, 5vw, 76px); }
+  .lead { max-width: 21em; margin: 0; padding-bottom: .62em; font-size: clamp(21px, 1.72vw, 25px); line-height: 1.32; }
+}
+.notice { max-width: 40em; margin-top: 24px; padding: 14px 16px; border: 1px solid var(--edge); border-radius: 8px; font-size: 16px; }
+.band { margin-top: clamp(88px, 12vw, 176px); }
+
+/* The ladder */
+.ladder { margin-top: clamp(28px, 5vw, 64px); }
+.chart { position: relative; touch-action: pan-y; }
+.ladder-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ladder-svg [hidden] { display: none; }
+.ladder-svg text { font-family: inherit; }
+.rung { stroke: var(--rule); stroke-width: 1; }
+.rung-name { fill: var(--mist); font-size: 15px; font-weight: 500; }
+.rung-name.is-reached, .rung-name.is-next { fill: var(--chalk); }
+.rung-note { fill: var(--haze); font-size: 13px; }
+.route-ahead { stroke: var(--edge); stroke-width: 2; }
+.route-done { stroke: var(--violet); stroke-width: 2; }
+.node { fill: var(--night); stroke: var(--edge); stroke-width: 2; }
+.node.is-reached { fill: var(--violet); stroke: var(--night); }
+.node.is-next { stroke: var(--violet); }
+.node-check { fill: none; stroke: var(--night); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.year-tick { stroke: var(--edge); }
+.year-name { fill: var(--mist); font-size: 14px; font-variant-numeric: tabular-nums; }
+.spread { fill: var(--violet); fill-opacity: .1; }
+.spread.is-tested { fill-opacity: .22; }
+.pace { fill: none; stroke: var(--violet); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1 7; stroke-opacity: .75; }
+.pace.is-tested { stroke-dasharray: 7 6; stroke-opacity: 1; }
+.pace.is-past { stroke-width: 1; stroke-dasharray: none; stroke-opacity: .4; }
+.here line { stroke: var(--span); stroke-width: 1; }
+.here text { fill: var(--haze); font-size: 14px; font-weight: 500; }
+.climb { fill: none; stroke: var(--violet); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.dot { fill: var(--violet); stroke: var(--night); stroke-width: 2; }
+.crossing { fill: var(--night); stroke: var(--violet); stroke-width: 2; stroke-opacity: .8; }
+.crossing.is-tested { stroke-opacity: 1; }
+.crossing-name, .point-name { fill: var(--haze); font-size: 14px; }
+.point-system { fill: var(--chalk); font-weight: 600; }
+.is-halo, .is-halo tspan { fill: var(--night); stroke: var(--night); stroke-width: 6px; stroke-linejoin: round; }
+.crosshair line { stroke: var(--mist); stroke-width: 1; }
+.crosshair circle { fill: none; stroke: var(--chalk); stroke-width: 1.5; }
+
+/* One arrival: the line draws itself once, then the forecast fades in. */
+@media (prefers-reduced-motion: no-preference) {
+  .is-first .climb { stroke-dasharray: 1; stroke-dashoffset: 1; animation: climb 1.3s cubic-bezier(.3, .1, .2, 1) .15s forwards; }
+  .is-first .dot { opacity: 0; animation: appear .3s ease-out forwards; animation-delay: calc(.2s + var(--i) * .1s); }
+  .is-first .future, .is-first .crossings, .is-first .names { opacity: 0; animation: appear .7s ease-out 1.45s forwards; }
+}
+@keyframes climb { to { stroke-dashoffset: 0; } }
+@keyframes appear { to { opacity: 1; } }
+
+.tip { position: absolute; z-index: 2; top: 0; left: 0; width: max-content; max-width: min(272px, 86%); padding: 10px 12px; border: 1px solid var(--edge); border-radius: 8px; background: var(--dusk); color: var(--haze); font-size: 14px; line-height: 1.35; pointer-events: none; }
+.tip b { display: block; color: var(--chalk); font-size: 16px; font-weight: 650; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 18px; color: var(--haze); font-size: 15px; }
+.legend li { display: inline-flex; align-items: center; gap: 9px; }
+.key-line { stroke: var(--violet); stroke-width: 2.5; }
+.key-dot { fill: var(--violet); stroke: var(--night); stroke-width: 2; }
+.key-dash { stroke: var(--violet); stroke-width: 2; stroke-dasharray: 7 6; stroke-linecap: round; }
+.key-wash { fill: var(--violet); fill-opacity: .34; }
+.key-pin { flex: none; width: 13px; height: 13px; }
+.key-pin.is-experts { border-radius: 50%; background: var(--amber); }
+.key-pin.is-pace { background: var(--violet); transform: rotate(45deg) scale(.84); }
+.key-span { flex: none; width: 34px; height: 8px; border-radius: 4px; background: var(--span); }
+figcaption { max-width: 46em; margin-top: 14px; color: var(--mist); font-size: 15px; line-height: 1.5; text-wrap: pretty; }
+
+.numbers { margin-top: 8px; font-size: 15px; }
+.numbers summary { display: inline-flex; align-items: center; min-height: 44px; color: var(--haze); cursor: pointer; list-style: none; text-decoration: underline; text-decoration-color: var(--edge); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+.numbers summary::-webkit-details-marker { display: none; }
+.numbers summary::before { content: ''; width: 7px; height: 7px; margin-right: 11px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-1px) rotate(-45deg); }
+.numbers[open] summary::before { transform: translateY(-3px) rotate(45deg); }
+.table-wrap { overflow-x: auto; }
+table { min-width: min(100%, 560px); border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 24px 9px 0; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+th { color: var(--mist); font-weight: 500; }
+td { color: var(--haze); }
+td:nth-child(2) { color: var(--chalk); }
+@media (max-width: 620px) {
+  .numbers table { font-size: 14px; }
+  .numbers th, .numbers td { padding-right: 12px; white-space: normal; vertical-align: top; }
+  .numbers th:last-child, .numbers td:last-child { padding-right: 0; }
+}
+
+/* Arrival */
+.arrival { margin-top: clamp(48px, 7vw, 88px); padding-top: clamp(28px, 4vw, 44px); border-top: 1px solid var(--rule); }
+.eta { display: grid; gap: clamp(14px, 2vw, 22px) clamp(32px, 6vw, 88px); margin-top: clamp(10px, 1.4vw, 18px); }
+.eta li { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: clamp(12px, 1.6vw, 22px); }
+.eta .key-pin { width: clamp(15px, 1.8vw, 22px); height: clamp(15px, 1.8vw, 22px); }
+.eta b { font-size: clamp(60px, 9.4vw, 124px); font-weight: 760; line-height: .94; letter-spacing: -.055em; }
+.how { grid-column: 2; color: var(--haze); font-size: clamp(17px, 1.6vw, 21px); line-height: 1.3; }
+.away { display: block; color: var(--chalk); font-weight: 600; }
+.aside { max-width: 34em; margin-top: clamp(20px, 2.6vw, 30px); color: var(--haze); font-size: clamp(17px, 1.6vw, 20px); line-height: 1.45; text-wrap: pretty; }
+.stamp { margin-top: 12px; color: var(--mist); font-size: 15px; font-variant-numeric: tabular-nums; }
+@media (min-width: 760px) { .eta { grid-template-columns: repeat(2, max-content); } }
+
+/* Three moments, to scale */
+.moments { display: grid; gap: 18px; margin-top: clamp(28px, 4vw, 48px); }
+.moments li { display: grid; grid-template-columns: minmax(0, 210px) 1fr; align-items: center; column-gap: 20px; }
+.who { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.who small { display: block; color: var(--mist); font-size: 14px; font-weight: 400; }
+.track { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.bar { flex: none; width: max(3px, calc((100% - 7.4em) * var(--share))); height: 22px; border-radius: 0 4px 4px 0; background: var(--violet); }
+.val { font-size: 16px; font-weight: 600; white-space: nowrap; }
+@media (max-width: 620px) {
+  .moments li { grid-template-columns: 1fr; row-gap: 6px; }
+  .who small { display: inline; margin-left: 8px; }
+}
+
+/* The stops */
+.stops .legend { margin-top: clamp(24px, 3.4vw, 40px); }
+.stops-chart { margin-top: 18px; }
+.stop, .stop-axis { display: grid; grid-template-columns: minmax(0, 320px) 1fr; column-gap: 32px; }
+.stop { align-items: center; padding: 20px 0; border-top: 1px solid var(--rule); }
+.stop-name b { display: block; font-size: clamp(18px, 1.8vw, 22px); font-weight: 620; line-height: 1.2; letter-spacing: -.015em; }
+.stop-name span { color: var(--mist); font-size: 15px; }
+.stop-track { position: relative; height: 68px; }
+.stop-tick { position: absolute; top: 0; bottom: 0; left: calc(var(--at) * 100%); width: 1px; background: var(--rule); }
+.stop-span { position: absolute; top: 30px; left: calc(var(--from) * 100%); width: calc((var(--to) - var(--from)) * 100%); height: 8px; border-radius: 4px; background: var(--span); }
+.pin { position: absolute; top: 34px; left: calc(var(--at) * 100%); }
+.pin i { position: absolute; top: -7px; left: -7px; width: 14px; height: 14px; box-shadow: 0 0 0 2px var(--night); }
+.pin.is-experts i { border-radius: 50%; background: var(--amber); }
+.pin.is-pace i { background: var(--violet); transform: rotate(45deg) scale(.86); }
+.pin b { position: absolute; left: 0; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; transform: translateX(-50%); }
+.pin.is-pace b { bottom: 11px; }
+.pin.is-experts b { top: 11px; }
+.pin[data-edge='start'] b { transform: translateX(-9px); }
+.pin[data-edge='end'] b { transform: translateX(calc(-100% + 9px)); }
+.stop-axis { padding-top: 8px; border-top: 1px solid var(--rule); }
+.stop-ticks { position: relative; grid-column: 2; height: 24px; }
+.stop-ticks span { position: absolute; left: calc(var(--at) * 100%); color: var(--mist); font-size: 14px; font-variant-numeric: tabular-nums; transform: translateX(-50%); }
+.stop-ticks span:first-child { transform: none; }
+.stop-ticks span:last-child { transform: translateX(-100%); }
+@media (max-width: 820px) {
+  .stop, .stop-axis { grid-template-columns: 1fr; }
+  .stop { row-gap: 4px; padding: 18px 0 8px; }
+  .stop-ticks { grid-column: 1; }
+}
+
+/* At work */
+.effects { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(36px, 5vw, 64px) clamp(32px, 4vw, 56px); margin-top: clamp(32px, 5vw, 56px); }
+.effect { display: grid; align-content: start; gap: 18px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.effect-source { margin: -8px 0 -12px; }
+.effect-say { font-size: clamp(19px, 1.7vw, 22px); line-height: 1.3; letter-spacing: -.01em; text-wrap: pretty; }
+.effect-say b { font-weight: 720; }
+.pair { display: grid; gap: 12px; }
+.pair-row { display: grid; gap: 5px; }
+.pair-label { color: var(--mist); font-size: 14px; }
+.pair .bar { height: 16px; }
+.pair-row:first-child .bar { background: var(--span); }
+.effect-source { color: var(--mist); font-size: 14px; }
+.effect-source a { display: inline-block; padding: 12px 0; }
+.effect .numbers { margin-top: -14px; font-size: 14px; }
+.effect .numbers p { max-width: 34em; color: var(--mist); line-height: 1.5; }
+
+.foot { margin-top: clamp(96px, 13vw, 184px); padding: clamp(36px, 5vw, 64px) 0 clamp(48px, 6vw, 80px); border-top: 1px solid var(--rule); }
+.why { max-width: 21em; font-size: clamp(22px, 2.4vw, 30px); font-weight: 560; line-height: 1.2; letter-spacing: -.02em; text-wrap: balance; }
+.credit { max-width: 40em; margin-top: 18px; color: var(--mist); font-size: 15px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 22px; font-size: 16px; }
+.foot nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--haze); }
+
+@media (max-width: 520px) {
+  body { font-size: 17px; }
+  .rung-name { font-size: 14px; }
+  .crossing-name, .point-name, .year-name, .here text { font-size: 13px; }
+}
+
+/* Forced colours repaint every background, which would erase the bars drawn in
+   CSS, and would turn each label's halo into a solid block behind the words. */
+@media (forced-colors: active) {
+  .bar, .stop-span, .stop-tick, .pin i, .key-pin, .key-span { forced-color-adjust: none; }
+  .is-halo { display: none; }
+}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#100e1a">
+  <meta name="robots" content="noindex">
+  <title>Are we there yet? · Singularity Watch</title>
+  <meta name="description" content="Not yet. See how far AI has come, how fast it is moving and when the big moments might arrive, in four pictures.">
+  <link rel="canonical" href="https://arewethereyet.now/clock">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Singularity Watch">
+  <meta property="og:title" content="Are we there yet?">
+  <meta property="og:description" content="Not yet. See how far AI has come, how fast it is moving and when the big moments might arrive, in four pictures.">
+  <meta property="og:url" content="https://arewethereyet.now/clock">
+  <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=4">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png?v=4">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/watch-touch.png?v=4">
+  <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./clock.css">
+  <script type="module" src="./clock.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="top"><div class="wrap">
+    <a class="mark" href="./"><img src="./favicon.svg?v=4" width="28" height="28" alt=""> Singularity Watch</a>
+    <a class="more" href="./dashboard.html">Full dashboard</a>
+  </div></header>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <section class="hero" aria-labelledby="answer">
+      <div class="hero-head">
+        <h1 id="answer"><span class="ask">Are we there yet?</span> <span class="reply" id="reply">Not yet.</span></h1>
+        <p class="lead" id="lead">Here is how far AI has come, how fast it is moving and when the big moments might arrive.</p>
+      </div>
+      <p class="notice" id="notice" role="status" hidden></p>
+      <noscript><p class="notice">The pictures on this page are drawn from live data and need JavaScript. The <a href="./dashboard.html">full dashboard</a> lists every figure.</p></noscript>
+
+      <figure class="ladder" id="ladder" hidden>
+        <div class="chart" id="ladder-chart" tabindex="0" role="group" aria-roledescription="chart" aria-label="The longest job the best AI can finish on its own" aria-describedby="ladder-help"></div>
+        <p class="sr" id="ladder-help">Use the left and right arrow keys to step through the measurements.</p>
+        <p class="sr" id="ladder-live" aria-live="polite"></p>
+        <ul class="legend" aria-label="How to read the chart">
+          <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><line class="key-line" x1="1" y1="6" x2="33" y2="6"/><circle class="key-dot" cx="17" cy="6" r="4"/></svg>Best AI each month</li>
+          <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><line class="key-dash" x1="1" y1="6" x2="33" y2="6"/></svg>The pace, carried forward</li>
+          <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><rect class="key-wash" x="1" y="1" width="32" height="10" rx="2"/></svg>If it speeds up or slows</li>
+        </ul>
+        <figcaption>Each dot is the best AI of its month, tested on real computer jobs by METR, an independent lab. Finishing a job means succeeding about half the time. The dashes carry the same pace forward and fade where that guess has never been tested.</figcaption>
+        <details class="numbers">
+          <summary>See the numbers</summary>
+          <div class="table-wrap"><table>
+            <thead><tr><th scope="col">When</th><th scope="col">What</th><th scope="col">Longest job</th><th scope="col">Basis</th><th scope="col">If it speeds up or slows</th></tr></thead>
+            <tbody id="ladder-rows"></tbody>
+          </table></div>
+        </details>
+      </figure>
+
+      <div class="arrival" id="arrival" hidden>
+        <h2 id="arrival-q">So when do we arrive?</h2>
+        <ul class="eta" id="eta"></ul>
+        <p class="aside">Arriving means the singularity: AI building better AI until all of technology speeds up. Finishing long jobs is one stop on the way, not the destination.</p>
+        <p class="stamp" id="stamp"></p>
+      </div>
+    </section>
+
+    <section class="band pace" id="pace" aria-labelledby="pace-q" hidden>
+      <h2 id="pace-q">How fast are we going?</h2>
+      <p class="answer" id="pace-answer"></p>
+      <p class="detail" id="pace-detail"></p>
+      <figure>
+        <ol class="moments" id="moments"></ol>
+        <figcaption>Record holders on the same test, drawn to scale.</figcaption>
+      </figure>
+    </section>
+
+    <section class="band stops" id="stops" aria-labelledby="stops-q" hidden>
+      <h2 id="stops-q">What are the stops along the way?</h2>
+      <p class="answer" id="stops-answer"></p>
+      <figure>
+        <ul class="legend" aria-label="How to read the chart">
+          <li><span class="key-pin is-experts" aria-hidden="true"></span>Experts’ survey answers</li>
+          <li id="stops-key-pace"><span class="key-pin is-pace" aria-hidden="true"></span>If today’s speed-up lasts</li>
+          <li><span class="key-span" aria-hidden="true"></span>Earliest to latest scenario</li>
+        </ul>
+        <div class="stops-chart" id="stops-chart"></div>
+        <figcaption id="stops-note"></figcaption>
+        <details class="numbers">
+          <summary>See the numbers</summary>
+          <div class="table-wrap"><table>
+            <thead><tr><th scope="col">Moment</th><th scope="col">Experts’ survey answers</th><th scope="col">If today’s speed-up lasts</th><th scope="col">Earliest scenario</th><th scope="col">Latest scenario</th></tr></thead>
+            <tbody id="stops-rows"></tbody>
+          </table></div>
+        </details>
+      </figure>
+    </section>
+
+    <section class="band work" id="work" aria-labelledby="work-q" hidden>
+      <h2 id="work-q">Has anything changed yet?</h2>
+      <p class="answer" id="work-answer"></p>
+      <div class="effects" id="effects"></div>
+    </section>
+  </main>
+
+  <footer class="foot"><div class="wrap">
+    <p class="why">This page is not here to scare anyone. It is here to help you keep an ear to the ground.</p>
+    <p class="credit">Built on public measurements and surveys from METR, AI Impacts, the Forecasting Research Institute and others. Every source is listed on the full dashboard.</p>
+    <nav aria-label="More to read">
+      <a href="./dashboard.html">Full dashboard</a>
+      <a href="./dashboard.html#methodology">How the estimates are made</a>
+      <a href="./data/observatory.json">Raw data</a>
+      <a href="./">Original front page</a>
+    </nav>
+  </div></footer>
+</body>
+</html>
