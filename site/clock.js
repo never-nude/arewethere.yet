@@ -181,12 +181,12 @@ function renderField() {
   box.hidden = false;
   if (litLab && !field.labs.some(lab => lab.name === litLab)) litLab = null;
   const chip = (text, count, pick, name) => {
-    const button = el('button', 'ask');
+    const button = el('button', 'chip');
     button.type = 'button';
     button.dataset.pick = pick;
     if (name) button.dataset.name = name;
     if (name && namedLabs.includes(name)) button.dataset.lab = name.toLowerCase();
-    button.append(text + ' ', el('span', 'ask-count', String(count)));
+    button.append(text + ' ', el('span', 'chip-count', String(count)));
     return button;
   };
   byId('field-labs').replaceChildren(
@@ -288,7 +288,7 @@ function renderArrival() {
 // the dials and reports what they add up to.
 function wireWhatIf() {
   byId('asks').replaceChildren(...whatIfQuestions.map(question => {
-    const button = el('button', 'ask', question.ask);
+    const button = el('button', 'chip', question.ask);
     button.type = 'button';
     button.dataset.ask = question.id;
     return button;
@@ -448,7 +448,7 @@ function wireDoubling() {
 // or setting an age only slides the markers, so the movement can be seen.
 function wireStops() {
   byId('futures').replaceChildren(...futures.map(item => {
-    const button = el('button', 'ask', item.name);
+    const button = el('button', 'chip', item.name);
     button.type = 'button';
     button.dataset.future = item.id;
     return button;

@@ -335,9 +335,9 @@ html { scroll-behavior: smooth; }
 .reset:disabled { opacity: .45; cursor: default; }
 .asks { display: flex; gap: 8px; margin: 10px calc(-1 * var(--gutter)) 0; padding: 2px var(--gutter) 12px; overflow-x: auto; scrollbar-width: none; }
 .asks::-webkit-scrollbar { display: none; }
-.ask { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--edge); border-radius: 22px; background: var(--dusk); color: var(--chalk); font: inherit; font-size: 15px; white-space: nowrap; cursor: pointer; }
-.ask:hover { border-color: var(--violet); }
-.ask[aria-pressed='true'] { border-color: var(--violet); background: var(--violet); color: var(--night); font-weight: 650; }
+.chip { flex: none; min-height: 44px; padding: 0 16px; border: 1px solid var(--edge); border-radius: 22px; background: var(--dusk); color: var(--chalk); font: inherit; font-size: 15px; white-space: nowrap; cursor: pointer; }
+.chip:hover { border-color: var(--violet); }
+.chip[aria-pressed='true'] { border-color: var(--violet); background: var(--violet); color: var(--night); font-weight: 650; }
 .dials { margin-top: 6px; }
 .dial { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; padding: 14px 0 12px; border-top: 1px solid var(--rule); }
 .dial-name { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 640; letter-spacing: -.01em; }
@@ -387,10 +387,10 @@ html { scroll-behavior: smooth; }
 
 /* The field of models */
 .field .asks { margin-top: clamp(20px, 3vw, 32px); }
-.ask-count { color: var(--mist); font-size: 13px; font-variant-numeric: tabular-nums; }
-.ask[aria-pressed='true'] .ask-count { color: var(--night); }
-.ask[data-lab]::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--hue); }
-.ask[data-lab][aria-pressed='true']::before { box-shadow: 0 0 0 2px var(--night); }
+.chip-count { color: var(--mist); font-size: 13px; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed='true'] .chip-count { color: var(--night); }
+.chip[data-lab]::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--hue); }
+.chip[data-lab][aria-pressed='true']::before { box-shadow: 0 0 0 2px var(--night); }
 .field-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .field-svg text { font-family: inherit; }
 .field-svg [hidden] { display: none; }
