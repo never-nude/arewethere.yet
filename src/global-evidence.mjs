@@ -122,7 +122,7 @@ export const reviewedObservations = [
   },
   {
     id: 'iea-global-data-centres-2025',
-    topic: 'energy',
+    topic: 'data-centers',
     label: 'Worldwide growth in data-centre electricity demand',
     source: 'International Energy Agency',
     sourceUrl:

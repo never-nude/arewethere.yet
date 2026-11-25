@@ -133,6 +133,14 @@ function register(a) {
     'Coverage by topic',
     list(a.topicCoverage.map((x) => x.label + ' · ' + x.status + ' (' + x.observationIds.length + ' records)')),
   );
+  // The commissioning edition filed this IEA report under energy. Preserve its original entry.
+  const priorCategory = a.observations.find(o => o.id === 'iea-global-data-centres-2025' && o.topic === 'energy');
+  const crossReference = () => {
+    const note = el('p', 'This edition filed the IEA’s data-centre electricity estimate under energy. ');
+    note.append(obsSource(priorCategory));
+    return note;
+  };
+  if (priorCategory) catalog.append(crossReference());
   root.replaceChildren(controls, count, body, prev, next, catalog);
   let page = 0;
   function show() {
@@ -157,6 +165,7 @@ function register(a) {
         ' observations'
       : 'No matching observations in this edition.';
     body.replaceChildren(...filtered.slice(start, start + 8).map((o) => details(rowTitle(o), observationBody(o))));
+    if (pick.value === 'data-centers' && priorCategory && !query) body.append(crossReference());
     prev.disabled = !page;
     next.disabled = start + 8 >= filtered.length;
   }

@@ -22,7 +22,7 @@ function changesSince(previous, milestones, observations, forecasts, events) {
   const revised = observations.filter(
     (o) =>
       before.has(o.id) &&
-      ['value', 'low', 'high', 'classification', 'sourceUrl', 'publishedOn', 'measuredOn'].some(
+      ['value', 'unit', 'topic', 'low', 'high', 'classification', 'sourceUrl', 'publishedOn', 'measuredOn', 'limitations'].some(
         (k) => (before.get(o.id)[k] ?? null) !== (o[k] ?? null),
       ),
   );

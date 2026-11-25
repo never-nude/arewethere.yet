@@ -34,3 +34,7 @@ test('reviewed observations retain provenance and explicitly missing test dates'
     assert.ok(Object.hasOwn(r, 'measuredOn'));
   }
 });
+
+test('global data-centre figures and national grid load have separate coverage', () => {
+  assert.equal(reviewedObservations.find(row => row.id === 'iea-global-data-centres-2025').topic, 'data-centers');
+});
