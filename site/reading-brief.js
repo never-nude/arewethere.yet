@@ -11,10 +11,11 @@ const inputNames = {
   releases: 'the number of model launches in the past 45 days',
 };
 
-export function dailyReading(index) {
+export function dailyReading(index, { dated = false } = {}) {
   const previous = index.history.at(-2);
   if (!Number.isFinite(index.delta) || !Number.isFinite(previous?.score)) return '';
-  const since = 'Since ' + day.format(Date.parse(previous.date)) + ', the score ';
+  const since = dated ? 'The last change was on ' + day.format(Date.parse(index.date)) + ', when the score ' :
+    'Since ' + day.format(Date.parse(previous.date)) + ', the score ';
   const movement = Math.abs(index.delta);
   let headline = 'held steady.';
   if (movement > 0) {

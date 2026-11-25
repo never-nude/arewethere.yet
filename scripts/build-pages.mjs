@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { getSignals } from '../src/signals.mjs';
 import { buildIndex } from '../site/index-model.js';
+import { summarizeScaleHistory } from '../site/front-scale.js';
 import { buildCompanionFeed } from '../site/companion-feed.js';
 import { checkResearchForecast } from '../site/research-forecast.js';
 
@@ -65,6 +66,7 @@ const published = {
 };
 
 const result = buildIndex(published);
+published.scaleHistory = summarizeScaleHistory(published, result);
 assert(result.history.length > 0 && result.factors.length >= 6, 'Expected usable historical frames and factor metadata');
 await rm(target, { recursive: true, force: true });
 await cp(new URL('../site/', import.meta.url), target, { recursive: true });

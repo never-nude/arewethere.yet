@@ -2,9 +2,10 @@ import { renderCountdownSummary } from './countdown-summary.js';
 import { dailyReading } from './reading-brief.js';
 import { buildIndex, observationDay, hasSourceReading } from './index-model.js';
 import { measureMilestoneProgress } from './milestone-progress.js';
-import { installGlossary } from './glossary.js';
+import { installBriefingGlossary } from './front-glossary.js';
+import { renderScaleHistory } from './front-scale.js';
 import { assessAcceleration } from './watchtower.js';
-import { renderScoreGuide } from './front-score-guide.js';
+import { renderChecklistUnavailable, renderScoreGuide } from './front-score-guide.js';
 
 const byId = (id) => document.getElementById(id);
 const numbers = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
@@ -97,7 +98,13 @@ function showHistory(index) {
   const missing = history.length - measured.length;
   if (missing) summary += ' ' + missing + (missing === 1 ? ' day has' : ' days have') + ' no reading.';
   if (first.coverage !== last.coverage) {
-    summary += ' Source coverage went from ' + first.coverage + ' to ' + last.coverage + ' of 100 possible points.';
+    summary += ' The available readings covered ' + first.coverage + ' possible points at the start and ' + last.coverage + ' at the end.';
+    const newInputs = last.factors.filter(factor => Number.isFinite(factor.contribution) &&
+      !Number.isFinite(first.factors.find(earlier => earlier.id === factor.id)?.contribution));
+    if (newInputs.length) {
+      const points = newInputs.reduce((total, factor) => total + factor.contribution, 0);
+      summary += ' Indicators missing at the start contribute ' + numbers.format(points) + ' points to the latest score.';
+    }
   } else if (index.coverage < 100) {
     summary += ' Current readings cover ' + index.coverage + ' of 100 possible points.';
   }
@@ -147,6 +154,28 @@ function showContributions(index) {
   }
 }
 
+function showMovement(index) {
+  const direction = byId('front-direction');
+  const change = byId('front-change');
+  if (!Number.isFinite(index.delta)) {
+    direction.textContent = '';
+    change.textContent = 'A daily comparison needs readings for two consecutive days.';
+    return;
+  }
+  direction.textContent = index.delta === 0 ? 'Unchanged since yesterday' :
+    (index.delta > 0 ? 'Up ' : 'Down ') + numbers.format(Math.abs(index.delta)) +
+    (Math.abs(index.delta) === 1 ? ' point' : ' points') + ' since yesterday';
+  const previous = index.history.at(-2);
+  if (index.delta !== 0 || index.factors.some((factor, i) => factor.contribution !== previous.factors[i].contribution)) {
+    change.textContent = dailyReading(index);
+    return;
+  }
+  const lastMove = index.history.findLastIndex(frame => Number.isFinite(frame.delta) && frame.delta !== 0);
+  change.textContent = lastMove > 0
+    ? dailyReading({ ...index.history[lastMove], history: index.history.slice(0, lastMove + 1) }, { dated: true })
+    : 'The available daily comparisons show no change in the total over the past 30 days.';
+}
+
 function render(payload) {
   const index = buildIndex(payload, { days: 30 });
   if (!Number.isFinite(index.score)) throw new Error('No measured index');
@@ -155,7 +184,7 @@ function render(payload) {
   edition.textContent = fullDate.format(Date.parse(index.date)) + ' · UTC edition';
   edition.dateTime = index.date;
   byId('front-score').textContent = numbers.format(index.score);
-  byId('front-change').textContent = dailyReading(index) || 'Daily change unavailable.';
+  showMovement(index);
   showContributions(index);
 
   const reliability = index.factors.find(factor => factor.id === 'reliability');
@@ -169,14 +198,14 @@ function render(payload) {
     return leader.label + ' (' + category + ', ' + numbers.format(leader.value) + ')';
   });
   byId('front-breadth').textContent = rankings.length
-    ? 'Top scores on the Epoch Capabilities Index come from ' + rankings.join(' and ') + '.'
+    ? rankings.join(' and ') + ' lead their groups on the Epoch Capabilities Index.'
     : 'Model comparison scores are currently unavailable.';
   const testsMet = index.threshold.criteria.filter(test => test.status === 'met').length;
-  byId('front-verdict').textContent = index.threshold.observed
-    ? 'All three tests are met, including independent evidence that AI research speeds up across generations.'
-    : testsMet + ' of 3 tests met. ' + (index.threshold.criteria.find(test => test.id === 'compounding').status !== 'met'
-      ? 'Independent studies have yet to trace faster gains across AI generations to AI’s own research.'
-      : 'The Watch is still waiting for confirmation on the remaining tests.');
+  byId('front-verdict').replaceChildren(node('strong', '', testsMet + ' of 3 singularity tests met.'),
+    index.threshold.observed ? ' Independent evidence now meets the Watch’s criteria for sustained AI-led acceleration.' :
+    index.threshold.criteria.find(test => test.id === 'compounding').status !== 'met'
+      ? ' Independent researchers have yet to show that AI’s own research makes successive generations improve faster.'
+      : ' Independent confirmation is still needed for the remaining tests.');
   for (const { id, score } of milestones) {
     const row = byId('front-milestones').querySelector('[data-front-milestone="' + id + '"]');
     const measured = Number.isFinite(score);
@@ -187,6 +216,7 @@ function render(payload) {
   byId('front-report').textContent = report?.context ?? 'No dated research report accompanies this reading.';
   byId('front-report-link').href = report?.url ?? './dashboard.html#factor-research-autonomy';
   renderScoreGuide(index, milestones);
+  renderScaleHistory(payload, index);
 }
 
 function checkStatus(failed = false) {
@@ -224,6 +254,7 @@ async function refresh() {
       renderCountdownSummary(byId('front-countdown'), null, null);
       byId('front-score').textContent = '—';
       byId('front-change').textContent = 'Daily change unavailable';
+      byId('front-scale-detail').textContent = 'Dated source readings are needed to reconstruct the score’s history.';
       byId('front-breadth').textContent = 'Model comparison data is currently unavailable.';
       byId('front-reliability').textContent = 'Task-length measurements are currently unavailable.';
       byId('front-verdict').textContent = 'The Watch needs source readings to assess the evidence.';
@@ -232,7 +263,7 @@ async function refresh() {
       byId('front-score-guide').replaceChildren(node('p', '', 'The eight contributions are unavailable until the source feed returns.'));
       for (const row of byId('front-milestones').querySelectorAll('[data-front-milestone]')) {
         row.querySelector('output').textContent = 'Awaiting data';
-        row.querySelector('[data-front-checklist]').replaceChildren(node('p', '', 'The evidence readings are currently unavailable.'));
+        renderChecklistUnavailable(row.querySelector('[data-front-checklist]'));
       }
     }
     checkStatus(true);
@@ -242,13 +273,19 @@ async function refresh() {
 }
 
 function openScoreGuide() {
-  if (location.hash === '#front-points') byId('front-points').open = true;
+  const target = byId(location.hash.slice(1));
+  if (!target) return;
+  const disclosure = target.closest('details');
+  if (disclosure && !disclosure.open) {
+    disclosure.open = true;
+    target.scrollIntoView();
+  }
 }
 
 renderCountdownSummary(byId('front-countdown'), null, null);
 openScoreGuide();
 window.addEventListener('hashchange', openScoreGuide);
-installGlossary(byId('main'));
+installBriefingGlossary(byId('main'));
 if (typeof ResizeObserver === 'function') new ResizeObserver(drawHistory).observe(chart);
 else window.addEventListener('resize', drawHistory);
 document.addEventListener('visibilitychange', refresh);

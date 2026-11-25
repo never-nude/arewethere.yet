@@ -77,7 +77,7 @@ function updateIndexGuide(index) {
   let list = root.querySelector('ol');
   if (!list) {
     list = element('ol', null, 'front-factor-list');
-    root.replaceChildren(element('p', 'AI skills can earn 50 points, research results 35, and computing power, market expectations and model launches the remaining 15. Each indicator earns a share of its points under the Watch’s published scoring rules. Add those contributions to get the headline score, allowing for rounding.'), element('p', null, 'front-example'), list);
+    root.replaceChildren(element('p', 'One skills test estimates the length of task AI can finish with 80% success. Task length is the time a human expert would need. At 15 minutes the Watch awards zero points for this indicator. At 24 hours it awards all 22. Each of the eight indicators has its own scoring rule.'), element('p', null, 'front-example'), list);
   }
   const market = index.factors.find(factor => factor.id === 'forecast');
   const example = root.querySelector('.front-example');
@@ -110,6 +110,17 @@ function updateIndexGuide(index) {
   }
 }
 
+const milestoneDescriptions = {
+  agi: 'An AI would perform at least as well as skilled people on unfamiliar tasks across many fields. Independent tests would need to show that its skills carry over from one kind of work to another.',
+  asi: 'An AI would consistently outperform leading human experts across many kinds of unfamiliar work. Meeting this standard would also demonstrate AGI.',
+  rsi: 'One AI helps build a stronger successor, which then helps improve the generation after it. A system that specializes in AI research could start this cycle.',
+  singularity: 'Each generation of AI helps build a stronger successor, and progress speeds up from one generation to the next. The Watch looks for independent evidence tying that acceleration to AI-led research.',
+};
+
+export function renderChecklistUnavailable(root) {
+  root.replaceChildren(element('p', milestoneDescriptions[root.dataset.frontChecklist]), element('p', 'The evidence readings are currently unavailable.'));
+}
+
 export function renderScoreGuide(index, milestones) {
   updateIndexGuide(index);
   const factors = new Map(index.factors.map(factor => [factor.id, factor]));
@@ -134,6 +145,6 @@ export function renderScoreGuide(index, milestones) {
       }
       items.append(item);
     }
-    root.replaceChildren(element('p', total), items);
+    root.replaceChildren(element('p', milestoneDescriptions[milestone.id]), element('p', total), items);
   }
 }

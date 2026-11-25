@@ -54,54 +54,71 @@
   <main class="front-wrap" id="main" tabindex="-1">
     <header class="front-intro">
       <div class="front-reading">
+        <div class="front-edition"><span class="front-edition-label">Daily briefing</span><time id="front-date"></time></div>
         <h1 id="front-headline">The Singularity Watchdog</h1>
         <label class="front-score-label" for="front-score">Evidence score</label>
-        <div class="front-scoreline"><strong><output id="front-score" aria-describedby="front-score-meaning" aria-live="off">—</output><small> / 100</small></strong><span id="front-change"></span></div>
-        <p id="front-score-meaning">Eight indicators track whether AI can help build better AI faster. Each bar shows how many points a category can earn. The filled portions add up to the score.</p>
+        <div class="front-scoreline"><strong><output id="front-score" aria-describedby="front-score-meaning" aria-live="off">—</output><small> / 100</small></strong><span id="front-direction"></span></div>
+        <p id="front-score-meaning">Each point is one of 100 the Watch awards for evidence about AI skills, research and related trends. At zero, the available readings earn no credit. At 100, all eight indicators meet the Watch’s chosen targets.</p>
+        <p class="front-test-reading"><span id="front-verdict">Confirming the singularity takes independent evidence that AI is speeding up the development of its successors.</span> <a class="front-tests-link" href="./dashboard.html#evidence-gates">See the three tests</a></p>
+        <a class="front-forecast-cue" href="#front-countdown">AI researcher forecast <span id="front-forecast-window"></span></a>
+        <p id="front-scale-record"></p>
+        <details class="front-guide" id="front-scale">
+          <summary>When did the score first pass 20?</summary>
+          <div id="front-scale-detail"><p>Checking the historical readings…</p></div>
+          <a href="#front-points">See how today’s eight indicators earned their points</a>
+        </details>
+      </div>
+    </header>
+    <section class="front-findings" aria-labelledby="front-digest-title">
+      <div class="front-section-heading"><h2 id="front-digest-title">What the evidence shows</h2></div>
+      <p class="front-term-hint">Tap or hover over a dotted term for its meaning.</p>
+      <ul class="front-digest">
+        <li class="front-item">
+          <h3>What moved the score</h3>
+          <p id="front-change">Checking the latest change…</p>
+        </li>
+        <li class="front-item">
+          <h3><a href="./dashboard.html#factor-reliability">How long AI can work reliably</a></h3>
+          <p id="front-reliability">Awaiting the latest task results.</p>
+        </li>
+        <li class="front-item">
+          <h3 id="front-report-title"><a id="front-report-link" href="./dashboard.html#factor-research-autonomy">How much research AI can do on its own</a></h3>
+          <p id="front-report">Awaiting the latest research result.</p>
+        </li>
+        <li class="front-item">
+          <h3><a href="./dashboard.html#model-leaders">Which models lead on skills tests</a></h3>
+          <p id="front-breadth">Awaiting the latest model scores.</p>
+        </li>
+      </ul>
+    </section>
+    <section class="front-forecast" aria-label="Research milestone countdown">
+      <div id="front-countdown" class="countdown-summary">
+        <h2 class="countdown-summary-title">Superhuman AI researcher forecast</h2>
+        <p>Six forecasters’ November 2026 estimates span May to November 2027. <a href="https://blog.aifutures.org/p/q35-timelines-update-looks-like-the">Forecast and assumptions</a></p>
+      </div>
+    </section>
+    <section class="front-score-section" aria-labelledby="front-contributions-title">
+        <h2 id="front-contributions-title">Where the points come from</h2>
         <ul class="front-contributions" aria-label="Points by source of evidence">
           <li data-group="skills"><span class="front-contribution-name">AI skills</span><span class="front-contribution-value">— / 50</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
           <li data-group="research"><span class="front-contribution-name">AI research</span><span class="front-contribution-value">— / 35</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
           <li data-group="context"><span class="front-contribution-name">Compute, markets &amp; releases</span><span class="front-contribution-value">— / 15</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
         </ul>
         <details class="front-guide" id="front-points">
-          <summary>What earns a point?</summary>
+          <summary>See how each of the eight indicators earns points</summary>
           <div id="front-score-guide"><p>Loading the eight contributions…</p></div>
         </details>
-        <section id="front-countdown" class="countdown-summary" aria-label="Research milestone countdown">
-          <h2 class="countdown-summary-title">Superhuman AI researcher forecast</h2>
-          <p>Six forecasters’ November 2026 estimates span May to November 2027. <a href="https://blog.aifutures.org/p/q35-timelines-update-looks-like-the">Forecast and assumptions</a></p>
-        </section>
-      </div>
-    </header>
-    <section class="front-findings" aria-labelledby="front-digest-title">
-      <div class="front-section-heading"><h2 id="front-digest-title">Key readings</h2><time id="front-date"></time></div>
-      <ul class="front-digest">
-        <li class="front-item">
-          <h3><a href="./dashboard.html#evidence-gates">Evidence for the singularity</a></h3>
-          <p id="front-verdict">The Watch looks for evidence that AI-led research speeds up across generations.</p>
-        </li>
-        <li class="front-item">
-          <h3><a href="./dashboard.html#factor-reliability">Reliable work</a></h3>
-          <p id="front-reliability">Awaiting the latest task results.</p>
-        </li>
-        <li class="front-item">
-          <h3 id="front-report-title"><a id="front-report-link" href="./dashboard.html#factor-research-autonomy">AI doing research</a></h3>
-          <p id="front-report">Awaiting the latest research result.</p>
-        </li>
-        <li class="front-item">
-          <h3><a href="./dashboard.html#model-leaders">Model leaders</a></h3>
-          <p id="front-breadth">Awaiting the latest model scores.</p>
-        </li>
-      </ul>
     </section>
-    <figure class="front-history" aria-labelledby="front-history-title">
+    <section class="front-trend" aria-labelledby="front-history-title">
       <h2 id="front-history-title">The past 30 days</h2>
-      <div id="front-history"></div>
-      <figcaption id="front-history-caption">Daily score out of 100.</figcaption>
-    </figure>
+      <p id="front-history-caption">Daily score out of 100.</p>
+      <details class="front-chart-disclosure" id="front-chart-details"><summary>View daily scores on the chart</summary>
+        <figure class="front-history" aria-labelledby="front-history-title"><div id="front-history"></div></figure>
+      </details>
+    </section>
     <section class="front-milestone-section" aria-labelledby="front-milestones-title">
       <h2 id="front-milestones-title">Four milestones</h2>
-      <p>Each percentage shows how much of its own evidence checklist is met.</p>
+      <p>Each percentage is the share of a different evidence checklist met so far. Open a row for its definition and the evidence behind it.</p>
       <div id="front-milestones">
         <details class="front-check" data-front-milestone="singularity"><summary><span>The singularity</span> <output aria-label="Singularity checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="singularity"></div></details>
         <details class="front-check" data-front-milestone="rsi"><summary><span>Recursive self-improvement</span> <output aria-label="Self-improvement checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="rsi"></div></details>

@@ -33,20 +33,21 @@ const entries = [
   ['weight access|weight availability|open- and closed-weight|open- and closed-weights|open and closed weights|open or closed weights', 'Model weight access', 'This tells you whether people can download the numbers a model learned. A model’s price, the license for using it, and whether its training code or data are public are separate questions.'],
 ];
 
-const aliasLookup = new Map();
-for (const [index, [aliases, name, description]] of entries.entries()) {
-  const term = { id: `glossary-meaning-${index}`, name, description };
-  for (const alias of aliases.split('|')) aliasLookup.set(alias.toLowerCase(), term);
-}
-const terms = [...aliasLookup.keys()]
-  .sort((a, b) => b.length - a.length)
-  .map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll('-', '[-‐‑]').replaceAll(' ', '\\s+'));
-const glossaryPattern = new RegExp(`\\b(?:${terms.join('|')})\\b`, 'gi');
 const termSelector = '.glossary-term';
 const controls = 'a[href], button, summary, label, [role="button"], [role="tab"], [role="option"], [role="slider"]';
-const excluded = `${termSelector}, .glossary-popup, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
+const excludedContent = `${termSelector}, .glossary-popup, script, style, template, noscript, canvas, svg, textarea, select, output, [contenteditable], [role="alert"], [role="status"], [role="log"], [role="timer"]`;
 
-export function installGlossary(root) {
+export function installGlossary(root, { additionalEntries = [], skipSelector = '', inlineButtons = false } = {}) {
+  const excluded = skipSelector ? excludedContent + ', ' + skipSelector : excludedContent;
+  const aliasLookup = new Map();
+  for (const [index, [aliases, name, description]] of [...entries, ...additionalEntries].entries()) {
+    const term = { id: `glossary-meaning-${index}`, name, description };
+    for (const alias of aliases.split('|')) aliasLookup.set(alias.toLowerCase(), term);
+  }
+  const terms = [...aliasLookup.keys()]
+    .sort((a, b) => b.length - a.length)
+    .map((alias) => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll('-', '[-‐‑]').replaceAll(' ', '\\s+'));
+  const glossaryPattern = new RegExp(`\\b(?:${terms.join('|')})\\b`, 'gi');
   const owner = root.ownerDocument;
   const view = owner.defaultView;
   const glossaryById = new Map([...aliasLookup.values()].map((term) => [term.id, term]));
@@ -92,7 +93,7 @@ export function installGlossary(root) {
       tabFrame = null;
       const sections = new Map();
       const updates = [];
-      for (const mark of root.querySelectorAll('.glossary-term[role="button"]')) {
+      for (const mark of root.querySelectorAll('button.glossary-term, .glossary-term[role="button"]')) {
         const section = mark.closest('section, article, details, [role="tabpanel"]') ?? root;
         if (!sections.has(section)) sections.set(section, new Set());
         const seen = sections.get(section);
@@ -132,14 +133,15 @@ export function installGlossary(root) {
       const [label] = match;
       const term = aliasLookup.get(label.toLowerCase().replace(/[‐‑]/g, '-').replace(/\s+/g, ' '));
       if (match.index > end) fragment.append(text.data.slice(end, match.index));
-      const mark = owner.createElement('span');
+      const mark = owner.createElement(inlineButtons && !control ? 'button' : 'span');
       mark.className = 'glossary-term';
       mark.dataset.glossaryMeaning = term.id;
       mark.textContent = label;
       mark.title = '';
       if (!control) {
         mark.tabIndex = 0;
-        mark.setAttribute('role', 'button');
+        if (inlineButtons) mark.type = 'button';
+        else mark.setAttribute('role', 'button');
         mark.setAttribute('aria-describedby', term.id);
       }
       fragment.append(mark);

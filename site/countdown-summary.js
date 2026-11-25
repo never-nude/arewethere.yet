@@ -32,7 +32,8 @@ function mount(container) {
   const body = doc.createElement('div');
   details.append(summary, body);
   container.replaceChildren(heading, reading, definition, newer, details);
-  const state = { container, doc, value, dates, body, newer, record: null, key: '', timer: null };
+  const cue = container.id === 'front-countdown' ? doc.getElementById('front-forecast-window') : null;
+  const state = { container, doc, value, dates, definition, body, newer, cue, record: null, key: '', timer: null };
   mounted.set(container, state);
   doc.addEventListener('visibilitychange', () => {
     if (doc.hidden) clearTimeout(state.timer);
@@ -47,6 +48,7 @@ function paint(state) {
   const now = new Date();
   const { first, last, remaining, passed } = forecastWindow(record, now);
   if (state.value.textContent !== remaining) state.value.textContent = remaining;
+  if (state.cue && state.cue.textContent !== remaining) state.cue.textContent = remaining;
   const dates = ' · ' + monthSpan(first, last);
   if (state.dates.textContent !== dates) state.dates.textContent = dates;
   const key = JSON.stringify([record, passed]);
@@ -64,6 +66,9 @@ function paint(state) {
       return a;
     };
     const issued = day.format(new Date(record.publishedOn + 'T00:00:00Z'));
+    if (state.container.id === 'front-countdown') {
+      state.definition.textContent = 'On ' + issued + ', six AI Futures Project forecasters gave these 50/50 dates. Their estimates can change. To qualify, AI must automate a research project’s coding and choose experiments as well as its best human researchers.';
+    }
     const note = paragraph('The AI Futures Project published these estimates on ' + issued +
       '. Each forecaster assigns equal odds to an earlier or later arrival than their own date. The actual milestone could fall outside this span.');
     state.newer.hidden = !record.newerPublication;
