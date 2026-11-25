@@ -1,0 +1,23 @@
+// Selected primary disclosures. Amounts are specific transactions, never model budgets.
+export const fundingDisclosures = [
+  { organization: 'Anthropic', amount: 91.6e9, currency: 'USD', when: 'Nov 20, 2026', published: '2026-11-20',
+    kind: 'Gross IPO proceeds to Anthropic', issuer: 'Anthropic',
+    scope: 'Proceeds on shares the company sold, before fees. The same announcement lists a separate $26 billion private placement.',
+    url: 'https://www.anthropic.com/news/ipo-close' },
+  { organization: 'Mistral AI', amount: 3e9, currency: 'EUR', when: 'Sep 8, 2026', published: '2026-09-08',
+    kind: 'Series D funding round', issuer: 'Mistral AI',
+    scope: 'Mistral reported a €3 billion equity round led by Samsung Electronics. It did not give a training budget for individual Mistral models.',
+    url: 'https://mistral.ai/news/mistral-makes-sovereign-open-weight-ai-to-frontier/' },
+  { organization: 'OpenAI', amount: 122e9, currency: 'USD', when: 'Mar 31, 2026', published: '2026-03-31',
+    kind: 'Committed capital in one funding round', issuer: 'OpenAI',
+    scope: 'Investor commitments announced at the close of the round. The company did not allocate this amount to individual GPT models.',
+    url: 'https://openai.com/index/accelerating-the-next-phase-ai/' },
+  { organization: 'xAI', amount: 20e9, currency: 'USD', when: 'Jan 6, 2026', published: '2026-01-06',
+    kind: 'Series E funding round', issuer: 'xAI',
+    scope: 'Capital raised by the company in this round. The announcement gives no spending breakdown for individual Grok models.',
+    url: 'https://x.ai/news/series-e' },
+  { organization: 'Moonshot', amount: 0.8e9, currency: 'USD', when: 'Fiscal year ended Mar 31, 2024', published: '2024-05-23',
+    kind: 'Alibaba investment in Moonshot', issuer: 'Alibaba Group',
+    scope: 'Alibaba reported buying roughly 36% of Moonshot in its fiscal 2024 annual report. The filing gives no spending figure for Kimi models.',
+    url: 'https://static.alibabagroup.com/reports/fy2024/ar/ebook/EN/87/index.html' },
+];

@@ -11,7 +11,9 @@ import { buildCompanionFeed, observatoryCompanionReading } from '../site/compani
 import { checkResearchForecast } from '../site/research-forecast.js';
 import { buildObservatoryAssessment } from '../site/observatory-model.js';
 import { deriveField } from '../site/observatory-field-model.js';
-import { checkTimes, checkTimeZone, checkpointForRun, checkpointWindow } from '../site/checkpoint-schedule.js';
+import { checkTimes, checkTimeZone, checkpointForRun, checkpointWindow, fourCheckStartDay } from '../site/checkpoint-schedule.js';
+import { collectModelResources } from './model-resources.mjs';
+import firstResources from '../site/data/first-training-resources.js';
 import { loadCandidateQueue } from './candidate-observations.mjs';
 import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, readArchive, nextRecord } from './checkpoint-archive.mjs';
 import firstOutlook from '../site/data/first-arrival-outlook.json' with { type: 'json' };
@@ -43,6 +45,9 @@ async function collect(previous) {
   const pending = await loadCandidateQueue(process.env.OBSERVATORY_CANDIDATE_DIR,
     previous?.checkedAt ?? new Date(Date.parse(current.checkedAt) - 7 * 86400000).toISOString(), current.checkedAt);
   const preserveMetrics = checkpointMetrics(current, previous);
+  const scoredModels = preserveMetrics.find(m => m.id === 'breadth')?.observations || [];
+  const lastResources = previous?.modelResources ?? (firstResources.checkedAt <= current.checkedAt ? firstResources : null);
+  const modelResources = await collectModelResources(scoredModels, current.checkedAt, lastResources);
   const events = [...new Map([
     ...(previous?.events ?? []).map((event) => [event.url.replace(/\/$/, ''), event]),
     ...pending.events.map((event) => [event.url.replace(/\/$/, ''), event]),
@@ -79,6 +84,7 @@ async function collect(previous) {
   const published = {
     ...current,
     candidateDiscovery: pending,
+    modelResources,
     observatoryObservations,
     sources,
     metrics: preserveMetrics,
@@ -161,7 +167,7 @@ const archiveRow = row => {
 };
 const feed = {
   schemaVersion: 2, status: record.kind === 'official' ? 'validated' : 'commissioning',
-  schedule: { timezone: checkTimeZone, times: checkTimes },
+  schedule: { timezone: checkTimeZone, times: checkTimes, effectiveLocalDate: fourCheckStartDay },
   assessment: record.assessment, currentRecord: publicRow(latest),
   commissioning: commissioning ? publicRow(commissioning) : null,
   archive: records.filter(item => item.kind === 'official').map(archiveRow),
@@ -171,6 +177,12 @@ if (records.some(row => row.sha256 === firstOutlook.basedOnSha256 && row.checkpo
   if (!record.assessment.arrivalOutlook && latest.sha256 === firstOutlook.basedOnSha256) feed.supplementalOutlook = firstOutlook;
 }
 
+const firstResourceUrl = 'data/first-training-resources.json';
+feed.firstTrainingResourcesUrl = firstResourceUrl;
+if (!record.assessment.modelResources && record.assessment.checkpointAt === firstResources.forEdition) {
+  feed.supplementalTrainingResources = {basedOnCheckpoint: firstResources.forEdition,
+    checkedAt: firstResources.checkedAt, sourceSha256: firstResources.sha256, url: firstResourceUrl};
+}
 const genesis = latest === records[0] ? record : JSON.parse(await readFile(records[0].file, 'utf8'));
 const legacyBytes = genesis.legacyV1 ? JSON.stringify(genesis.legacyV1) : null;
 feed.legacy = legacyBytes ? {
@@ -191,6 +203,7 @@ for (const row of bundled) {
   await cp(row.file, dest);
 }
 if (legacyBytes) await writeFile(new URL('data/legacy-v1.json', target), legacyBytes);
+await writeFile(new URL(firstResourceUrl, target), JSON.stringify(firstResources));
 await writeFile(new URL('data/observatory.json', target), JSON.stringify(feed));
 await writeFile(new URL('data/signals.json', target), JSON.stringify(record.signals));
 const publicCompanion = feed.supplementalOutlook ? { ...record.companion, supplementalOutlook: firstOutlook } : record.companion;

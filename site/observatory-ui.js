@@ -1,6 +1,10 @@
+import { countdownParts, referenceInstant } from './observatory-clock.js';
+import { renderInvestment } from './observatory-investment.js';
+import { renderMetricCharts } from './observatory-charts.js';
+import { renderCalculations } from './observatory-calculations.js';
 import { renderTrends } from './observatory-trends.js';
-import { checkpointWindow, editionLabel } from './checkpoint-schedule.js';
-import { mountField } from './observatory-field.js';
+import { checkpointWindow, editionLabel } from './checkpoint-schedule.js?v=20261125-visuals';
+import { mountField } from './observatory-field.js?v=20261125-visuals';
 import { installBriefingGlossary } from './front-glossary.js';
 
 const base = new URL('./', import.meta.url);
@@ -16,6 +20,9 @@ const eastern = new Intl.DateTimeFormat('en-US', {
   minute: '2-digit',
   timeZone: 'America/New_York',
   timeZoneName: 'short',
+});
+const briefTime = new Intl.DateTimeFormat('en-US', {
+  month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York', timeZoneName: 'short',
 });
 const day = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const month = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -37,7 +44,7 @@ let manifest,
   arrivalOutlook,
   outlookSupplement,
   requestInFlight = false,
-  clockForecast,
+  targetInstant,
   fieldInstance,
   disposeTrends,
   selectedArchive = false;
@@ -222,11 +229,195 @@ function scenarioSummary(m, f) {
   row.append(name, timing, progress);
   return row;
 }
+const criterionStatus = { met: 'Verified', unmet: 'Tested and unmet', conflicting: 'Conflicting evidence', unknown: 'Unresolved' };
+const shortNames = { singularity: 'Singularity', rsi: 'Recursive self-improvement', asi: 'Artificial superintelligence', agi: 'Artificial general intelligence' };
+const milestoneDefinitions = {
+  singularity: 'AI helps build better AI, and the cycle speeds up technological progress beyond the lab.',
+  rsi: 'An AI helps build a better successor, which then helps build the next one.',
+  asi: 'One AI reliably outperforms leading human experts across many fields.',
+  agi: 'One AI can reliably handle unfamiliar work across many fields at the level of a skilled person.',
+};
+
+const criterionNames = {
+  'agi-breadth': 'Breadth', 'agi-transfer': 'Transfer', 'agi-reliability': 'Reliability',
+  'asi-experts': 'Expert lead', 'rsi-contribution': 'Successor gain', 'rsi-repeat': 'Repeat gain',
+  'singularity-feedback': 'AI feedback', 'singularity-acceleration': 'Speedup', 'singularity-transition': 'Wider change',
+};
+const gateSymbol = { met: '●', unknown: '○', unmet: '×', conflicting: '◐' };
+let selectedMilestone = 'singularity';
+
+function latestReliability(a) {
+  const tested = a.observations.filter(o => o.topic === 'reliability' && Number.isFinite(o.value) && o.publishedOn);
+  const latest = tested.map(o => o.publishedOn).sort().at(-1);
+  return tested.filter(o => o.publishedOn === latest).sort((a, b) => b.value - a.value)[0];
+}
+
+function milestoneSignal(id, a) {
+  let o, value, caption;
+  if (id === 'singularity') {
+    o = a.observations.find(r => r.topic === 'research-acceleration' && r.organization === 'Anthropic' && r.unit === '×' && Number.isFinite(r.value));
+    if (o) { value = number.format(o.value) + '×'; caption = 'Pace of AI capability gains at Anthropic compared with its earlier rate. The comparison includes changes in computing power and staffing.'; }
+  } else if (id === 'agi') {
+    o = latestReliability(a);
+    if (o) { value = number.format(o.value) + ' h'; caption = 'Expert work time for selected tasks that ' + o.system + ' completes with an estimated 80% success rate.'; }
+  } else if (id === 'rsi') {
+    o = records.get('dgm-2025-swe-bench-agent');
+    if (Number.isFinite(o?.value)) { value = number.format(o.value) + '%'; caption = 'Coding tasks solved by a self-editing agent after it revised its software. The authors tested agents on the same software benchmark.'; }
+  } else if (id === 'asi') {
+    o = a.observations.find(r => r.id.startsWith('frontiermath-open-problems-') && Number.isFinite(r.value));
+    if (o) { value = number.format(o.value); caption = (o.unit || 'listed problems') + ' in Epoch’s open mathematics register were credited to AI alone.'; }
+  }
+  return value ? { o, value, caption } : null;
+}
+
+function signalFigure(id, o) {
+  const fig = el('figure', null, 'obs-signal-figure');
+  if (id === 'asi') {
+    const total = Number(/^of (\d+) listed problems$/.exec(o.unit)?.[1]);
+    if (!Number.isInteger(total) || total < 1 || total > 100 || o.value < 0 || o.value > total) return null;
+    const marks = el('span', null, 'obs-problem-marks');
+    marks.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < total; i++) marks.append(el('i', null, i < o.value ? 'obs-problem-solved' : ''));
+    fig.append(marks, el('figcaption', o.value + ' of ' + total + ' problems credited to AI alone.'));
+  } else if (id === 'rsi') {
+    for (const [label, percent] of [['Starting agent', 20], ['Revised agent', o.value]]) {
+      const bar = el('span', null, 'obs-agent-track');
+      const mark = el('i');
+      mark.style.width = percent + '%';
+      bar.append(mark);
+      const row = el('div', null, 'obs-agent-result');
+      row.append(el('span', label), bar, el('span', number.format(percent) + '%'));
+      fig.append(row);
+    }
+    fig.setAttribute('aria-label', 'Share of selected coding tasks solved');
+  } else if (Number.isFinite(o.low) && Number.isFinite(o.high) && o.high > o.low && o.value >= o.low && o.value <= o.high) {
+    const unit = id === 'agi' ? ' h' : '×';
+    const track = el('span', null, 'obs-uncertainty-track');
+    const point = el('i');
+    point.style.insetInlineStart = 100 * (o.value - o.low) / (o.high - o.low) + '%';
+    track.append(point);
+    track.setAttribute('aria-hidden', 'true');
+    const labels = el('div', null, 'obs-range-labels');
+    labels.append(el('span', number.format(o.low) + unit), el('span', o.intervalLabel || 'Reported range'), el('span', number.format(o.high) + unit));
+    fig.append(track, labels);
+  } else return null;
+  return fig;
+}
+
+function milestonePane(pane, m, forecast, a) {
+  pane.dataset.milestone = m.id;
+  pane.setAttribute('aria-labelledby', 'milestone-tab-' + m.id);
+  const name = el('h3', m.label);
+  const definition = el('p', milestoneDefinitions[m.id], 'obs-reader-definition');
+  const measurement = milestoneSignal(m.id, a);
+  const signal = el('div', null, 'obs-reader-signal');
+  if (measurement) {
+    const { o, value, caption } = measurement;
+    const number = el('strong', value);
+    number.dataset.signalValue = '';
+    const copy = el('div');
+    copy.append(el('p', caption), link(o.source + ' · ' + date(o.publishedOn || o.referenceOn || o.measuredOn), o.sourceUrl));
+    signal.append(number, copy);
+    const figure = signalFigure(m.id, o);
+    if (figure) signal.append(figure);
+  } else signal.append(el('p', forecast?.progress?.summary || 'This edition carries no comparable measurement for this milestone.'));
+  const results = el('dl', null, 'obs-reader-findings');
+  for (const status of ['met', 'unmet', 'conflicting', 'unknown']) {
+    const conditions = m.criteria.filter(c => c.status === status);
+    if (conditions.length) results.append(el('dt', criterionStatus[status]),
+      el('dd', conditions.map(c => c.label).join(' · ')));
+  }
+  const accounting = el('p', null, 'obs-reader-accounting');
+  accounting.append(el('strong', m.coverage.met + ' of ' + m.coverage.total + ' conditions verified'),
+    Number.isFinite(m.score) ? ' · Evidence score ' + m.score + '/100.' : ' · Evidence score pending.');
+  const u = new URL('./dashboard.html#assessment-' + m.id, base);
+  if (selectedArchive) u.searchParams.set('assessment', a.checkpointAt);
+  const components = [name, definition, signal, accounting, results];
+  if (forecast && forecast.status !== 'Observed') components.push(small('Scenario range · ' + scenarioRange(forecast)));
+  pane.replaceChildren(...components, link('Full evidence for ' + shortNames[m.id], u));
+}
+
+function milestoneInstrument(container, a) {
+  const rail = el('div', null, 'obs-milestone-tabs');
+  rail.id = 'milestone-tabs';
+  rail.setAttribute('role', 'tablist');
+  rail.setAttribute('aria-label', 'Milestones');
+  rail.setAttribute('aria-orientation', 'vertical');
+  const pane = el('div', null, 'obs-milestone-reader');
+  pane.id = 'milestone-reader';
+  pane.setAttribute('role', 'tabpanel');
+  pane.tabIndex = 0;
+  const controls = new Map();
+  for (const id of editorialOrder) {
+    const m = a.milestones.find(x => x.id === id);
+    const f = arrivalOutlook?.milestones.find(x => x.id === id);
+    const strict = a.forecasts.find(x => x.id === id);
+    const control = el('button', null, 'obs-progress-row');
+    control.id = 'milestone-tab-' + id;
+    control.type = 'button';
+    control.dataset.milestone = id;
+    control.setAttribute('role', 'tab');
+    control.setAttribute('aria-controls', 'milestone-reader');
+    const title = el('strong', id === 'agi' ? 'General intelligence' : id === 'asi' ? 'Superintelligence' : shortNames[id]);
+    if (id !== 'singularity') title.append(el('small', labels[id]));
+    const year = f ? scenarioYear(f.centralYear, f.horizonYear) : strict?.centralDate ? period(strict.centralDate) : 'Undated';
+    const displayYear = el('span', year, 'obs-tab-year');
+    const checks = el('span', null, 'obs-gate-track');
+    for (const c of m.criteria) {
+      const tag = el('span', null, 'obs-gate');
+      tag.dataset.status = c.status;
+      tag.append(el('i', gateSymbol[c.status]), criterionNames[c.id] || c.label);
+      tag.title = c.label + ' · ' + criterionStatus[c.status];
+      checks.append(tag);
+    }
+    const yearLabel = strict?.status === 'Observed' ? 'confirmed' : 'reference';
+    control.setAttribute('aria-label', m.label + ', ' + yearLabel + ' ' + year + ', ' + m.coverage.met + ' of ' + m.coverage.total + ' conditions verified');
+    control.append(title, displayYear, checks);
+    rail.append(control);
+    controls.set(id, { control, m, f });
+  }
+  function select(id, focus = false) {
+    selectedMilestone = id;
+    for (const [key, { control }] of controls) {
+      control.setAttribute('aria-selected', String(key === id));
+      control.tabIndex = key === id ? 0 : -1;
+    }
+    const { control, m, f } = controls.get(id);
+    milestonePane(pane, m, f, a);
+    if (focus) control.focus();
+  }
+  for (const [key, { control }] of controls) {
+    control.addEventListener('click', () => {
+      select(key);
+      if (matchMedia('(max-width: 740px)').matches) pane.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    });
+    control.addEventListener('keydown', event => {
+      const i = editorialOrder.indexOf(key);
+      const actions = { ArrowDown: (i + 1) % 4, ArrowUp: (i + 3) % 4, Home: 0, End: 3 };
+      if (!Object.hasOwn(actions, event.key)) return;
+      event.preventDefault();
+      select(editorialOrder[actions[event.key]], true);
+    });
+  }
+  const legend = el('div', null, 'obs-gate-legend');
+  const states = new Set(a.milestones.flatMap(m => m.criteria.map(c => c.status)));
+  states.add('met');
+  for (const status of ['met', 'unknown', 'unmet', 'conflicting']) {
+    if (states.has(status)) legend.append(el('span', gateSymbol[status] + ' ' + criterionStatus[status]));
+  }
+  const track = el('div', null, 'obs-milestone-rail');
+  track.append(rail, legend);
+  container.replaceChildren(track, pane);
+  select(selectedMilestone);
+}
 function renderMilestones(a) {
   const container = byId('assessment-list');
   byId('arrival-intro').textContent = arrivalOutlook
     ? 'The reference year shows when a milestone could arrive under the model’s main assumptions. The ranges compare faster and slower scenarios. A milestone could also remain out of reach.'
     : 'This edition records which criteria were independently assessed. It predates the scenario estimates. An unresolved criterion leaves the evidence score open.';
+  if (!dashboard) byId('arrival-intro').textContent = arrivalOutlook
+    ? 'Select a milestone to explore its evidence. The years show the reference forecast.'
+    : 'Select a milestone to explore its evidence. This edition predates the scenario forecasts.';
   const note = byId('arrival-note');
   note.replaceChildren();
   if (outlookSupplement) {
@@ -235,6 +426,10 @@ function renderMilestones(a) {
   } else if (arrivalOutlook) note.textContent = 'Estimates as of ' + time(a.checkpointAt) + '.';
   if (arrivalOutlook) {
     note.append(' · ', link('How the years and ranges are calculated', dashboard ? '#forecasts' : './dashboard.html#forecasts'));
+  }
+  if (!dashboard) {
+    milestoneInstrument(container, a);
+    return;
   }
   container.replaceChildren(
     ...editorialOrder.map((id) => {
@@ -249,7 +444,6 @@ function renderMilestones(a) {
         line.append(title, el('span', value, 'obs-value'),
           el('p', summaries[id] + ' · ' + m.coverage.assessed + '/' + m.coverage.total + ' criteria assessed'));
       }
-      if (!dashboard) return line;
       const box = el('article');
       box.id = 'assessment-' + id;
       box.append(line);
@@ -299,14 +493,7 @@ function renderMilestones(a) {
   );
 }
 function measuredLead(a) {
-  const tested = a.observations.filter(
-    (x) => x.topic === 'reliability' && Number.isFinite(x.value) && x.publishedOn,
-  );
-  const latest = tested
-    .map((o) => o.publishedOn)
-    .sort()
-    .at(-1);
-  const r = tested.filter((o) => o.publishedOn === latest).sort((a, b) => b.value - a.value)[0];
+  const r = latestReliability(a);
   const lead = byId('measured-lead');
   lead.hidden = !r;
   if (!r) return;
@@ -545,61 +732,75 @@ function renderArrivalForecasts(a) {
       list(model.limitations) : el('p', model.limitations)));
   }
 }
+const clockUnits = ['Years', 'Months', 'Days', 'Hours', 'Minutes', 'Seconds'];
 function updateClock() {
-  if (!clockForecast) return;
-  const target = byId('countdown-duration');
-  if (!target) return;
-  const f = clockForecast;
-  if (f === arrivalOutlook?.milestones.find(x => x.id === 'singularity')) {
-    if (f.status === 'Observed') target.textContent = 'Confirmed in ' + f.centralYear;
-    else if (!Number.isFinite(f.centralYear)) target.textContent = 'Beyond ' + f.horizonYear;
-    else {
-      const currentYear = selectedArchive ? Number(assessment.checkpointAt.slice(0, 4)) : new Date().getUTCFullYear();
-      target.textContent = f.centralYear < currentYear ? 'Forecast year passed · awaiting evidence'
-        : spanYears(f.centralYear - currentYear) + ' · reference year ' + f.centralYear;
-    }
+  if (!Number.isFinite(targetInstant)) return;
+  const instant = selectedArchive ? Date.parse(assessment.checkpointAt) : Date.now();
+  const parts = countdownParts(instant, targetInstant);
+  const timer = byId('countdown-duration');
+  if (!parts) {
+    timer.className = 'obs-clock-state';
+    timer.replaceChildren('Forecast reference date reached. Confirmation awaits evidence.');
+    targetInstant = null;
     return;
   }
-  if (f.status === 'Observed') target.textContent = 'First confirmed ' + date(f.centralDate);
-  else if (!f.centralDate) target.textContent = 'Not reliably estimable';
-  else {
-    const asOf = selectedArchive ? Date.parse(assessment.checkpointAt) : Date.now();
-    const remaining = Date.parse(f.centralDate) - asOf;
-    const months = Math.max(0, Math.round(remaining / (86400000 * 30.4375)));
-    target.textContent =
-      remaining <= 0
-        ? 'Forecast period reached · awaiting evidence'
-        : months < 1
-          ? 'Within the forecast month'
-          : 'About ' + months + ' month' + (months === 1 ? '' : 's') + ' · ' + period(f.centralDate);
-  }
+  const digits = timer.querySelectorAll('.obs-digit');
+  parts.forEach((value, index) => {
+    const text = index === 0 ? String(value) : String(value).padStart(2, '0');
+    if (digits[index].textContent !== text) digits[index].textContent = text;
+  });
 }
 function clock(a) {
   const scenario = arrivalOutlook?.milestones.find(x => x.id === 'singularity');
-  const f = a.forecasts.find((x) => x.id === 'singularity');
-  const useScenario = scenario?.status === 'Scenario estimate';
-  clockForecast = useScenario ? scenario : f;
-  const val = el('h3');
-  val.id = 'countdown-duration';
-  if (useScenario) {
-    const expl = el('p', 'The countdown follows the reference scenario for sustained AI-driven technological acceleration. It is rounded to years because the model projects a year. Later evidence or different assumptions can move it.');
-    const out = byId('clock-reading');
-    out.replaceChildren(val, expl);
-    if (scenario.status !== 'Observed') out.append(small('Faster and slower scenarios · ' + scenarioRange(scenario) + '.'));
-    if (scenario.change) out.append(small(scenario.change));
-    out.append(link('See the singularity scenarios and sources', dashboard ? '#arrival-singularity' : './dashboard.html#arrival-singularity'));
-    updateClock();
-    return;
+  const strict = a.forecasts.find(x => x.id === 'singularity');
+  const out = byId('clock-reading');
+  const timer = el('div', null, 'obs-clock-state');
+  timer.id = 'countdown-duration';
+  targetInstant = null;
+  const context = el('div', null, 'obs-clock-context');
+  const confirmed = strict?.status === 'Observed' || scenario?.status === 'Observed';
+  const yearBased = scenario?.status === 'Scenario estimate';
+  if (confirmed) {
+    timer.textContent = 'Confirmed ' + (strict?.centralDate ? date(strict.centralDate) : 'in ' + scenario.centralYear);
+    context.append(el('p', 'Independent evidence satisfies the Watch’s conditions for sustained AI-driven acceleration.'));
+  } else if (yearBased && !Number.isFinite(scenario.centralYear)) {
+    timer.textContent = 'Beyond ' + scenario.horizonYear;
+    context.append(el('p', 'The reference scenario puts this milestone outside its modeled time horizon.'));
+  } else if (yearBased || Number.isFinite(Date.parse(strict?.centralDate))) {
+    targetInstant = yearBased ? referenceInstant(scenario.centralYear) : Date.parse(strict.centralDate);
+    timer.className = 'obs-timeboard';
+    timer.setAttribute('role', 'timer');
+    timer.setAttribute('aria-label', 'Time until the forecast reference date');
+    timer.setAttribute('aria-live', 'off');
+    for (const unit of clockUnits) {
+      const part = el('span', null, 'obs-time-part');
+      const value = el('b', '00', 'obs-digit');
+      value.translate = false;
+      part.append(value, el('span', unit, 'obs-time-unit'));
+      timer.append(part);
+    }
+    const reference = el('div', null, 'obs-clock-reference');
+    if (yearBased) {
+      const rangeNote = details('Scenario range ' + scenarioRange(scenario),
+        el('p', 'The endpoints compare the faster and slower paths for sustained, AI-driven technological acceleration. Their spread shows how much the timing depends on the assumptions.'));
+      rangeNote.className = 'obs-clock-range';
+      if (scenario.beyondHorizonPathCount) rangeNote.append(el('p', 'In the stalled scenario, the milestone remains out of reach through ' + scenario.horizonYear + '.'));
+      reference.append(el('strong', String(scenario.centralYear)), ' reference year');
+      context.append(reference, rangeNote, el('p', 'July 1, ' + scenario.centralYear + ' at 00:00 UTC stands in for a year-only estimate that can change.'));
+    } else {
+      reference.append(el('strong', period(strict.centralDate)), ' forecast month');
+      context.append(reference, el('p', 'The model estimates a month. The clock uses ' + date(strict.centralDate) + ' at 00:00 UTC as its reference point.'));
+    }
+  } else {
+    timer.textContent = 'No dated estimate';
+    context.append(el('p', yearBased ? 'This forecast has no reference date.' : 'This edition has too little independently verified evidence to date the singularity.'));
   }
-  byId('clock-reading').replaceChildren(
-    val,
-    el(
-      'p',
-      'The destination follows verified evidence for sustained AI-led acceleration. A new checkpoint can move it earlier or later.',
-    ),
-    small(editionLabel(a) + ' · ' + time(a.checkpointAt)),
-    forecastBody(f),
-  );
+  if (selectedArchive) context.append(small('Archived reading · time held at ' + time(a.checkpointAt) + '.'));
+  const actions = el('nav', null, 'obs-hero-actions');
+  actions.setAttribute('aria-label', 'Explore the forecast');
+  actions.append(link('Compare AI systems', '#metric-charts'), link('Explore the calculation', '#calculations'));
+  context.append(actions);
+  out.replaceChildren(timer, context);
   updateClock();
 }
 function validation(a) {
@@ -810,7 +1011,7 @@ function methodology(a) {
     ),
     el(
       'p',
-      'The Launch test is the first official measurement, taken on demand. Regular assessments run every day at midnight, 9:30 a.m. and 4 p.m. Eastern. Delayed verification keeps the previous edition visible. Measurements, publication dates and retrieval times can differ. Archive records retain those distinctions.',
+      'The Launch test is the first official measurement, taken on demand. The schedule expanded on November 25 to four daily checks at midnight, 6 a.m., 9:30 a.m. and 4 p.m. Eastern. Delayed verification keeps the previous edition visible. Measurements, publication dates and retrieval times can differ. Archive records retain those distinctions.',
     ),
     small('Milestone method ' + a.methodologyVersion + ' · milestone forecast model ' + a.modelVersion +
       (a.indicatorForecastVersion ? ' · benchmark forecast model ' + a.indicatorForecastVersion : '') +
@@ -837,6 +1038,13 @@ function metadata() {
     baseText +
     time(assessment.checkpointAt) +
     (stale ? ' · Awaiting a newer validated assessment' : '');
+  if (!dashboard && !selectedArchive) {
+    const shortLabel = editionLabel(assessment) === 'Scheduled assessment' ? 'Updated' : editionLabel(assessment);
+    byId('edition').textContent = shortLabel + ' ' + briefTime.format(new Date(assessment.checkpointAt)) +
+      (stale ? ' · Awaiting a newer validated assessment' : '');
+    byId('next-check').textContent = 'Four checks daily · Next ' + briefTime.format(new Date(window.next));
+    return;
+  }
   byId('next-check').textContent =
     (selectedArchive ? 'Schedule at publication · ' : '') +
     'Previous scheduled slot · ' + time(window.previous) + ' · Next · ' + time(window.next);
@@ -898,6 +1106,9 @@ function paint(a) {
   metadata();
   renderMilestones(a);
   clock(a);
+  renderInvestment(byId('model-investment'), a, { archived: selectedArchive, detailed: dashboard });
+  renderMetricCharts(byId('metric-charts'), a, { detailed: dashboard, arrivalOutlook });
+  renderCalculations(byId('calculation-visual'), a, arrivalOutlook, { compact: !dashboard });
   measuredLead(a);
   indicatorPredictions(a);
   showChanges(a);
@@ -923,7 +1134,7 @@ function paint(a) {
     renderArrivalForecasts(a);
   } else renderBrief(a);
   if (selectedArchive) {
-    for (const anchor of document.querySelectorAll('.view-switch a, .obs-footer a, #assessment-list a, #arrival-note a, #clock-reading a, #indicator-forecasts a, #brief-evidence a, #observatory-field a')) {
+    for (const anchor of document.querySelectorAll('.view-switch a, .obs-footer a, #assessment-list a, #arrival-note a, #clock-reading a, #calculation-visual a, #metric-charts a, #indicator-forecasts a, #brief-evidence a, #observatory-field a')) {
       const u = new URL(anchor.href, base);
       if (u.origin !== base.origin || ![base.pathname, base.pathname + 'dashboard.html'].includes(u.pathname)) continue;
       u.searchParams.set('assessment', a.checkpointAt);
@@ -978,11 +1189,16 @@ refresh();
 window.setInterval(() => {
   if (!document.hidden) {
     metadata();
-    updateClock();
     refresh();
   }
 }, 60000);
+window.setInterval(() => {
+  if (!selectedArchive && !document.hidden) updateClock();
+}, 1000);
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) refresh();
+  if (!document.hidden) {
+    updateClock();
+    refresh();
+  }
 });
 window.addEventListener('hashchange', linkedSection);

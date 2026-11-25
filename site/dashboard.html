@@ -31,10 +31,13 @@
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
-  <link rel="stylesheet" href="./observatory.css">
-  <link rel="stylesheet" href="./observatory-field.css">
+  <link rel="stylesheet" href="./observatory.css?v=20261125-visuals">
+  <link rel="stylesheet" href="./observatory-field.css?v=20261125-visuals">
+  <link rel="stylesheet" href="./observatory-calculations.css">
+  <link rel="stylesheet" href="./observatory-charts.css">
+  <link rel="stylesheet" href="./observatory-investment.css">
   <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./observatory-ui.js"></script>
+  <script type="module" src="./observatory-ui.js?v=20261125-visuals"></script>
 </head>
 <body class="observatory" data-view="dashboard">
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -44,19 +47,22 @@
   </div></header>
   <main id="main" class="obs-wrap" tabindex="-1">
     <header class="obs-heading"><h1>Singularity Observatory dashboard</h1>
-      <p>Follow the evidence for each milestone and see how different assumptions change its estimated arrival.</p>
+      <p>Compare model performance, training resources and the assumptions behind each milestone forecast.</p>
     </header>
     <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
-    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#outlook">Benchmark predictions</a><a href="#forecasts">Milestone forecasts</a><a href="#history">Archive</a></nav>
+    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#calculations">Forecast calculations</a><a href="#metric-charts">Measured capabilities</a><a href="#model-investment">Training &amp; investment</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#outlook">Benchmark predictions</a><a href="#forecasts">Milestone scenarios</a><a href="#history">Archive</a></nav>
 
     <section id="milestone-progress" class="obs-panel"><h2>Progress and estimated arrival</h2><p id="arrival-intro" class="obs-sub"></p><p id="arrival-note" class="obs-small"></p><div id="assessment-list"></div></section>
+    <section id="calculations" class="obs-panel"><h2>Explore the milestone forecasts</h2><div id="calculation-visual"></div></section>
+    <section id="metric-charts" aria-label="Measured AI capabilities"></section>
+    <section id="model-investment" aria-label="Model costs and investment"></section>
     <section id="outlook" class="obs-panel"><h2>Measurements and predictions</h2><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div><div id="indicator-outcomes"></div></section>
     <section id="atlas" class="obs-panel obs-field"><h2>Milestone field</h2><div id="observatory-field"></div></section>
     <div class="obs-bottom-grid"><section id="watchdog" class="obs-panel"><h2>What changed</h2><div id="changes"></div></section><section id="oversight" class="obs-panel"><h2>Human oversight and control</h2><div id="oversight-reading"></div></section></div>
     <section id="signals" class="obs-panel"><h2>Evidence register</h2><p class="obs-sub">Look up a measurement, the system tested and the limits of the finding. Release announcements earn no capability credit.</p><div id="register"></div></section>
     <section id="trends" class="obs-panel"><h2>Measured trends</h2><p class="obs-sub">Compare monthly measurements with the predictions available in this edition.</p><div id="trend-chart"></div></section>
     <section id="leaders" class="obs-panel"><h2>Organizations and systems</h2><p class="obs-sub">Each result belongs to a particular system or study. A collection of best scores can span several different systems.</p><div id="org-list"></div></section>
-    <section id="forecasts" class="obs-panel"><h2>How the milestone forecasts are made</h2><div id="arrival-method"></div><div id="forecast-list"></div><details id="countdown" class="obs-clock"><summary>Reveal the singularity countdown</summary><div id="clock-reading"></div></details><details class="obs-detail"><summary>Forecast models and historical validation</summary><div id="validation"></div></details></section>
+    <section id="forecasts" class="obs-panel"><h2>Milestone scenarios and sources</h2><div id="arrival-method"></div><div id="forecast-list"></div><details id="countdown" class="obs-clock"><summary>Reveal the singularity countdown</summary><div id="clock-reading"></div></details><details class="obs-detail"><summary>Forecast models and historical validation</summary><div id="validation"></div></details></section>
     <section id="x-factors" class="obs-panel"><h2>Disruptions, breakthroughs and external conditions</h2><div id="risk-register"></div></section>
     <section id="history" class="obs-panel"><h2>Assessment archive</h2><p class="obs-sub">Open an edition to inspect the evidence, decisions and forecasts as they were published.</p><div id="archive"></div></section>
     <section id="methodology" class="obs-panel"><h2>How the observatory works</h2><div id="method"></div></section>

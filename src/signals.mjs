@@ -112,7 +112,7 @@ function numberOrNull(raw) {
   return typeof raw === "string" && raw.trim() && Number.isFinite(Number(raw)) ? Number(raw) : null;
 }
 
-function csvColumns(csv, names) {
+export function csvColumns(csv, names) {
   const [header, ...rows] = parseCsv(csv.replace(/^\uFEFF/, ""));
   const indexes = names.map(name => header.indexOf(name));
   if (indexes.includes(-1)) throw new Error("CSV data columns changed");

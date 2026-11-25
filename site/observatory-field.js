@@ -1,6 +1,7 @@
 import {deriveField, fieldAxes, pathwayKinds} from './observatory-field-model.js';
 import {editionLabel} from './checkpoint-schedule.js';
 import {createFieldRenderer} from './observatory-field-renderer.js';
+import {pathwayExplorer} from './observatory-field-pathways.js';
 export {deriveField};
 
 const mounted=new WeakMap();
@@ -66,6 +67,13 @@ export function mountField(root,{assessment,history=[],loadAssessment,compact=fa
   if(!assessment){root.append(el('p','The milestone field is waiting for a validated assessment.'));return;}
   const oldView=priorView.get(root);
   let data=assessment,field=fieldFrom(data),selection='current',renderer=null,timer,playing=false,request=0,closed=false;
+  let fallback;
+  if(compact){
+    const routes=pathwayExplorer(root,{compact:true,onSelect:id=>{selection=routes.update(field,id);}});
+    const requested=new URL(location.href).searchParams.get('field') ?? oldView?.selection;
+    selection=routes.update(field,requested);
+    return finish();
+  }
   const archive=new Map();
   for(const row of history){const timestamp=when(row);if(timestamp)archive.set(timestamp,row);}
   if(when(data))archive.set(when(data),data);
@@ -73,25 +81,21 @@ export function mountField(root,{assessment,history=[],loadAssessment,compact=fa
   const cache=new Map();if(when(data))cache.set(when(data),data);
   let index=records.findIndex(row=>when(row)===when(data));
   const intro=el('p','The four milestones have fixed reference positions. Distance in this conceptual field has no conversion to time or probability.','of-intro');
-  const stage=el('div',null,'of-stage'),unavailable=el('p','The 3D renderer is unavailable. The field can be explored using the controls and text below.','of-unavailable');
+  const stage=el('div',null,'of-stage'),unavailable=el('p','Explore the milestone connections in two dimensions. Select a line or use the field selector below.','of-unavailable');
   unavailable.hidden=true;stage.append(unavailable);root.append(intro,stage);
-  const link=el('a','Explore the field on the full dashboard');link.href='./dashboard.html#atlas';
   let viewer,picker,detail,compareText,archiveSelect,prev,next,play,compareBtn;
-  const paintGraphic=()=>renderer?.update(field,selection);
+  const paintGraphic=()=>{renderer?.update(field,selection);fallback?.update(field,selection);};
   function failed(){
     renderer?.destroy();renderer=null;
     unavailable.hidden=false;stage.classList.add('of-no-graphics');
+    fallback??=pathwayExplorer(stage,{onSelect:select});
+    fallback.update(field,selection);
     if(viewer)viewer.hidden=true;
   }
   renderer=createFieldRenderer(stage,{compact,select, onUnavailable:failed});
   if(!renderer)failed();
   if(renderer && oldView?.field.version===field.version && oldView.displayedAt!==when(data)){
     renderer.update(oldView.field,oldView.selection);
-  }
-  if(compact){
-    const brief=el('p',field.current.coordinates?'The white sphere shows the independently supported position.':'The white sphere is unplaced. The three dimensions lack comparable evidence for one system.','of-small');
-    root.append(brief,link);paintGraphic();
-    return finish();
   }
   viewer=el('div',null,'of-camera');viewer.setAttribute('role','group');viewer.setAttribute('aria-label','3D view controls');
   const cameraItems=[
@@ -149,7 +153,7 @@ export function mountField(root,{assessment,history=[],loadAssessment,compact=fa
   }
   return finish();
 
-  function select(id){if(compact)return;selection=id;picker.value=id;paintDetails();paintGraphic();}
+  function select(id){selection=id;picker.value=id;paintDetails();paintGraphic();}
   function finish(){
     const destroy=()=>{
       if(closed)return;

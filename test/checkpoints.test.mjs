@@ -7,13 +7,13 @@ import { checkpointForRun, checkpointWindow } from '../site/checkpoint-schedule.
 import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, nextRecord, readArchive } from '../scripts/checkpoint-archive.mjs';
 
 const iso = date => new Date(date).toISOString();
-const schedules = ['0 0 * * *','30 9 * * *','0 16 * * *'];
+const schedules = ['0 0 * * *','30 9 * * *','0 16 * * *','0 6 * * *'];
 const spring = '2026-03-08T13:30:00.000Z';
 const summer = '2026-07-04T13:30:00.000Z';
 const winter = '2026-11-25T14:30:00.000Z';
 const prior = '2026-11-25T05:00:00.000Z';
 
-test('exactly three daily slots cover NY weekends, holiday and both DST boundaries', () => {
+test('New York checkpoints retain the original calendar and add a fourth daily slot after the schedule change', () => {
   for (const [stamp, prev, next] of [
     ['2026-03-08T07:05Z','2026-03-08T05:00Z',spring],
     ['2026-03-08T03:00Z','2026-03-07T21:00Z','2026-03-08T05:00Z'],
@@ -22,16 +22,20 @@ test('exactly three daily slots cover NY weekends, holiday and both DST boundari
     ['2026-11-02T02:00Z','2026-11-01T21:00Z','2026-11-02T05:00Z'],
     [summer,summer,'2026-07-04T20:00Z'],
     ['2026-11-25T11:00Z',prior,winter],
+    ['2026-11-26T10:59Z','2026-11-26T05:00Z','2026-11-26T11:00Z'],
+    ['2026-11-26T11:00Z','2026-11-26T11:00Z','2026-11-26T14:30Z'],
+    ['2027-03-14T09:05Z','2027-03-14T05:00Z','2027-03-14T10:00Z'],
+    ['2027-11-07T07:05Z','2027-11-07T04:00Z','2027-11-07T11:00Z'],
   ]) assert.deepEqual(checkpointWindow(stamp), {previous:iso(prev),next:iso(next)});
   const slots = [];
-  let time = '2026-03-06T05:00Z';
-  for(let i=0;i<12;i++) { const window=checkpointWindow(time);slots.push(window.previous);time=window.next; }
-  assert.equal(new Set(slots).size,12);
-  assert.equal(slots.at(-1),'2026-03-09T20:00:00.000Z');
+  let time = '2027-03-12T05:00Z';
+  for(let i=0;i<16;i++) { const window=checkpointWindow(time);slots.push(window.previous);time=window.next; }
+  assert.equal(new Set(slots).size,16);
+  assert.equal(slots.at(-1),'2027-03-15T20:00:00.000Z');
   const workflow = awaitFile => awaitFile.match(/- cron: '(.*?)'/g).map(row=>row.slice(9,-1)).sort();
   return readFile(new URL('../.github/workflows/pages.yml',import.meta.url),'utf8').then(source=>{
     assert.deepEqual(workflow(source),[...schedules].sort());
-    assert.equal(source.match(/timezone: 'America\/New_York'/g).length,3);
+    assert.equal(source.match(/timezone: 'America\/New_York'/g).length,4);
   });
 });
 
@@ -41,6 +45,9 @@ test('only the original scheduled event can consume its unexpired slot, includin
   for(const change of [{event:'push'},{event:'workflow_dispatch'},{createdAt:null},{cron:schedules[0]},
     {now:'2026-11-25T21:02Z'},{now:'2026-11-25T13:00Z'}]) assert.equal(checkpointForRun({...options,...change}),null);
   assert.equal(checkpointForRun({...options,cron:schedules[0],createdAt:'2026-11-25T05:10Z',now:'2026-11-25T12:10Z'}),prior);
+  assert.equal(checkpointForRun({...options,cron:schedules[3],createdAt:'2026-11-25T11:05Z',now:'2026-11-25T11:15Z'}),null);
+  assert.equal(checkpointForRun({...options,cron:schedules[3],createdAt:'2026-11-26T11:05Z',now:'2026-11-26T11:15Z'}),iso('2026-11-26T11:00Z'));
+  assert.equal(checkpointForRun({...options,cron:schedules[0],createdAt:'2026-11-26T05:05Z',now:'2026-11-26T11:15Z'}),null);
 });
 
 async function temp(t) {

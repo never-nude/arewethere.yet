@@ -31,10 +31,13 @@
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
-  <link rel="stylesheet" href="./observatory.css">
-  <link rel="stylesheet" href="./observatory-field.css">
+  <link rel="stylesheet" href="./observatory.css?v=20261125-visuals">
+  <link rel="stylesheet" href="./observatory-field.css?v=20261125-visuals">
+  <link rel="stylesheet" href="./observatory-charts.css">
+  <link rel="stylesheet" href="./observatory-investment.css">
+  <link rel="stylesheet" href="./observatory-calculations.css">
   <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./observatory-ui.js"></script>
+  <script type="module" src="./observatory-ui.js?v=20261125-visuals"></script>
 </head>
 <body class="observatory" data-view="brief">
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -43,19 +46,34 @@
     <div class="page-tools"><nav class="view-switch" aria-label="Site views"><a href="./" aria-current="page">At a glance</a><a href="./dashboard.html">Full dashboard</a></nav><site-language-menu></site-language-menu></div>
   </div></header>
   <main id="main" class="obs-wrap" tabindex="-1">
-    <header class="obs-heading"><h1>The Singularity Observatory</h1>
-      <p>How far AI has come, when four milestones might arrive, and what could move them closer or farther away.</p>
-    </header>
-    <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
+    <section id="countdown" class="obs-hero" aria-labelledby="projection-title">
+      <h1 id="projection-title">Projected singularity:</h1>
+      <div id="clock-reading"><p class="obs-clock-state">Loading the forecast…</p></div>
+      <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
+    </section>
 
-    <section id="milestone-progress" class="obs-panel"><h2>How far away are the four milestones?</h2><p id="arrival-intro" class="obs-sub"></p><p id="arrival-note" class="obs-small"></p><div id="assessment-list"></div><details id="countdown" class="obs-clock"><summary>Reveal the singularity countdown</summary><div id="clock-reading"></div></details></section>
-    <div class="obs-brief-grid">
-      <section id="outlook" class="obs-panel"><h2>What the tests show</h2><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div></section>
-      <section id="atlas" class="obs-panel obs-field"><h2>Milestone field</h2><div id="observatory-field"></div></section>
-    </div>
-    <div class="obs-bottom-grid"><section id="watchdog" class="obs-panel"><h2>What changed</h2><div id="changes"></div></section>
-      <section id="signals" class="obs-panel"><h2>Evidence in brief</h2><div id="brief-evidence"></div></section>
-    </div>
+    <section id="milestone-progress" class="obs-panel obs-milestones-brief" aria-labelledby="milestone-heading">
+      <h2 id="milestone-heading">Milestone progress</h2>
+      <p id="arrival-intro" class="obs-sub"></p>
+      <div id="assessment-list"></div>
+      <details class="obs-detail obs-reading-note">
+        <summary>How to read the evidence and the years</summary>
+        <p>Each marker stands for one condition the Watch requires. Independent findings for the same system or its successors can confirm or rule out a condition. Once every condition has a finding, the evidence score is the share met, expressed out of 100. An unresolved condition keeps the total open.</p>
+        <p>Superintelligence includes the abilities required for AGI. A specialist system could improve its successor before it reaches AGI. For a singularity, that feedback would also have to speed up technological progress more broadly.</p>
+        <p id="arrival-note" class="obs-small"></p>
+      </details>
+    </section>
+
+    <section id="metric-charts" aria-label="Measured AI capabilities"></section>
+    <section id="model-investment" aria-label="Model costs and investment"></section>
+    <section id="calculations" class="obs-panel"><h2>Explore the milestone forecasts</h2><div id="calculation-visual"></div></section>
+    <section id="atlas" class="obs-panel obs-field"><h2>How the milestones connect</h2><div id="observatory-field"></div></section>
+    <section class="obs-panel obs-edition-extras">
+      <h2>More from this edition</h2>
+      <details id="watchdog" class="obs-detail"><summary>What changed since the last check</summary><div id="changes"></div></details>
+      <details id="outlook" class="obs-detail"><summary>Upcoming benchmark predictions</summary><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div></details>
+      <details id="signals" class="obs-detail"><summary>Additional evidence and sources</summary><div id="brief-evidence"></div></details>
+    </section>
     <noscript><p>JavaScript displays the measurements and interactive field. <a href="./data/observatory.json">Read the published assessment as JSON</a>.</p></noscript>
   </main>
   <footer class="obs-wrap obs-footer"><a href="./dashboard.html">Explore the full dashboard</a><a href="./dashboard.html#methodology">Methodology</a><a href="./data/observatory.json">Public data</a></footer>

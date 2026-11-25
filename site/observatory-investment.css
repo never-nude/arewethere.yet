@@ -1,0 +1,37 @@
+.iv-panel { min-width:0; }
+.iv-panel h2 { margin:0; }
+.iv-controls { display:flex; flex-wrap:wrap; gap:6px; margin-block:14px; }
+.iv-controls button, .iv-funding-row, .iv-inspector select { font:inherit; border:1px solid #54465f; border-radius:7px; color:var(--ink); background:#211b2d; }
+.iv-controls button { min-height:40px; padding:7px 13px; font-weight:550; }
+.iv-controls button[aria-pressed=true], .iv-funding-row[aria-pressed=true] { border-color:#82ddca; color:#a1eddc; background:#202d30; }
+.iv-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:clamp(12px,3vw,38px); align-items:center; }
+.iv-figure { margin:0; min-width:0; }
+.iv-figure figcaption, .iv-key, .iv-inspector label, .iv-caption, .iv-model-meta, .iv-details p, .iv-reading small { color:var(--dim); font-size:14px; line-height:1.5; }
+.iv-figure svg { width:100%; height:auto; display:block; max-height:245px; }
+.iv-figure svg text { font:10.5px var(--mono); fill:var(--dim); }
+.iv-line { stroke:var(--line); stroke-width:1; }
+.iv-open { --iv-color:#79e2cf; } .iv-closed { --iv-color:#bdabff; } .iv-other { --iv-color:#f2bc83; }
+.iv-point {cursor:pointer;} .iv-dot { fill:var(--iv-color); stroke:#1c1826; stroke-width:1; }
+.iv-picked .iv-dot { stroke:#fff; stroke-width:2; r:6; }
+.iv-hit { fill:transparent; }
+.iv-key { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+.iv-key span::before { content:''; display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--iv-color); margin-inline-end:5px; }
+.iv-inspector { padding:15px; border-inline-start:2px solid #655478; background:#211c2c; border-radius:0 8px 8px 0; min-width:0; }
+.iv-inspector label { display:grid; gap:5px; }
+.iv-inspector select { width:100%; padding:8px; min-height:42px; }
+.iv-reading { display:grid; gap:4px; margin-top:12px; }
+.iv-value { font:500 clamp(21px,2.2vw,31px)/1.25 var(--mono); color:var(--teal); }
+.iv-content .iv-caption { margin-top:10px; }
+.iv-details { margin-block:10px 0; }
+.iv-details a, .iv-readout a { text-decoration:underline; color:var(--violet); text-underline-offset:.17em; }
+.iv-funding-rows { display:grid; gap:5px; margin-block:10px; }
+.iv-funding-row { width:100%; display:grid;grid-template-columns:minmax(6.2em,.6fr) minmax(28px,3fr) 6ch;gap:10px;align-items:center; min-height:42px;padding:5px 12px;text-align:start; }
+.iv-funding-row strong { font:500 15px var(--mono); }
+.iv-funding-track { height:6px;background:#3a3447; } .iv-funding-bar { display:block; min-width:1px;height:100%;background:#8ddac9; }
+.iv-readout h4,.iv-readout p { margin:4px 0; }
+@media(max-width:650px) {
+ .iv-layout {grid-template-columns:1fr;gap:12px;} .iv-controls {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+ .iv-controls button {min-height:44px;padding:6px;} .iv-inspector {padding:10px 13px;} .iv-figure svg text {font-size:13px;}
+}
+
+.iv-see-funding { justify-self:start; text-align:start; color:var(--violet); background:transparent; border:0; text-decoration:underline; text-underline-offset:.2em; padding:5px 0; font-size:14px; }

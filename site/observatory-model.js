@@ -132,6 +132,7 @@ export function buildObservatoryAssessment(
     milestones,
     forecasts,
     observations,
+    ...(payload.modelResources ? {modelResources: payload.modelResources} : {}),
     ...indicators,
     organizations: assessOrganizations(observations, previous),
     oversight: assessOversight(observations),
