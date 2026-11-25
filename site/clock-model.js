@@ -246,11 +246,13 @@ const safeLink = url => { try { return new URL(url).protocol === 'https:' ? url 
 const effects = {
   'service-issues-resolved': impact => Number.isFinite(impact.value) && impact.value > 0 && {
     say: ['Support agents with an AI helper resolved ', whole.format(impact.value) + '% more', ' customer issues an hour.'],
+    unit: 'resolved in the same hours',
     rows: [{label: 'Without AI', value: 100, text: '100 issues'},
       {label: 'With AI', value: 100 + impact.value, text: whole.format(100 + impact.value) + ' issues'}],
   },
   'developer-completion-time': impact => Number.isFinite(impact.value) && impact.value > 0 && {
     say: ['Experienced programmers took ', whole.format(impact.value) + '% longer', ' to finish tasks with early-2025 AI tools.'],
+    unit: 'to finish the same work',
     rows: [{label: 'Without AI', value: 100, text: '100 minutes'},
       {label: 'With AI', value: 100 + impact.value, text: whole.format(100 + impact.value) + ' minutes'}],
   },
@@ -261,6 +263,7 @@ const effects = {
     return {
       say: ['At one AI lab, AI now finishes ', whole.format(impact.toValue) + ' in 100', ' research tasks on its own, up from ' +
         whole.format(impact.fromValue) + ' ' + count(months) + (months === 1 ? ' month' : ' months') + ' earlier.'],
+      unit: 'research tasks finished without help',
       rows: [{label: monthLong.format(from), value: impact.fromValue, text: whole.format(impact.fromValue) + ' in 100'},
         {label: monthLong.format(to), value: impact.toValue, text: whole.format(impact.toValue) + ' in 100'}],
     };
@@ -275,12 +278,127 @@ function buildWork(outlook) {
     if (!view) return [];
     const peak = Math.max(...view.rows.map(row => row.value));
     return [{
-      id, say: view.say, rows: view.rows.map(row => ({...row, share: row.value / peak})),
+      id, say: view.say, unit: view.unit, rows: view.rows.map(row => ({...row, share: row.value / peak})),
       source: sourceName(impact.source), url: safeLink(impact.sourceUrl),
       year: /^\d{4}/.test(impact.publishedOn ?? '') ? impact.publishedOn.slice(0, 4) : null,
       scope: impact.scope ?? null,
     }];
   });
+}
+
+// ---------------------------------------------------------------------------
+// What if? A thought experiment, kept apart from the published forecast.
+// Rule one: computing power grows only as fast as its scarcest ingredient.
+// Rule two: progress blends computing power with better methods. Ho and
+// colleagues attribute 60–95% of language-model gains to scale and the rest to
+// methods. Three quarters is the rounded midpoint. Whitfill, Snodin and Becker
+// find job length has grown in step with computing power.
+export const computeShare = 0.75;
+const growth = Object.freeze([
+  {value: 0, label: 'Stops'}, {value: 0.5, label: 'Half pace'}, {value: 1, label: 'Today’s pace'},
+  {value: 1.5, label: 'Faster'}, {value: 2, label: 'Twice as fast'},
+]);
+export const dials = Object.freeze([
+  {id: 'build', part: 'compute', name: 'Data centres', about: 'The buildings that hold the computers. A big one takes about two years to put up.', stops: growth, start: 2},
+  {id: 'chips', part: 'compute', name: 'Chips and minerals', about: 'Rare minerals such as gallium and germanium go into the chips. Copper goes into the wiring.', stops: growth, start: 2},
+  {id: 'money', part: 'compute', name: 'Money', about: 'Each gigawatt-size site costs tens of billions of dollars.', stops: growth, start: 2},
+  {id: 'power', part: 'compute', name: 'Electricity', about: 'A large site draws as much power as a city.', stops: growth, start: 2},
+  {id: 'ideas', part: 'methods', name: 'New ideas', about: 'Smarter methods get more out of the same computers.', stops: growth, start: 2},
+  {id: 'self', part: 'methods', name: 'AI doing AI research', about: 'AI helping to design its own successors.', start: 0,
+    stops: Object.freeze([{value: 1, label: 'As much as now'}, {value: 2, label: 'Twice as much'}, {value: 4, label: 'Four times as much'}])},
+  {id: 'pause', part: 'rules', name: 'A pause on bigger AI', about: 'Governments or labs agree to stop scaling up for a while.', start: 0,
+    stops: Object.freeze([{value: 0, label: 'None'}, {value: 1, label: '1 year'}, {value: 2, label: '2 years'}, {value: 5, label: '5 years'}])},
+]);
+
+// Each question moves the dials it names and leaves the rest on today's course.
+export const whatIfQuestions = Object.freeze([
+  {id: 'fewer-minerals', ask: 'fewer rare minerals are mined?', set: {chips: 1}},
+  {id: 'more-minerals', ask: 'more rare minerals are mined?', set: {chips: 4}},
+  {id: 'no-build', ask: 'data centres stop going up?', set: {build: 0}},
+  {id: 'double-build', ask: 'data centres go up twice as fast?', set: {build: 4, chips: 4, money: 4, power: 4}},
+  {id: 'grid', ask: 'the power grid can’t keep up?', set: {power: 1}},
+  {id: 'bust', ask: 'the money dries up?', set: {money: 0}},
+  {id: 'self', ask: 'AI starts doing its own research?', set: {self: 2}},
+  {id: 'dry', ask: 'the new ideas run out?', set: {ideas: 0}},
+  {id: 'pause', ask: 'governments pause it for two years?', set: {pause: 2}},
+  {id: 'all', ask: 'everything speeds up at once?', set: {build: 4, chips: 4, money: 4, power: 4, ideas: 4, self: 2}},
+]);
+
+export const whatIfStart = () => Object.fromEntries(dials.map(dial => [dial.id, dial.start]));
+
+export function readWhatIf(state = {}) {
+  const index = dial => Number.isInteger(state[dial.id]) ? Math.min(dial.stops.length - 1, Math.max(0, state[dial.id])) : dial.start;
+  const at = Object.fromEntries(dials.map(dial => [dial.id, dial.stops[index(dial)].value]));
+  const parts = dials.filter(dial => dial.part === 'compute');
+  const compute = Math.min(...parts.map(dial => at[dial.id]));
+  const best = Math.max(...parts.map(dial => at[dial.id]));
+  const methods = at.ideas * at.self;
+  return {
+    compute, methods, pauseYears: at.pause,
+    speed: computeShare * compute + (1 - computeShare) * methods,
+    // Named only when one ingredient really is holding the others back.
+    limitedBy: compute < best ? parts.filter(dial => at[dial.id] === compute).map(dial => dial.id) : [],
+    changed: dials.some(dial => index(dial) !== dial.start),
+  };
+}
+
+// Time still to go stretches or shrinks with the speed, then the pause is added.
+export function whatIfTime(time, now, reading) {
+  if (!Number.isFinite(time) || !(reading.speed > 0)) return null;
+  return now + (time - now) / reading.speed + reading.pauseYears * yearMs;
+}
+
+// A forecast year uses July 1 as its reference, as the watch's own clock does.
+export function whatIfYear(year, now, reading) {
+  if (!Number.isInteger(year)) return null;
+  const time = whatIfTime(Date.UTC(year, 6, 1), now, reading);
+  return time === null ? null : new Date(time).getUTCFullYear();
+}
+
+const list = names => names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names.at(-1);
+const multiple = value => value === 0.5 ? 'half' : value === 1.5 ? 'one and a half times' : value === 2 ? 'twice' : tenth.format(value) + ' times';
+
+export function whatIfSentences(reading) {
+  const lines = [], held = reading.limitedBy.map(id => dials.find(dial => dial.id === id).name.toLowerCase());
+  const because = held.length ? ', held back by ' + list(held) : '';
+  if (reading.compute === 0) lines.push('Computing power stops growing' + because + '.');
+  else if (reading.compute === 1) { if (held.length) lines.push('Computing power still grows at today’s pace' + because + '.'); }
+  else lines.push('Computing power grows ' + (reading.compute === 0.5 ? 'at half today’s pace' : multiple(reading.compute) + ' as fast as today') + because + '.');
+  if (reading.methods === 0) lines.push('No new methods arrive.');
+  else if (reading.methods !== 1) lines.push('Better methods arrive at ' + multiple(reading.methods) + ' today’s rate.');
+  if (!(reading.speed > 0)) lines.push('Progress stops. On this road there is no arrival.');
+  else if (reading.speed === 1) lines.push(reading.changed && !reading.pauseYears ? 'Overall the speed is unchanged.' : reading.changed ? 'The speed is unchanged.' : 'This is today’s course.');
+  else lines.push('Overall, progress runs at ' + whole.format(reading.speed * 100) + '% of today’s speed.');
+  if (reading.pauseYears && reading.speed > 0) lines.push('The pause pushes every date back by ' + (reading.pauseYears === 1 ? 'a year' : count(reading.pauseYears) + ' years') + '.');
+  return lines;
+}
+
+// How far a what-if date has moved from the published one, in words.
+export function shiftPhrase(base, moved) {
+  if (moved === null) return 'never, on this road';
+  const months = Math.round((moved - base) / (monthDays * dayMs)), size = Math.abs(months);
+  if (size < 1) return 'no change';
+  const span = size < 18 ? size + (size === 1 ? ' month' : ' months') : whole.format(size / 12) + ' years';
+  return span + (months > 0 ? ' later' : ' sooner');
+}
+
+// Everything the what-if panel shows, from the published view and the dial positions.
+export function whatIfView(view, state, now) {
+  const reading = readWhatIf(state), ladder = view.ladder;
+  const rung = ladder?.stops.find(stop => stop.status !== 'reached' && stop.when > now && !stop.due) ?? null;
+  const arrival = view.arrival?.reference ?? null;
+  const moved = rung ? whatIfTime(rung.when, now, reading) : null;
+  const year = arrival === null ? null : whatIfYear(arrival, now, reading);
+  return {
+    reading, sentences: whatIfSentences(reading),
+    doublingDays: view.pace?.doublingDays && reading.speed > 0 ? Math.round(view.pace.doublingDays / reading.speed) : null,
+    next: rung && {name: rung.name, base: rung.when, when: moved, shift: shiftPhrase(rung.when, moved)},
+    arrival: arrival !== null ? {
+      base: arrival, year, beyond: year !== null && year > view.horizonYear,
+      shift: year === null ? 'never, on this road' : year === arrival ? 'no change'
+        : Math.abs(year - arrival) + (Math.abs(year - arrival) === 1 ? ' year ' : ' years ') + (year > arrival ? 'later' : 'sooner'),
+    } : null,
+  };
 }
 
 export function buildClock(feed, now = Date.now()) {

@@ -70,6 +70,46 @@
       </div>
     </section>
 
+    <section class="band whatif" id="whatif" aria-labelledby="whatif-q" hidden>
+      <h2 id="whatif-q">What could speed us up or slow us down?</h2>
+      <p class="answer">Turn the dials and see.</p>
+      <div class="console">
+        <div class="console-out">
+          <p class="console-tag">A what-if, not the forecast</p>
+          <div class="gauge" id="gauge"></div>
+          <div class="readout">
+            <p class="speed"><b id="whatif-speed">100%</b> <span>of today’s speed</span></p>
+            <dl class="dates">
+              <div data-stop="singularity"><dt>Arrival, on experts’ middle guess</dt><dd><b id="whatif-year"></b> <span id="whatif-year-shift"></span></dd></div>
+              <div id="whatif-next-box"><dt id="whatif-next-name">Next stop</dt><dd><b id="whatif-next"></b> <span id="whatif-next-shift"></span></dd></div>
+            </dl>
+          </div>
+          <div class="roads" aria-hidden="true">
+            <div class="road-box" data-stop="singularity">
+              <p class="road-name">The road to arrival</p>
+              <div class="road" id="road-arrival"><i class="road-base"></i><i class="road-pin"></i></div>
+              <p class="road-ends"><span>Now</span><span id="road-arrival-end"></span></p>
+            </div>
+            <div class="road-box">
+              <p class="road-name">The road to the next stop</p>
+              <div class="road" id="road-next"><i class="road-base"></i><i class="road-pin"></i></div>
+              <p class="road-ends"><span>Now</span><span id="road-next-end"></span></p>
+            </div>
+          </div>
+          <p class="whatif-why" id="whatif-why" role="status"></p>
+        </div>
+        <div class="console-in">
+          <div class="asks-head">
+            <p class="asks-title" id="asks-title">What if…</p>
+            <button type="button" class="reset" id="whatif-reset">Back to today’s course</button>
+          </div>
+          <div class="asks" id="asks" role="group" aria-labelledby="asks-title"></div>
+          <div class="dials" id="dials"></div>
+        </div>
+      </div>
+      <p class="fine">A thought experiment, not part of the forecast. It assumes computing power grows only as fast as its scarcest ingredient, that about three quarters of progress comes from computing power and a quarter from better methods, and that the time left stretches or shrinks with the speed. The split follows <a href="https://epoch.ai/blog/algorithmic-progress-in-language-models">Epoch AI’s estimate</a>. The link between computing power and job length follows <a href="https://arxiv.org/abs/2511.19492">Whitfill, Snodin and Becker</a>.</p>
+    </section>
+
     <section class="band pace" id="pace" aria-labelledby="pace-q" hidden>
       <h2 id="pace-q">How fast are we going?</h2>
       <p class="answer" id="pace-answer"></p>

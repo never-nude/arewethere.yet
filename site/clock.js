@@ -1,7 +1,10 @@
 // The visual front page at /clock. It reads the same published feed as the rest
 // of the site, redraws after each scheduled check and once an hour in between.
-import {approxWhen, buildClock, dayMonthYear, plainHours, rangeWhen, yearsAway} from './clock-model.js';
+import {
+  approxWhen, buildClock, dayMonthYear, dials, plainHours, rangeWhen, whatIfQuestions, whatIfStart, whatIfView, yearsAway,
+} from './clock-model.js';
 import {drawLadder, ladderRows} from './clock-charts.js';
+import {dialIcon, drawGauge, drawSquares} from './clock-visuals.js';
 import {checkTimeZone, checkpointWindow} from './checkpoint-schedule.js';
 
 const feedUrl = './data/observatory.json';
@@ -26,6 +29,7 @@ const numberWords = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 
 let view = null, chart = null, tip = null, current = null;
 let firstDraw = true, drawnWidth = 0, loadedAt = 0, timer = 0;
+let turned = whatIfStart(), asked = null, gauge = null;
 
 function renderHero() {
   byId('reply').textContent = view.arrived ? 'We are.' : 'Not yet.';
@@ -150,6 +154,7 @@ function renderArrival() {
     : {kind: 'experts', year: Infinity, text: 'After ' + view.horizonYear, how: 'on experts’ survey answers'});
   byId('eta').replaceChildren(...answers.sort((a, b) => a.year - b.year).map(answer => {
     const line = el('li'), pin = el('span', 'key-pin is-' + answer.kind), how = el('span', 'how');
+    line.dataset.stop = stop.id;
     pin.setAttribute('aria-hidden', 'true');
     // The countdown, in the only unit a forecast this loose can honestly carry.
     const away = yearsAway(answer.year, view.nowYear);
@@ -160,6 +165,101 @@ function renderArrival() {
   }));
   box.hidden = false;
   renderStamp();
+}
+
+// The what-if panel. Its arithmetic lives in clock-model.js. This only moves
+// the dials and reports what they add up to.
+function wireWhatIf() {
+  byId('asks').replaceChildren(...whatIfQuestions.map(question => {
+    const button = el('button', 'ask', question.ask);
+    button.type = 'button';
+    button.dataset.ask = question.id;
+    return button;
+  }));
+  byId('asks').addEventListener('click', event => {
+    const question = whatIfQuestions.find(row => row.id === event.target.closest('[data-ask]')?.dataset.ask);
+    if (!question) return;
+    turned = {...whatIfStart(), ...question.set};
+    asked = question.id;
+    renderWhatIf();
+  });
+  byId('dials').replaceChildren(...dials.map(dial => {
+    const row = el('div', 'dial'), name = el('label', 'dial-name'), value = el('output', 'dial-value');
+    const input = el('input'), ticks = el('span', 'dial-ticks'), about = el('p', 'dial-about', dial.about);
+    row.dataset.dial = dial.id;
+    name.htmlFor = 'dial-' + dial.id;
+    name.append(dialIcon(dial.id), el('span', '', dial.name));
+    value.htmlFor = input.id = 'dial-' + dial.id;
+    about.id = 'dial-' + dial.id + '-about';
+    Object.assign(input, {type: 'range', min: 0, max: dial.stops.length - 1, step: 1, value: dial.start});
+    input.setAttribute('aria-describedby', about.id);
+    ticks.setAttribute('aria-hidden', 'true');
+    ticks.append(...dial.stops.map((stop, index) => el('i', index === dial.start ? 'is-start' : '')));
+    row.append(name, value, input, ticks, about);
+    return row;
+  }));
+  byId('dials').addEventListener('input', event => {
+    const id = event.target.closest('.dial')?.dataset.dial;
+    if (!id) return;
+    turned = {...turned, [id]: Number(event.target.value)};
+    asked = null;
+    renderWhatIf();
+  });
+  byId('whatif-reset').addEventListener('click', () => {
+    turned = whatIfStart();
+    asked = null;
+    renderWhatIf();
+  });
+  gauge = drawGauge(byId('gauge'));
+}
+
+// A marker on a short road from now to a far year. The hollow one stays on the
+// published date and the solid one follows the dials.
+function placeRoad(id, from, to, base, moved) {
+  const road = byId(id), share = time => Math.min(1, Math.max(0, (time - from) / (to - from)));
+  road.style.setProperty('--base', share(base).toFixed(4));
+  road.style.setProperty('--at', (moved === null ? 1 : share(moved)).toFixed(4));
+  road.dataset.off = String(moved === null || moved > to);
+}
+
+function renderWhatIf() {
+  const box = byId('whatif');
+  if (!view?.arrival || view.arrived || view.arrival.reference === null || !view.ladder?.trend) { box.hidden = true; return; }
+  const now = Date.now(), out = whatIfView(view, turned, now), speed = out.reading.speed;
+  for (const dial of dials) {
+    const row = box.querySelector('[data-dial="' + dial.id + '"]'), input = row.querySelector('input'), stop = dial.stops[turned[dial.id]];
+    input.value = turned[dial.id];
+    input.setAttribute('aria-valuetext', stop.label);
+    row.querySelector('output').textContent = stop.label;
+    row.style.setProperty('--fill', (turned[dial.id] / (dial.stops.length - 1) * 100).toFixed(1) + '%');
+    row.dataset.held = String(out.reading.limitedBy.includes(dial.id));
+    row.dataset.moved = String(turned[dial.id] !== dial.start);
+  }
+  for (const button of byId('asks').children) button.setAttribute('aria-pressed', String(button.dataset.ask === asked));
+  gauge.set(speed);
+  byId('whatif-speed').textContent = Math.round(speed * 100) + '%';
+
+  const yearStart = Date.UTC(view.nowYear, 0, 1), horizon = Date.UTC(view.horizonYear, 0, 1);
+  const arrival = out.arrival, midYear = year => Date.UTC(year, 6, 1);
+  byId('whatif-year').textContent = arrival.year === null ? 'Never' : arrival.beyond ? 'After ' + view.horizonYear : String(arrival.year);
+  byId('whatif-year-shift').textContent = arrival.beyond ? 'not this century' : arrival.shift;
+  placeRoad('road-arrival', yearStart, horizon, midYear(arrival.base), arrival.year === null ? null : midYear(arrival.year));
+
+  const next = out.next, nextBox = byId('whatif-next-box');
+  nextBox.hidden = !next;
+  if (next) {
+    const reach = now + 6 * 365.25 * 86400000;
+    byId('whatif-next-name').textContent = 'Next stop, ' + next.name.toLowerCase();
+    byId('whatif-next').textContent = next.when === null ? 'Never' : approxWhen(next.when, now);
+    byId('whatif-next-shift').textContent = next.shift;
+    placeRoad('road-next', now, reach, next.base, next.when);
+    byId('road-next-end').textContent = String(new Date(reach).getUTCFullYear());
+  }
+  byId('road-arrival-end').textContent = String(view.horizonYear);
+  byId('whatif-why').textContent = out.sentences.join(' ');
+  byId('whatif-reset').disabled = !out.reading.changed;
+  box.dataset.state = !out.reading.changed ? 'today' : speed > 1 ? 'faster' : speed < 1 ? 'slower' : 'same';
+  box.hidden = false;
 }
 
 function scaledBar(share) {
@@ -194,6 +294,7 @@ function renderStops() {
 
   const rows = stops.map(stop => {
     const row = el('div', 'stop'), name = el('div', 'stop-name'), track = el('div', 'stop-track');
+    row.dataset.stop = stop.id;
     name.append(el('b', '', stop.name));
     if (stop.term) name.append(el('span', '', stop.term));
     const said = [];
@@ -259,14 +360,26 @@ function renderWork() {
   byId('effects').replaceChildren(...view.work.map(effect => {
     const tile = el('article', 'effect'), say = el('p', 'effect-say'), pair = el('div', 'pair');
     say.append(effect.say[0], el('b', '', effect.say[1]), effect.say[2]);
-    pair.setAttribute('role', 'img');
-    pair.setAttribute('aria-label', effect.rows.map(row => row.label + ': ' + row.text).join('; ') + '.');
+    // One square for each unit, and a switch between the two readings.
+    const [before, after] = effect.rows, picture = el('div'), reading = el('p', 'pair-reading');
+    const squares = drawSquares(picture, {before, after, unit: effect.unit});
+    const flip = el('div', 'flip');
+    flip.setAttribute('role', 'group');
+    flip.setAttribute('aria-label', 'Show');
+    const show = row => {
+      squares.show(row);
+      reading.replaceChildren(el('b', '', row.text), ' ' + effect.unit);
+      for (const button of flip.children) button.setAttribute('aria-pressed', String(button.dataset.row === row.label));
+    };
     for (const row of effect.rows) {
-      const line = el('div', 'pair-row'), track = el('span', 'track');
-      track.append(scaledBar(row.share), el('span', 'val', row.text));
-      line.append(el('span', 'pair-label', row.label), track);
-      pair.append(line);
+      const button = el('button', '', row.label);
+      button.type = 'button';
+      button.dataset.row = row.label;
+      button.addEventListener('click', () => show(row));
+      flip.append(button);
     }
+    pair.append(flip, picture, reading);
+    show(after);
     const source = el('p', 'effect-source'), credit = effect.source + (effect.year ? ', ' + effect.year : '');
     if (effect.url) {
       const link = el('a', '', credit);
@@ -288,6 +401,7 @@ function render() {
   renderHero();
   renderLadder();
   renderArrival();
+  renderWhatIf();
   renderPace();
   renderStops();
   renderWork();
@@ -327,6 +441,7 @@ async function load() {
 }
 
 wireLadder();
+wireWhatIf();
 load();
 setInterval(renderStamp, 30000);
 document.addEventListener('visibilitychange', () => {
