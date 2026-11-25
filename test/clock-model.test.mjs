@@ -3,8 +3,8 @@ import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import {ladderRows} from '../site/clock-charts.js';
 import {
-  approxWhen, buildClock, computeShare, dials, plainHours, rangeWhen, readWhatIf, shiftPhrase, spanPhrase, whatIfQuestions,
-  whatIfStart, whatIfTime, whatIfView, whatIfYear, yearsAway,
+  approxWhen, buildClock, computeShare, dials, futures, namedLabs, plainHours, rangeWhen, readWhatIf, shiftPhrase, spanPhrase,
+  whatIfQuestions, whatIfStart, whatIfTime, whatIfView, whatIfYear, yearsAway,
 } from '../site/clock-model.js';
 import {gaugeShare, gaugeTop} from '../site/clock-visuals.js';
 import {fitPace} from '../site/observatory-pace-fit.js';
@@ -122,6 +122,59 @@ test('the stops keep both voices and their order in time', () => {
   ]);
   assert.equal(view.arrival.id, 'singularity');
   assert.equal(view.horizonYear, 2100);
+  // Every published scenario is a future a reader can pick, in the same order of time.
+  assert.deepEqual(futures.map(item => item.id), ['faster', 'speedup', 'reference', 'slower', 'never']);
+  assert.deepEqual(view.arrival.paths, {faster: 2029, speedup: 2045, reference: 2062, slower: 2095, never: null});
+  assert.deepEqual(view.stops[0].paths, {faster: 2028, speedup: 2028, reference: 2034, slower: 2056, never: null});
+  for (const stop of view.stops) {
+    assert.equal(stop.paths.reference, stop.reference);
+    assert.ok(stop.paths.faster <= stop.paths.reference && stop.paths.reference <= stop.paths.slower, stop.id);
+    assert.equal(typeof stop.sign, 'string');
+  }
+});
+
+test('requirements are counted from the assessment and never assumed met', () => {
+  const criteria = [
+    {id: 'rsi-contribution', label: 'A material contribution to a successor', status: 'met'},
+    {id: 'rsi-repeat', label: 'Repeated improvement by successors', status: 'unknown'},
+    {id: 'rsi-new', label: 'A requirement added later', status: 'not met'},
+  ];
+  const withNeeds = {...feed, assessment: {...feed.assessment, milestones: [{id: 'rsi', criteria}]}};
+  const stop = buildClock(withNeeds, now).stops.find(item => item.id === 'rsi');
+  assert.deepEqual(stop.needs, [
+    {id: 'rsi-contribution', text: 'An AI measurably improves its own successor', met: true},
+    {id: 'rsi-repeat', text: 'That successor improves the next one too', met: false},
+    {id: 'rsi-new', text: 'A requirement added later', met: false},
+  ]);
+  assert.deepEqual(buildClock(feed, now).stops[0].needs, []);
+});
+
+test('the field counts every scored model, the labs behind them and who has held the lead', () => {
+  assert.equal(buildClock(feed, now).field, null);
+  const model = (day, value, system, organization, weightAccess = 'Closed weights') =>
+    ({topic: 'breadth', referenceOn: day, value, system, organization, weightAccess});
+  const observations = [
+    model('2025-01-10', 100, 'Alpha 1', 'OpenAI'), model('2025-02-01', 90, 'Open 1', 'Meta AI', 'Open weights'),
+    model('2025-03-01', 104, 'Beta 1', 'Google DeepMind,Google'), model('2025-04-01', 103, 'Gamma 1', 'Anthropic'),
+    model('2025-06-01', 110, 'Alpha 2', 'OpenAI'), model('2025-08-01', 96, 'Open 2', 'Meta AI', 'Open weights'),
+    model('2025-12-15', 118, 'Gamma 2', 'Anthropic'), model('2026-02-01', 112, 'Beta 2', 'Google'),
+    model('2026-05-01', 121, 'Alpha 3', 'OpenAI'), model('2026-06-01', 121, 'Tie', 'Mistral AI'),
+    model('2026-09-01', 126, 'Alpha 4', 'OpenAI'), model('2026-10-01', 99, 'Nameless', null, 'Open weights'),
+    {topic: 'breadth', referenceOn: null, value: 300, system: 'Undated'}, {topic: 'compute', referenceOn: '2026-01-01', value: 999},
+  ];
+  const {field} = buildClock({...feed, assessment: {...feed.assessment, observations}}, now);
+  assert.equal(field.points.length, 12);
+  assert.deepEqual(field.frontier.map(point => point.system), ['Alpha 1', 'Beta 1', 'Alpha 2', 'Gamma 2', 'Alpha 3', 'Alpha 4']);
+  assert.equal(field.leader.system, 'Alpha 4');
+  // Joint credits and renamed labs fold into one name. A model with no lab stays uncounted.
+  assert.deepEqual(field.labs.map(lab => [lab.name, lab.models]), [['OpenAI', 4], ['Anthropic', 2], ['Google', 2], ['Meta', 2], ['Mistral', 1]]);
+  assert.equal(field.points.filter(point => point.open).length, 3);
+  // In the year to late November 2026: three new top scores, two of them a change of lab.
+  assert.equal(field.records, 3);
+  assert.equal(field.handovers, 2);
+  assert.equal(field.answer, '5 labs. The top score fell three times in a year.');
+  assert.ok(field.domain.low < 90 && field.domain.high > 126 && field.domain.to > now);
+  assert.deepEqual([...namedLabs], ['OpenAI', 'Anthropic', 'Google']);
 });
 
 test('workplace studies keep their own numbers', () => {

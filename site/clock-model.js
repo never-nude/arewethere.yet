@@ -217,6 +217,28 @@ const plainStops = {
   asi: {name: 'AI beyond the best experts', term: 'superintelligence'},
 };
 
+// The published scenarios, under names a reader can choose between.
+export const futures = Object.freeze([
+  {id: 'faster', name: 'Fastest case', match: /^faster/i},
+  {id: 'speedup', name: 'Today’s speed-up lasts', match: /acceleration/i},
+  {id: 'reference', name: 'Experts’ middle guess', match: /^reference/i},
+  {id: 'slower', name: 'Slowest case', match: /^slower/i},
+  {id: 'never', name: 'It never comes', match: /never|stalled/i},
+]);
+
+// What must be shown before a moment counts as reached, in plain words.
+const plainNeeds = {
+  'agi-breadth': 'Matches a skilled person across many kinds of work',
+  'agi-transfer': 'Handles kinds of task it has never seen',
+  'agi-reliability': 'Does it again when independent testers repeat the test',
+  'rsi-contribution': 'An AI measurably improves its own successor',
+  'rsi-repeat': 'That successor improves the next one too',
+  'asi-experts': 'Beats the best human experts in every field tested',
+  'singularity-feedback': 'Each generation of AI speeds up the research behind the next',
+  'singularity-acceleration': 'The pace of AI progress rises twice in a row',
+  'singularity-transition': 'Technology as a whole starts advancing faster than before',
+};
+
 function buildStops(outlook, assessment) {
   const year = value => Number.isInteger(value) ? value : null;
   const paceRows = outlook?.pace?.milestones ?? [];
@@ -224,6 +246,14 @@ function buildStops(outlook, assessment) {
     const reference = year(row.centralYear);
     const speed = year(paceRows.find(item => item.id === row.id)?.accelerationYear) ??
       year(row.scenarios?.find(scenario => /acceleration/i.test(scenario.label ?? ''))?.year);
+    const paths = Object.fromEntries(futures.flatMap(future => {
+      const scenario = row.scenarios?.find(item => future.match.test(item.label ?? ''));
+      return scenario ? [[future.id, year(scenario.year)]] : [];
+    }));
+    if (reference !== null) paths.reference = reference;
+    const needs = (assessment.milestones?.find(item => item.id === row.id)?.criteria ?? []).map(need => ({
+      id: need.id, text: plainNeeds[need.id] ?? need.label ?? need.id, met: /^(met|confirmed|observed)$/i.test(need.status ?? ''),
+    }));
     return {
       id: row.id,
       name: plainStops[row.id]?.name ?? row.label ?? row.id,
@@ -234,8 +264,51 @@ function buildStops(outlook, assessment) {
       low: year(row.range?.low), high: year(row.range?.high),
       never: row.beyondHorizonPathCount > 0,
       observed: row.status === 'Observed',
+      paths, needs,
+      sign: typeof row.progress?.summary === 'string' ? row.progress.summary : null,
     };
   });
+}
+
+// Every scored model as one dot: when it came out and how it did on Epoch's
+// combined index. The three labs that have traded the lead keep a colour each.
+export const namedLabs = Object.freeze(['OpenAI', 'Anthropic', 'Google']);
+const labAliases = {'Google DeepMind': 'Google', 'Meta AI': 'Meta', 'Mistral AI': 'Mistral', 'Microsoft Research': 'Microsoft', 'Z.ai (Zhipu AI)': 'Zhipu AI'};
+const labName = organization => {
+  const first = String(organization ?? '').split(',')[0].trim();
+  return labAliases[first] ?? (first || null);
+};
+
+function buildField(assessment, now) {
+  const rows = (assessment.observations ?? []).filter(row =>
+    row.topic === 'breadth' && Number.isFinite(row.value) && Number.isFinite(Date.parse(row.referenceOn)));
+  if (rows.length < 12) return null;
+  const points = rows.map(row => ({
+    time: Date.parse(row.referenceOn), score: row.value, system: row.system || 'Unnamed model',
+    lab: labName(row.organization), open: row.weightAccess === 'Open weights', lead: false,
+  })).sort((a, b) => a.time - b.time || a.score - b.score);
+  const frontier = [];
+  for (const point of points) {
+    if (frontier.length && point.score <= frontier.at(-1).score) continue;
+    point.lead = true;
+    frontier.push(point);
+  }
+  const tally = new Map();
+  for (const point of points) if (point.lab) tally.set(point.lab, (tally.get(point.lab) ?? 0) + 1);
+  const labs = [...tally].map(([name, models]) => ({name, models})).sort((a, b) => b.models - a.models || a.name.localeCompare(b.name));
+  const lately = frontier.filter(point => point.time >= now - yearMs);
+  const scores = points.map(point => point.score), low = Math.min(...scores), high = Math.max(...scores);
+  const source = rows.find(row => typeof row.sourceUrl === 'string');
+  const often = lately.length === 1 ? 'once' : lately.length === 2 ? 'twice' : count(lately.length) + ' times';
+  return {
+    points, frontier, labs, leader: frontier.at(-1),
+    answer: labs.length + ' labs. ' + (lately.length ? 'The top score fell ' + often + ' in a year.' : 'No one has beaten the top score in a year.'),
+    records: lately.length,
+    // How often the top score passed from one lab to another in the past year.
+    handovers: lately.filter(point => frontier[frontier.indexOf(point) - 1]?.lab !== point.lab && frontier.indexOf(point) > 0).length,
+    domain: {from: points[0].time - 40 * dayMs, to: Math.max(now, points.at(-1).time) + 40 * dayMs, low: low - (high - low) * 0.06, high: high + (high - low) * 0.1},
+    source: {name: source?.source ?? 'Epoch AI', url: safeLink(source?.sourceUrl)},
+  };
 }
 
 const sourceName = text => String(text ?? '').replaceAll(' · ', ', ');
@@ -316,11 +389,15 @@ export const whatIfQuestions = Object.freeze([
   {id: 'more-minerals', ask: 'more rare minerals are mined?', set: {chips: 4}},
   {id: 'no-build', ask: 'data centres stop going up?', set: {build: 0}},
   {id: 'double-build', ask: 'data centres go up twice as fast?', set: {build: 4, chips: 4, money: 4, power: 4}},
+  {id: 'factories', ask: 'the main chip factories go offline?', set: {chips: 0}},
   {id: 'grid', ask: 'the power grid can’t keep up?', set: {power: 1}},
+  {id: 'clean-power', ask: 'cheap clean power arrives?', set: {power: 4}},
   {id: 'bust', ask: 'the money dries up?', set: {money: 0}},
+  {id: 'boom', ask: 'investors double their bets?', set: {money: 4}},
   {id: 'self', ask: 'AI starts doing its own research?', set: {self: 2}},
   {id: 'dry', ask: 'the new ideas run out?', set: {ideas: 0}},
   {id: 'pause', ask: 'governments pause it for two years?', set: {pause: 2}},
+  {id: 'long-pause', ask: 'an accident brings a five-year halt?', set: {pause: 3}},
   {id: 'all', ask: 'everything speeds up at once?', set: {build: 4, chips: 4, money: 4, power: 4, ideas: 4, self: 2}},
 ]);
 
@@ -419,5 +496,6 @@ export function buildClock(feed, now = Date.now()) {
     arrival, stops, horizonYear,
     nowYear: new Date(now).getUTCFullYear(),
     work: buildWork(outlook),
+    field: buildField(assessment, now),
   };
 }
