@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import test from 'node:test';
 import {ladderRows} from '../site/clock-charts.js';
-import {approxWhen, buildClock, plainHours, rangeWhen, spanPhrase, yearsAway} from '../site/clock-model.js';
+import {
+  approxWhen, buildClock, computeShare, dials, plainHours, rangeWhen, readWhatIf, shiftPhrase, spanPhrase, whatIfQuestions,
+  whatIfStart, whatIfTime, whatIfView, whatIfYear, yearsAway,
+} from '../site/clock-model.js';
+import {gaugeShare, gaugeTop} from '../site/clock-visuals.js';
 import {fitPace} from '../site/observatory-pace-fit.js';
 
 // The frozen first pace bulletin is the same material the front page drew on
@@ -155,4 +159,102 @@ test('thin or missing evidence leaves gaps and never invents a forecast', () => 
   const confirmed = structuredClone(bulletin);
   confirmed.outlook.milestones.find(row => row.id === 'singularity').status = 'Observed';
   assert.equal(buildClock({...feed, supplementalPaceOutlook: confirmed}, now).arrived, true);
+});
+
+test('the what-if dials leave the published dates alone until one is turned', () => {
+  const view = buildClock(feed, now), still = whatIfView(view, whatIfStart(), now);
+  assert.equal(still.reading.speed, 1);
+  assert.equal(still.reading.changed, false);
+  assert.deepEqual(still.sentences, ['This is today’s course.']);
+  assert.equal(still.arrival.year, 2062);
+  assert.equal(still.arrival.shift, 'no change');
+  assert.equal(still.next.when, still.next.base);
+  assert.equal(month(still.next.when), '2027-06');
+  assert.equal(still.doublingDays, 111);
+  // Any time and any year come back unchanged at today's speed.
+  assert.equal(whatIfTime(now + 123456789, now, still.reading), now + 123456789);
+  for (const year of [2028, 2045, 2062, 2099]) assert.equal(whatIfYear(year, now, still.reading), year);
+});
+
+test('computing power moves at the pace of its scarcest ingredient', () => {
+  const turn = change => readWhatIf({...whatIfStart(), ...change});
+  // One short ingredient slows everything that depends on it.
+  const short = turn({chips: 1});
+  assert.equal(short.compute, 0.5);
+  assert.deepEqual(short.limitedBy, ['chips']);
+  assert.equal(short.speed, computeShare * 0.5 + (1 - computeShare));
+  // One plentiful ingredient changes nothing while the others hold it back.
+  const plenty = turn({chips: 4});
+  assert.equal(plenty.speed, 1);
+  assert.equal(plenty.changed, true);
+  assert.deepEqual(plenty.limitedBy, ['build', 'money', 'power']);
+  // All four together do speed it up, and no single one is the bottleneck.
+  const all = turn({build: 4, chips: 4, money: 4, power: 4});
+  assert.equal(all.compute, 2);
+  assert.deepEqual(all.limitedBy, []);
+  assert.equal(all.speed, computeShare * 2 + (1 - computeShare));
+  // Methods carry on when the building stops, and research help multiplies them.
+  assert.equal(turn({build: 0}).speed, 1 - computeShare);
+  assert.equal(turn({self: 2}).methods, 4);
+  assert.equal(turn({ideas: 0, self: 2}).methods, 0);
+  // A value outside a dial's stops falls back to its nearest end, and junk to its start.
+  assert.equal(readWhatIf({...whatIfStart(), chips: 99}).compute, 1);
+  assert.equal(readWhatIf({chips: 'x'}).speed, 1);
+});
+
+test('what-if dates stretch with the speed, shift with a pause and can stop altogether', () => {
+  const view = buildClock(feed, now), turn = change => whatIfView(view, {...whatIfStart(), ...change}, now);
+  const slow = turn({chips: 1});
+  assert.equal(slow.arrival.year, 2083);
+  assert.equal(slow.arrival.shift, '21 years later');
+  assert.equal(month(slow.next.when), '2027-10');
+  assert.equal(slow.next.shift, '4 months later');
+  assert.deepEqual(slow.sentences, [
+    'Computing power grows at half today’s pace, held back by chips and minerals.',
+    'Overall, progress runs at 63% of today’s speed.',
+  ]);
+  assert.deepEqual(turn({chips: 4}).sentences, [
+    'Computing power still grows at today’s pace, held back by data centres, money and electricity.',
+    'Overall the speed is unchanged.',
+  ]);
+  const paused = turn({pause: 2});
+  assert.equal(paused.arrival.year, 2064);
+  assert.equal(paused.next.shift, '2 years later');
+  assert.equal(paused.sentences.at(-1), 'The pause pushes every date back by two years.');
+  const fast = turn({build: 4, chips: 4, money: 4, power: 4, ideas: 4, self: 2});
+  assert.equal(fast.reading.speed, gaugeTop);
+  assert.equal(fast.arrival.year, 2037);
+  assert.equal(fast.next.shift, '5 months sooner');
+  // A quarter of the speed puts arrival past the horizon. No speed at all means no arrival.
+  const crawl = turn({money: 0});
+  assert.equal(crawl.arrival.beyond, true);
+  const halt = turn({build: 0, ideas: 0});
+  assert.equal(halt.reading.speed, 0);
+  assert.equal(halt.arrival.year, null);
+  assert.equal(halt.next.when, null);
+  assert.equal(halt.doublingDays, null);
+  assert.equal(halt.sentences.at(-1), 'Progress stops. On this road there is no arrival.');
+  assert.equal(shiftPhrase(now, now + 10 * 86400000), 'no change');
+  assert.equal(shiftPhrase(now, now + 31 * 86400000), '1 month later');
+  assert.equal(shiftPhrase(now, now - 3 * 365.25 * 86400000), '3 years sooner');
+  assert.equal(shiftPhrase(now, null), 'never, on this road');
+});
+
+test('every what-if question names real dials and stops, and the gauge covers the range', () => {
+  const ids = new Set(dials.map(dial => dial.id));
+  assert.equal(new Set(whatIfQuestions.map(question => question.id)).size, whatIfQuestions.length);
+  for (const question of whatIfQuestions) {
+    assert.match(question.ask, /\?$/);
+    for (const [id, index] of Object.entries(question.set)) {
+      assert.ok(ids.has(id), id);
+      assert.ok(Number.isInteger(index) && index >= 0 && index < dials.find(dial => dial.id === id).stops.length, question.id);
+      assert.notEqual(index, dials.find(dial => dial.id === id).start, question.id + ' moves ' + id);
+    }
+  }
+  const most = Object.fromEntries(dials.map(dial => [dial.id, dial.stops.length - 1]));
+  assert.equal(readWhatIf({...most, pause: 0}).speed, gaugeTop);
+  assert.equal(gaugeShare(0), 0);
+  assert.equal(gaugeShare(1), 0.5);
+  assert.equal(gaugeShare(gaugeTop), 1);
+  assert.equal(gaugeShare(99), 1);
 });
