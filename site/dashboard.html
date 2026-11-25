@@ -29,6 +29,7 @@
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./view-switch.css">
+  <link rel="stylesheet" href="./countdown-summary.css">
   <link rel="stylesheet" href="./language-menu.css">
   <script type="module" src="./language-menu.js?v=3"></script>
   <link rel="stylesheet" href="./glossary.css">
@@ -55,7 +56,7 @@
       <a href="./" class="wordmark"><img class="wordmark-icon" src="./favicon.svg?v=4" width="30" height="30" alt=""> Singularity Watch</a>
       <div class="page-tools">
         <nav class="view-switch" aria-label="Site views">
-          <a href="./">Front page</a><a href="./overview.html">Overview</a><a href="./dashboard.html" aria-current="page">Full dashboard</a>
+          <a href="./">At a glance</a><a href="./dashboard.html" aria-current="page">Full dashboard</a>
         </nav>
         <site-language-menu></site-language-menu>
       </div>
@@ -77,7 +78,7 @@
     </div>
   </header>
 
-  <p class="file-preview">This copy is open directly from disk. <a href="https://arewethereyet.now/dashboard.html">Open the live dashboard</a> for the chart, evidence score, and countdown.</p>
+  <p class="file-preview">This copy is open directly from disk. <a href="https://arewethereyet.now/dashboard.html">Open the live dashboard</a> for the latest readings and charts.</p>
 
   <main id="main" class="wrap" tabindex="-1">
     <section class="overview-panel" aria-labelledby="overview-heading">
@@ -90,13 +91,17 @@
         <p class="reading-explainer daily-reading" id="index-daily-reading"></p>
         <p class="reading-explainer" id="index-score-meaning">Eight indicators track what AI can do, how it contributes to research, and what people expect. We check sources four times a day. Risks and dates require separate evidence.</p>
         <div class="reading-meta"><span id="current-delta" class="change"></span><a href="#methodology">How it works ↗</a><a href="#public-sources">Last source check ↓</a></div>
-        <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-describedby="index-watch-meaning" aria-valuemin="0" aria-valuemax="100">
+        <div class="index-meter" id="index-meter" role="progressbar" aria-label="Current evidence index" aria-describedby="index-score-meaning" aria-valuemin="0" aria-valuemax="100">
           <span class="index-meter-fill" id="index-fill"></span>
-          <span class="watch-tick" id="watch-tick"></span>
         </div>
         <div class="meter-scale" aria-hidden="true"><span>0</span><span>100 points</span></div>
-        <div class="meter-key"><span id="score-coverage">Source coverage pending</span><a id="watch-line-label" href="#watch-line">75-point watch line</a></div>
-        <p class="reading-explainer reading-watch" id="index-watch-meaning"><strong>The vertical mark means take a closer look.</strong> We chose 75 points because reaching it requires points for both AI skills and AI research. Confirming the Singularity takes separate, independent evidence. <span id="index-gap"></span></p>
+        <div class="meter-key"><span id="score-coverage">Source coverage pending</span><a href="#signals">Inspect the eight indicators</a></div>
+        <div id="countdown">
+          <section id="watch-clock" class="countdown-summary" aria-label="Research milestone countdown">
+            <h3 class="countdown-summary-title">Superhuman AI researcher forecast</h3>
+            <p>Six forecasters’ November 2026 estimates span May to November 2027. <a href="https://blog.aifutures.org/p/q35-timelines-update-looks-like-the">Forecast and assumptions</a></p>
+          </section>
+        </div>
       </section>
       <section class="score-panel" aria-labelledby="readout-heading">
         <div class="score-content">
@@ -108,7 +113,7 @@
           <div class="score-actions">
             <a href="#milestone-progress">See the four milestone scores ↓</a>
             <a id="watchdog-today" href="#watchdog">See what changed today ↓</a>
-            <a href="#watch-clock">See the countdown to 75 points ↓</a>
+            <a href="#scenario">Try a change of pace ↓</a>
           </div>
           <p class="term-help">Hover or tap a dotted term for a definition.</p>
         </div>
@@ -168,27 +173,6 @@
         </details>
       </section>
     </section>
-
-    <div class="watch-clock" id="watch-clock">
-      <aside class="watch-clock-disclaimer" aria-labelledby="forecast-disclaimer">
-        <h2 id="forecast-disclaimer">Countdown to the 75-point review mark</h2>
-        <p>We chose 75 as a signal to review the evidence. The countdown asks when the index would reach that mark <strong>if it gained one point per month.</strong> That pace is an assumption you can change in the scenarios below.</p>
-        <p>The Watch uses evidence available through <span id="countdown-evidence-date">its latest data check</span>. The date of a singularity remains unknown. Confirming one would require independent evidence that AI keeps speeding up research across generations.</p>
-      </aside>
-      <details id="countdown" open>
-        <summary><span class="watch-clock-show">Show the countdown at one point per month</span><span class="watch-clock-hide">Hide the countdown</span></summary>
-        <div class="watch-clock-body">
-          <div class="watch-clock-reading">
-            <p class="watch-clock-value" id="countdown-value" hidden><output id="countdown-days" aria-label="Days until the index would reach the review threshold under this assumption"></output><span>days</span></p>
-            <p class="watch-clock-target"><span id="countdown-state">Waiting for evidence</span><time id="countdown-date" hidden></time></p>
-          </div>
-          <p class="watch-clock-note" id="countdown-note">The watch line marks when to look more closely at the evidence.</p>
-          <div class="watch-clock-footer">
-            <p>The days remaining roll over at midnight UTC. The evidence follows the <a href="#public-sources">source-check schedule</a>.</p><a href="#scenario">Scenarios ↗</a>
-          </div>
-        </div>
-      </details>
-    </div>
 
     <section id="milestone-progress" class="section panel" aria-label="Evidence for four AI milestones"></section>
 
@@ -251,43 +235,31 @@
       </div>
       <div id="leaders" class="panel leader-board" aria-label="Organization rankings by milestone"></div>
       <section id="projected-leaders" class="panel leader-board" aria-label="Projected rankings and illustrative milestone timeline">
-        <div class="scenario-control leader-pace">
-          <label for="leader-scenario-pace">Assumed index points per month</label>
-          <output id="leader-scenario-rate" for="leader-scenario-pace">+1</output>
-          <input id="leader-scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
-        </div>
         <div id="organization-forecast"></div>
-        <div id="dependency-timeline" class="dependency-timeline"></div>
+        <div id="dependency-timeline" class="dependency-timeline" hidden></div>
       </section>
       <div id="labs-board"></div>
     </section>
 
     <section id="scenario" class="section" aria-labelledby="scenario-heading">
       <div class="section-heading">
-        <div><p class="eyebrow">WHAT IF</p><h2 id="scenario-heading">When would the index reach 75?</h2><p>Choose a pace for the evidence index. The chart shows when the score would reach our review threshold at that pace.</p></div>
+        <div><h2 id="scenario-heading">How would a change of pace affect the score?</h2><p>Choose a score and a monthly change to see where that pace would lead over five years. The date of a singularity remains unknown.</p></div>
       </div>
       <div class="scenario-grid">
         <div class="panel graph-panel">
-          <div class="panel-heading">
-            <div><h3>Conditional path</h3><p id="scenario-caption">The watch line is a score threshold. The gates require independent evidence.</p></div>
-            <div id="scenario-presets" class="segmented" role="group" aria-label="Scenario pace presets">
-              <button type="button" data-pace="-0.5" aria-pressed="false">Regression</button>
-              <button type="button" data-pace="1" aria-pressed="true">Steady</button>
-              <button type="button" data-pace="2.5" aria-pressed="false">Fast</button>
-            </div>
+          <h3>Your what-if scenario</h3>
+          <div class="scenario-inputs">
+            <label>Score to explore (0–100)<input type="number" id="scenario-target" min="0" max="100" step="any"></label>
+            <label>Change in points per month<input type="number" id="scenario-pace" step="any" aria-describedby="scenario-pace-help"></label>
           </div>
-          <div id="scenario-chart" class="plot scenario-chart" aria-label="Conditional index scenario"></div>
-          <div class="scenario-control">
-            <label for="scenario-pace">Assumed index points per month</label>
-            <output id="scenario-rate" for="scenario-pace">+1.0</output>
-            <input id="scenario-pace" type="range" min="-3" max="4" value="1" step=".25">
-          </div>
-          <p class="small-note">This scenario starts on the latest check date and looks up to five years ahead. The countdown above keeps its one-point monthly pace and its starting date while the score holds steady.</p>
+          <p id="scenario-pace-help" class="small-note">Use a positive number for a rise or a negative number for a fall.</p>
+          <p id="scenario-caption" class="small-note" role="status"></p>
+          <div id="scenario-chart" class="plot scenario-chart" aria-label="Your evidence score scenario" hidden></div>
         </div>
         <section class="panel gates-panel" aria-labelledby="gates-heading">
           <div class="panel-heading"><div><h3 id="gates-heading">Evidence for the singularity</h3><p>Our working definition requires sustained AI-led acceleration across generations.</p></div></div>
           <ol id="evidence-gates" class="gate-list"></ol>
-          <p class="small-note" id="gates-note">A score crossing prompts a closer look at the public evidence.</p>
+          <p class="small-note" id="gates-note">Each test requires independent evidence.</p>
         </section>
       </div>
     </section>
@@ -316,17 +288,12 @@
       <div class="section-heading"><div><h2 id="methodology-heading">How this works</h2></div></div>
       <div class="method-grid">
         <div>
-          <h3>Evidence, scenarios, and labels</h3>
-          <p>The index totals weighted evidence points. We choose the weights and reference targets. Missing readings leave their points unfilled and lower source coverage. The 75-point watch line flags a score to investigate.</p>
+          <h3 id="watch-line">Evidence, scenarios, and labels</h3>
+          <p>The index totals weighted evidence points. We choose the weights and reference targets. Missing readings leave their points unfilled and lower source coverage.</p>
           <p>Two indicators can rise together for several reasons. For example, a higher benchmark score and a shorter research cycle could both reflect more computing power. To confirm a singularity, independent researchers would need to show that AI’s contribution caused successive generations to improve faster.</p>
           <p>AGI and ASI both require broad skills on this Watch. ASI sets a higher performance bar. Recursive self-improvement describes how one AI generation helps improve the next. <a href="#milestone-order">See which milestones can come first ↑</a></p>
           <p>The automated readings can contribute up to 50 of the 100 points for AGI and 40 for ASI. The remaining points require an independent evaluation and editorial review. A scheduled source check can carry forward an older finding.</p>
           <a href="https://deepmind.google/research/publications/66938/" target="_blank" rel="noopener noreferrer">DeepMind’s AGI framework ↗</a>
-          <div class="watch-line-explainer" id="watch-line">
-            <h3>The 75-point watch line</h3>
-            <p>The dashboard uses 75 out of 100 as a cue to check the evidence more closely. At that point, we’d look for researchers outside the AI companies to verify that AI can handle longer tasks, do whole research projects, and keep speeding up the next round of AI improvements.</p>
-            <p>Even if all the other signals earned full points, reaching 75 would still require at least 25 points for what AI can do and 10 points for its role in AI research.</p>
-          </div>
           <div class="watch-line-explainer" id="human-evidence">
             <h3>Social behavior in evaluations</h3>
             <p>In a broad capability test, independent raters can check whether an AI recognizes a concern and responds appropriately in unfamiliar situations. Studies of how people use accurate or mistaken advice answer a different question. <sup class="evidence-citations"><a href="#ref-20" aria-label="Reference 20">[20]</a><a href="#ref-21" aria-label="Reference 21">[21]</a></sup></p>

@@ -1,7 +1,5 @@
 .front-page {
-  --front-chart-ink: var(--dim);
   --front-chart-grid: #80708e;
-  --front-chart-line: var(--teal);
   min-height: 100vh;
   background: radial-gradient(ellipse 70% 500px at 90% 3%, #251e36 0%, transparent 85%), var(--page);
   color: var(--ink);
@@ -24,49 +22,74 @@
 }
 
 .front-page :is(main.front-wrap, .front-wrap.front-footer) { max-width: 940px; }
-.front-page :is(.front-intro, .front-digest, .front-guide, .front-footer, noscript) a {
+.front-page :is(.front-intro, .front-digest, .front-milestone-section, .front-footer, noscript) a {
   color: var(--violet);
   text-decoration: underline;
   text-underline-offset: .18em;
 }
-.front-page :is(.front-intro, .front-digest, .front-guide, .front-footer, noscript) a:hover { color: var(--teal); }
+.front-page :is(.front-intro, .front-digest, .front-milestone-section, .front-footer, noscript) a:hover { color: var(--teal); }
 
-.front-page .front-intro {
+.front-page main.front-wrap {
   display: grid;
-  grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+  grid-template-areas: "reading history" "reading milestones" "findings milestones" "timestamp timestamp" "fallback fallback";
   align-items: start;
-  gap: 12px clamp(24px, 4.5vw, 60px);
-  padding-block: clamp(25px, 4.5vw, 55px) 22px;
+  gap: 14px clamp(24px, 4vw, 48px);
+  padding-block: clamp(18px, 3vw, 36px) 10px;
 }
+.front-page .front-intro { grid-area: reading; }
+.front-page .front-findings { grid-area: findings; min-width: 0; }
+.front-page main noscript { grid-area: fallback; }
 .front-page .front-reading { min-width: 0; }
 .front-page .front-reading #front-score-meaning { max-width: 63ch; margin-block: 9px 6px; color: #d4cbdf; }
-.front-page .front-reading .front-link { display: inline-block; padding-block: 5px; font-size: 15px; font-weight: 570; }
+.front-page .front-contributions {
+  display: grid;
+  gap: 3px;
+  margin: 8px 0 4px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.front-page .front-contributions li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24% 5.35em;
+  grid-template-areas: "name bar value";
+  align-items: center;
+  overflow-wrap: anywhere;
+  gap: 8px;
+}
+.front-page .front-contribution-name { grid-area: name; color: var(--ink); }
+.front-page .front-contribution-value { grid-area: value; text-align: end; color: var(--dim); font-variant-numeric: tabular-nums; }
+.front-page .front-contribution-track { grid-area: bar; height: 4px; border-radius: 4px; background: #453b54; }
+.front-page .front-contribution-track i { display: block; width: 0; height: 100%; border-radius: inherit; background: #aa9bbf; }
 .front-page .front-history {
+  grid-area: history;
   margin: 0;
   min-width: 0;
-  padding: clamp(13px, 2vw, 20px);
+  padding: clamp(12px, 1.6vw, 18px);
   border: 1px solid #433751;
   border-radius: 13px;
   background: var(--panel);
 }
 .front-page .front-history h2 { font-size: 17px; line-height: 1.3; font-weight: 600; letter-spacing: -.02em; }
-.front-page .front-timestamp { grid-column: 1 / -1; color: var(--dim); font-size: 14px; }
+.front-page .front-timestamp { grid-area: timestamp; color: var(--dim); font-size: 14px; }
 .front-page .front-section-heading {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   gap: 2px 12px;
-  padding-block: 18px 10px;
+  padding-block: 14px 8px;
   border-block-start: 1px solid #473b57;
 }
-.front-page #front-digest-title {
+.front-page :is(#front-digest-title, #front-milestones-title) {
   font-size: clamp(23px, 3vw, 32px);
   line-height: 1.2;
   font-weight: 625;
   letter-spacing: -.035em;
 }
-.front-page #front-date, .front-page .front-report-meta {
+.front-page #front-date {
   color: var(--dim);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
@@ -88,36 +111,35 @@
 }
 .front-page .front-item {
   margin-inline-start: 1.12rem;
-  padding-block: 15px 13px;
+  padding-block: 12px;
   padding-inline-start: 4px;
   overflow-wrap: anywhere;
 }
 .front-page .front-item + .front-item { border-block-start: 1px solid var(--border); }
 .front-page .front-item::marker { color: var(--violet); font-size: .9em; }
-.front-page .front-item h2 {
+.front-page .front-item h3 {
+  display: inline;
+  margin-inline-end: .35em;
   color: var(--ink);
-  font-size: clamp(19px, 2.1vw, 23px);
-  line-height: 1.25;
-  font-weight: 620;
-  letter-spacing: -.032em;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 630;
+  letter-spacing: -.02em;
 }
-.front-page .front-item > p { max-width: 79ch; margin-block-start: 4px; color: var(--dim); }
-.front-page .front-item .front-link {
-  display: inline-block;
-  padding-block: 4px;
-  color: #c7b7e1;
-  font-size: 14px;
-  font-weight: 500;
+.front-page .front-item h3 a {
+  color: inherit;
+  text-decoration-color: #9789aa;
+  text-decoration-thickness: 1px;
 }
-.front-page .front-item .front-link:hover { color: var(--teal); }
+.front-page .front-item > p { display: inline; color: var(--dim); }
 .front-page .front-item strong { color: var(--ink); font-weight: 600; }
-.front-page .front-score-label { display: block; margin-block-start: 10px; color: var(--dim); font-size: 15px; font-weight: 550; }
+.front-page .front-score-label { display: block; margin-block-start: 6px; color: var(--dim); font-size: 15px; font-weight: 550; }
 .front-page .front-scoreline {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 2px 16px;
-  margin-block: 12px 8px;
+  margin-block: 5px;
 }
 .front-page .front-scoreline strong { display: inline-flex; align-items: baseline; gap: 6px; direction: ltr; unicode-bidi: isolate; }
 .front-page .front-scoreline #front-score { font-size: clamp(49px, 6.2vw, 74px); line-height: .99; letter-spacing: -.065em; }
@@ -126,8 +148,8 @@
 .front-page .front-scoreline output { font-variant-numeric: tabular-nums; }
 .front-page #front-score { color: var(--teal); font-weight: 680; }
 
-.front-page :is(.front-digest, .front-guide) details { margin-block-start: 3px; min-width: 0; }
-.front-page :is(.front-digest, .front-guide) summary {
+.front-page :is(.front-milestone-section, .front-guide) details { margin-block-start: 3px; min-width: 0; }
+.front-page :is(.front-milestone-section, .front-guide) summary {
   width: fit-content;
   max-width: 100%;
   padding-block: 5px;
@@ -138,14 +160,14 @@
   cursor: pointer;
   overflow-wrap: anywhere;
 }
-.front-page :is(.front-digest, .front-guide) summary:hover { text-decoration: underline; text-underline-offset: .18em; }
-.front-page :is(.front-digest, .front-guide) summary::marker { color: var(--violet); }
-.front-page :is(.front-digest, .front-guide) details > p, .front-page #front-score-guide,
+.front-page :is(.front-milestone-section, .front-guide) summary:hover { text-decoration: underline; text-underline-offset: .18em; }
+.front-page :is(.front-milestone-section, .front-guide) summary::marker { color: var(--violet); }
+.front-page :is(.front-milestone-section, .front-guide) details > p, .front-page #front-score-guide,
 .front-page [data-front-checklist] { color: var(--dim); }
-.front-page :is(.front-digest, .front-guide) details > p + p, .front-page .front-example { margin-block-start: .55em; }
+.front-page :is(.front-milestone-section, .front-guide) details > p + p, .front-page .front-example { margin-block-start: .55em; }
 .front-page #front-score-guide, .front-page #front-history, .front-page #front-milestones { min-width: 0; }
-.front-page .front-guide { border-block-start: 1px solid #473b57; padding-block: 10px 17px; }
-.front-page .front-guide > summary { font-size: 17px; }
+.front-page .front-guide { margin-block: 2px 5px; }
+.front-page .front-guide > summary { padding-block: 3px; }
 .front-page .front-guide[open] > summary { margin-block-end: 7px; }
 .front-page .front-factor-list, .front-page [data-front-checklist] ul {
   margin-block: 10px 6px;
@@ -161,16 +183,24 @@
 .front-page .front-factor-list .front-source,
 .front-page [data-front-checklist] li > a { font-size: 14px; }
 
-.front-page #front-history { margin: 12px 0 0; }
+.front-page #front-history { margin: 4px 0 0; }
 .front-page #front-history svg { display: block; height: auto; width: 100%; direction: ltr; }
-.front-page #front-history-caption { margin-block: 5px 8px; color: var(--dim); font-size: 14px; }
-.front-page .front-report-summary { margin-block: 5px; color: var(--dim); }
+.front-page #front-history-caption { margin-block: 4px 0; color: var(--dim); font-size: 14px; }
 
-.front-page #front-milestones { margin-block-start: 10px; }
-.front-page #front-milestones .front-check { padding-block: 3px; border-block-start: 1px solid var(--border); }
+.front-page .front-milestone-section {
+  grid-area: milestones;
+  min-width: 0;
+  padding-block: 14px;
+  border-block-start: 1px solid var(--border);
+}
+.front-page .front-milestone-section > p { max-width: 76ch; margin-block-start: 4px; color: var(--dim); }
+.front-page .front-milestone-section > a { display: inline-block; margin-block-start: 6px; font-size: 15px; }
+.front-page #front-milestones { margin-block-start: 8px; }
+.front-page #front-milestones .front-check { max-width: 74ch; border-block-start: 1px solid var(--border); }
 .front-page #front-milestones .front-check > summary { width: 100%; color: var(--ink); }
 .front-page #front-milestones .front-check > summary output {
-  margin-inline-start: .5em;
+  float: inline-end;
+  margin-inline-start: .65em;
   color: var(--teal);
   white-space: nowrap;
   font: 500 14px/1.4 var(--mono);
@@ -191,15 +221,19 @@
 }
 
 @media (max-width: 720px) {
-  .front-page .front-intro { grid-template-columns: minmax(0, 1fr); row-gap: 13px; }
+  .front-page main.front-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "reading" "findings" "history" "milestones" "timestamp" "fallback";
+    row-gap: 10px;
+  }
 }
 @media (max-width: 570px) {
-  .front-page .front-header-inner { padding-block: 10px; }
-  .front-page .front-intro { padding-block: 21px 16px; }
-  .front-page .front-scoreline { margin-block-start: 8px; }
+  .front-page .front-header-inner { gap: 6px 12px; padding-block: 8px; }
+  .front-page main.front-wrap { padding-block-start: 15px; }
+  .front-page .front-item { padding-block: 10px; }
 }
 @media (pointer: coarse) {
-  .front-page :is(.front-digest, .front-guide) summary, .front-page .front-footer a {
+  .front-page :is(.front-milestone-section, .front-guide) summary, .front-page .front-footer a {
     min-height: 44px;
     padding-block: 10px;
     align-content: center;

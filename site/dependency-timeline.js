@@ -47,8 +47,8 @@ export function renderDependencyTimeline(container, index, projection, milestone
   explanation.append(map);
   if (!sequence.length) {
     let detail = 'This scenario has no future crossing date. The benchmark slider remains available.';
-    if (projection?.status === 'at-line') detail = 'The current index is already at the watch line. This scenario has no new crossing to schedule.';
-    else if (projection?.status === 'conditional') detail = 'The score scenario reaches the watch line too soon to show separate example dates.';
+    if (projection?.status === 'at-line') detail = 'The current index is already at or above your chosen score. This scenario has no new crossing to schedule.';
+    else if (projection?.status === 'conditional') detail = 'The index reaches your chosen score too soon to show separate dates.';
     container.replaceChildren(title, explanation, node('p', detail, 'small-note'));
     return;
   }
@@ -63,7 +63,7 @@ export function renderDependencyTimeline(container, index, projection, milestone
     const row = node('li');
     const passed = step.day <= selectedDay;
     const status = passed ? 'At or before selected date' : 'After selected date';
-    const label = step.id === 'singularity' ? 'Projected watch-line crossing' : step.label;
+    const label = step.id === 'singularity' ? 'Chosen score reached' : step.label;
     const time = node('time', dateFormat.format(new Date(step.date)));
     time.dateTime = step.date;
     row.dataset.reached = String(passed);
@@ -71,6 +71,6 @@ export function renderDependencyTimeline(container, index, projection, milestone
     items.append(row);
   }
   const note = node('p',
-    'The final date projects when the index would reach the watch line at the selected pace. Confirming the Singularity requires independent evidence of sustained AI-driven acceleration across generations.', 'small-note');
+    'The final date shows when the index would reach your chosen score at the selected pace. The suggested milestone order and dates are hypothetical. Confirming the Singularity requires independent evidence of sustained AI-driven acceleration across generations.', 'small-note');
   container.replaceChildren(title, explanation, summary, items, note);
 }

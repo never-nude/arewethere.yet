@@ -1,5 +1,5 @@
 import { renderCountdownSummary } from './countdown-summary.js';
-import { scoreMovement } from './reading-brief.js';
+import { dailyReading } from './reading-brief.js';
 import { buildIndex, observationDay, hasSourceReading } from './index-model.js';
 import { measureMilestoneProgress } from './milestone-progress.js';
 import { installGlossary } from './glossary.js';
@@ -46,7 +46,7 @@ function drawHistory() {
   const width = Math.max(200, Math.round(chart.getBoundingClientRect().width) || 360);
   if (width === chartWidth) return;
   chartWidth = width;
-  const height = Math.max(146, Math.min(206, Math.round(width * .43)));
+  const height = Math.max(116, Math.min(170, Math.round(width * .32)));
   const left = 31, right = width - 8, top = 29, bottom = height - 26;
   const x = (i) => left + (right - left) * i / Math.max(1, history.length - 1);
   const y = (score) => bottom - (bottom - top) * score / 100;
@@ -97,7 +97,7 @@ function showHistory(index) {
   const missing = history.length - measured.length;
   if (missing) summary += ' ' + missing + (missing === 1 ? ' day has' : ' days have') + ' no reading.';
   if (first.coverage !== last.coverage) {
-    summary += ' Available inputs accounted for ' + first.coverage + ' possible points at the start and ' + last.coverage + ' at the end.';
+    summary += ' Source coverage went from ' + first.coverage + ' to ' + last.coverage + ' of 100 possible points.';
   } else if (index.coverage < 100) {
     summary += ' Current readings cover ' + index.coverage + ' of 100 possible points.';
   }
@@ -120,42 +120,31 @@ function selectReport(payload, index) {
     const value = numbers.format(factor.value);
     const independent = metric.evidenceType === 'Independent study';
     const context = id === 'research-autonomy'
-      ? factor.source + ' reported that AI completed ' + value + '% of selected internal research tasks without human intervention. Experts would take four to eight hours to do those tasks.'
-      : factor.source + ' estimated that capability gains at Anthropic ran at ' + value + ' times their earlier pace. How much of that change came from AI assistance remains uncertain.';
+      ? factor.source + ' reports that AI finished ' + value + '% of selected internal research tasks without human help.'
+      : factor.source + ' puts gains at Anthropic at ' + value + ' times the earlier pace. AI’s share of that gain remains uncertain.';
     reports.push({ url, source: factor.source, independent, date, context });
   }
   return reports.sort((a, b) => b.date.localeCompare(a.date) || Number(b.independent) - Number(a.independent))[0];
 }
 
-function showReport(payload, index) {
-  const mount = byId('front-report');
-  const report = selectReport(payload, index);
-  if (!report) {
-    mount.replaceChildren(node('p', '', 'No dated research report accompanies this reading.'));
-    return;
+function showContributions(index) {
+  const groups = { skills: ['Capability'], research: ['Research'], context: ['Inputs', 'Expectations'] };
+  const entries = Object.entries(groups).map(([name, lanes]) => {
+    const factors = index.factors.filter(factor => lanes.includes(factor.lane));
+    return { name, factors, possible: factors.reduce((sum, factor) => sum + factor.weight, 0) };
+  });
+  const largest = Math.max(...entries.map(group => group.possible));
+  for (const { name, factors, possible } of entries) {
+    const row = document.querySelector('.front-contributions [data-group="' + name + '"]');
+    const available = factors.filter(factor => Number.isFinite(factor.contribution));
+    const earned = available.reduce((sum, factor) => sum + factor.contribution, 0);
+    const covered = available.reduce((sum, factor) => sum + factor.weight, 0);
+    const text = available.length ? numbers.format(earned) : '—';
+    row.querySelector('.front-contribution-value').textContent = text + ' / ' + possible +
+      (covered < possible ? ' · ' + (possible - covered) + ' awaiting data' : '');
+    row.querySelector('.front-contribution-track').style.width = (100 * possible / largest) + '%';
+    row.querySelector('i').style.width = (100 * earned / possible) + '%';
   }
-  const link = node('a', 'front-link', 'Read the ' + report.source + (report.independent ? ' study' : ' report'));
-  link.href = report.url;
-  const time = node('time', 'front-report-meta', fullDate.format(Date.parse(report.date)));
-  time.dateTime = report.date;
-  mount.replaceChildren(node('p', 'front-report-summary', report.context), link, ' · ', time);
-}
-
-function showIncident(payload) {
-  const mount = byId('front-incident');
-  const through = Date.parse(payload.checkedAt);
-  const notices = Array.isArray(payload.incidents) ? payload.incidents : [];
-  const latest = notices.filter(notice => notice?.organization && typeof notice.title === 'string' &&
-    safeUrl(notice.url) && Date.parse(notice.startedAt) <= through)
-    .sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt))[0];
-  mount.hidden = !latest;
-  if (!latest) return;
-  const link = node('a', '', latest.title);
-  link.href = safeUrl(latest.url);
-  const date = fullDate.format(Date.parse(latest.startedAt));
-  const state = latest.status === 'resolved' ? 'marked resolved' :
-    latest.status === 'monitoring' ? 'under monitoring' : 'open';
-  mount.replaceChildren(latest.organization + ' reported “', link, '” on ' + date + '. It was ' + state + ' in the provider’s last update.');
 }
 
 function render(payload) {
@@ -166,34 +155,37 @@ function render(payload) {
   edition.textContent = fullDate.format(Date.parse(index.date)) + ' · UTC edition';
   edition.dateTime = index.date;
   byId('front-score').textContent = numbers.format(index.score);
-  byId('front-change').textContent = scoreMovement(index);
+  byId('front-change').textContent = dailyReading(index) || 'Daily change unavailable.';
+  showContributions(index);
 
   const reliability = index.factors.find(factor => factor.id === 'reliability');
   byId('front-reliability').textContent = Number.isFinite(reliability.value)
-    ? reliability.source + ' estimates that ' + (reliability.model || 'the tested model') + ' succeeds 80% of the time on tested tasks that take a human expert about ' + Number(reliability.value.toFixed(1)) + ' hours.'
+    ? reliability.source + ' estimates 80% success for ' + (reliability.model || 'the tested model') + ' on tasks that take an expert about ' + numbers.format(Number(reliability.value.toPrecision(2))) + ' hours.'
     : 'A reliable task-length estimate is unavailable for this reading.';
   const modelGroups = assessAcceleration(payload, { asOf: index.date }).access;
   const rankings = modelGroups.filter(group => group.models.length).map(group => {
     const leader = group.models[0];
     const category = group.label === 'Open weights' ? 'open-weight' : 'closed-weight';
-    return leader.label + ' leads ' + category + ' models with ' + numbers.format(leader.value) + ' points';
+    return leader.label + ' (' + category + ', ' + numbers.format(leader.value) + ')';
   });
   byId('front-breadth').textContent = rankings.length
-    ? 'On the Epoch Capabilities Index, ' + rankings.join(' and ') + '.'
+    ? 'Top scores on the Epoch Capabilities Index come from ' + rankings.join(' and ') + '.'
     : 'Model comparison scores are currently unavailable.';
   const testsMet = index.threshold.criteria.filter(test => test.status === 'met').length;
   byId('front-verdict').textContent = index.threshold.observed
-    ? 'All three tests are met. Independent evidence traces sustained acceleration across successive AI generations to AI’s own research.'
-    : testsMet + ' of the three tests are met. Confirmation requires reliable work over a full day, repeated AI-led research, and evidence that each generation helps the next improve faster.';
+    ? 'All three tests are met, including independent evidence that AI research speeds up across generations.'
+    : testsMet + ' of 3 tests met. ' + (index.threshold.criteria.find(test => test.id === 'compounding').status !== 'met'
+      ? 'Independent studies have yet to trace faster gains across AI generations to AI’s own research.'
+      : 'The Watch is still waiting for confirmation on the remaining tests.');
   for (const { id, score } of milestones) {
     const row = byId('front-milestones').querySelector('[data-front-milestone="' + id + '"]');
     const measured = Number.isFinite(score);
     row.querySelector('output').textContent = measured ? numbers.format(score) + '%' : 'Awaiting data';
   }
-  renderCountdownSummary(byId('front-countdown'), index, payload);
-  showIncident(payload);
   showHistory(index);
-  showReport(payload, index);
+  const report = selectReport(payload, index);
+  byId('front-report').textContent = report?.context ?? 'No dated research report accompanies this reading.';
+  byId('front-report-link').href = report?.url ?? './dashboard.html#factor-research-autonomy';
   renderScoreGuide(index, milestones);
 }
 
@@ -218,6 +210,9 @@ async function refresh() {
     const response = await fetch(feedUrl, { cache: 'no-cache', signal: AbortSignal.timeout(15000) });
     if (!response.ok) throw new Error('Feed unavailable');
     const payload = await response.json();
+    if (lastChecked === null || Date.parse(payload?.checkedAt) >= Date.parse(lastChecked)) {
+      renderCountdownSummary(byId('front-countdown'), null, payload);
+    }
     if (!hasSourceReading(payload)) throw new Error('No usable evidence');
     if (lastChecked === null || Date.parse(payload.checkedAt) > Date.parse(lastChecked)) {
       render(payload);
@@ -233,7 +228,7 @@ async function refresh() {
       byId('front-reliability').textContent = 'Task-length measurements are currently unavailable.';
       byId('front-verdict').textContent = 'The Watch needs source readings to assess the evidence.';
       byId('front-history-caption').textContent = 'The chart will appear when daily readings are available.';
-      byId('front-report').replaceChildren(node('p', '', 'A source report is currently unavailable.'));
+      byId('front-report').textContent = 'Research readings are currently unavailable.';
       byId('front-score-guide').replaceChildren(node('p', '', 'The eight contributions are unavailable until the source feed returns.'));
       for (const row of byId('front-milestones').querySelectorAll('[data-front-milestone]')) {
         row.querySelector('output').textContent = 'Awaiting data';
@@ -250,11 +245,9 @@ function openScoreGuide() {
   if (location.hash === '#front-points') byId('front-points').open = true;
 }
 
+renderCountdownSummary(byId('front-countdown'), null, null);
 openScoreGuide();
 window.addEventListener('hashchange', openScoreGuide);
-document.querySelector('a[href="#front-points"]').addEventListener('click', () => {
-  byId('front-points').open = true;
-});
 installGlossary(byId('main'));
 if (typeof ResizeObserver === 'function') new ResizeObserver(drawHistory).observe(chart);
 else window.addEventListener('resize', drawHistory);

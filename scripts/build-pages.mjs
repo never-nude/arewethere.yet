@@ -3,6 +3,7 @@ import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { getSignals } from '../src/signals.mjs';
 import { buildIndex } from '../site/index-model.js';
 import { buildCompanionFeed } from '../site/companion-feed.js';
+import { checkResearchForecast } from '../site/research-forecast.js';
 
 const target = new URL('../dist-pages/', import.meta.url);
 
@@ -17,7 +18,10 @@ async function previousRelease() {
   }
 }
 
-const [current, previous] = await Promise.all([getSignals(), previousRelease()]);
+const previousBuild = previousRelease();
+const [current, previous, researchForecast] = await Promise.all([
+  getSignals(), previousBuild, previousBuild.then(previous => checkResearchForecast(previous?.researchForecast)),
+]);
 if (process.env.REQUIRE_LIVE === 'true') {
   assert(current.sources.some((source) => source.status === 'live'), 'Public sources unavailable. The current Pages release is preserved.');
 }
@@ -48,6 +52,7 @@ const incidentSources = current.incidentSources.map((source) => {
 const published = {
   ...current,
   metrics: preserveMetrics,
+  researchForecast,
   events,
   incidents,
   incidentSources,

@@ -1,6 +1,6 @@
 # Singularity Watch
 
-An interactive observatory for public evidence of self-accelerating AI. The [front page](https://arewethereyet.now/) leads with the evidence score and its 30-day trend, then summarizes the dashboard in a short list. The [overview](https://arewethereyet.now/overview.html) introduces the Watch and gives the daily briefing, weekly context and the next evidence to watch. The [full dashboard](https://arewethereyet.now/dashboard.html) includes source data, scoring rules, maps, history, and conditional scenarios. DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
+An interactive observatory for public evidence of self-accelerating AI. The [abridged dashboard](https://arewethereyet.now/) summarizes the current score, what contributed, the four milestones and a dated external forecast for AI research automation. The [full dashboard](https://arewethereyet.now/dashboard.html) includes source data, scoring rules, maps, history, and conditional scenarios. DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
 
 ## Development
 
@@ -14,7 +14,9 @@ Public figures arrive on their publishers’ schedules. If all sources fail duri
 
 The weighted score combines benchmark task horizons and breadth, research autonomy and speed, training compute, forecast market sentiment, and tracked frontier releases. Methodology, input values, source dates, and weights are visible in the site. The score is an editorial measure of evidence. Historical model observations are backfilled by release date.
 
-A scenario date marks a hypothetical crossing of the 75-point watch line. The working definition of the singularity requires independent evidence of an AI-led feedback loop that sustains accelerating capability gains across generations. The site tracks three explicit evidence criteria and records an observed date only when all three have been documented.
+The countdown uses six forecasters’ median months for a superhuman AI researcher. Their milestone requires automating the coding on an AI research project and matching its best researchers’ judgment about experiments. The published range reflects differences between forecasters. Source checks look for revised estimates, and the passage of a forecast month cannot confirm the milestone. [AI Futures Project forecast](https://blog.aifutures.org/p/q35-timelines-update-looks-like-the)
+
+The optional calculator projects a reader-chosen score at a reader-chosen monthly pace. The working definition of the singularity requires independent evidence of an AI-led feedback loop that sustains accelerating capability gains across generations. The site tracks three explicit evidence criteria and records an observed date only when all three have been documented.
 
 ## Paths and acceleration watch
 

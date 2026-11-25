@@ -174,7 +174,7 @@ function configureSlider(state, projection, previousDate) {
   }
   const last = dateFormat.format(model.asOf + maximum * dayMs);
   const start = dateFormat.format(model.asOf);
-  end.textContent = crossing ? 'Horizon ends ' + last + ' at the scenario’s 75-point watch line.'
+  end.textContent = crossing ? 'Horizon ends ' + last + ' at your chosen score of ' + number.format(projection.target) + ' points.'
     : 'Horizon covers 180 days through ' + last + '.';
   state.ticks.replaceChildren(element('span', '', start), element('span', '', '+' + Math.floor(maximum / 2) + ' days'), element('span', '', last));
 }
@@ -232,7 +232,7 @@ export function renderOrganizationForecast(container, { payload, index, projecti
   const handlerChanged = state.onDateChange !== onDateChange;
   state.onDateChange = onDateChange;
   const modelChanged = !state.model || state.payload !== payload || state.date !== index?.date;
-  const scenarioKey = [projection?.status, projection?.date, projection?.monthlyPoints].join('|');
+  const scenarioKey = [projection?.status, projection?.date, projection?.target, projection?.monthlyPoints].join('|');
   if (!modelChanged && state.scenarioKey === scenarioKey) {
     if (handlerChanged && Number.isFinite(state.model.asOf)) onDateChange?.(Number(state.slider.value));
     return;

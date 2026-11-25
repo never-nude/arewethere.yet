@@ -31,7 +31,7 @@ function grid(width, height, lower, upper, ticks, xStart, y, bottomLabels, watch
   if (!Number.isFinite(watch) || watch < lower || watch > upper) return [...rules, ...floor].join('');
   const watchY = y(watch);
   return [...rules, ...floor,
-    `<line class="watch-line" x1="${xStart}" x2="${width - 9}" y1="${watchY}" y2="${watchY}" stroke-dasharray="4 4"/><text class="watch-label" x="${width - 12}" y="${watchY - 5}" text-anchor="end">${watch} WATCH LINE</text>`,
+    `<line class="watch-line" x1="${xStart}" x2="${width - 9}" y1="${watchY}" y2="${watchY}" stroke-dasharray="4 4"/><text class="watch-label" x="${width - 12}" y="${watchY - 5}" text-anchor="end">${watch} · YOUR SCORE</text>`,
   ].join('');
 }
 
@@ -45,13 +45,13 @@ function makeSize(container) {
   return { width, height: Math.max(168, Math.min(262, Math.round(innerWidth * .23))), start: 32, end: width - 9 };
 }
 
-export function historyPlot(container, frames, selected, watch, onSelect) {
+export function historyPlot(container, frames, selected, onSelect) {
   const { width, height, start, end } = makeSize(container);
   if (!frames.length) return;
   const frameCount = Math.max(1, frames.length - 1);
   const values = frames.map((frame) => frame.score).filter(Number.isFinite);
-  const lower = Math.max(0, Math.floor((Math.min(watch, ...values) - 8) / 10) * 10);
-  const upper = Math.min(100, Math.max(80, Math.ceil((Math.max(watch, ...values) + 5) / 10) * 10));
+  const lower = values.length ? Math.max(0, Math.floor((Math.min(...values) - 8) / 10) * 10) : 0;
+  const upper = values.length ? Math.min(100, Math.ceil((Math.max(...values) + 5) / 10) * 10) : 100;
   const x = (index) => start + index / frameCount * (end - start);
   const bottom = height - plotBottomInset;
   const y = (score) => bottom - (score - lower) / (upper - lower) * (bottom - plotTop);
@@ -68,13 +68,13 @@ export function historyPlot(container, frames, selected, watch, onSelect) {
   const markers = frames.map((day, i) => day.events.length && Number.isFinite(day.score)
     ? `<circle cx="${x(i)}" cy="${y(day.score)}" r="2.1" fill="#e8d7ff" opacity=".8"/>` : '').join('');
   container.innerHTML = svgFrame(width, height, `
-    ${grid(width, height, lower, upper, ticks, start, y, dates, watch)}
+    ${grid(width, height, lower, upper, ticks, start, y, dates)}
     ${indexAxes(width, height)}
     <path class="data-line" d="${path}" fill="none" stroke-width="2.4" stroke-linejoin="round"/>
     ${markers}${mark}
     <rect class="plot-hit" x="${start}" y="${plotTop}" width="${end - start}" height="${bottom - plotTop}" fill="transparent"/>
   `, `Observed evidence index in points by date (UTC). The vertical scale shows ${lower} to ${upper} points out of 100. Use the replay slider to move between dates.`)
-    + '<p class="small-note">The vertical scale adjusts to show the selected readings and the watch line.</p>';
+    + '<p class="small-note">The vertical scale adjusts to the range of observed scores in this period.</p>';
   container.onpointerup = (event) => {
     if (!event.target.classList.contains('plot-hit')) return;
     const rect = event.target.getBoundingClientRect();
@@ -95,12 +95,12 @@ export function scenarioPlot(container, index, pace, crossing) {
   const path = Array.from({ length: 61 }, (_, i) => `${i ? 'L' : 'M'}${x(i).toFixed(2)},${y(Math.min(100, Math.max(0, index.score + pace * i))).toFixed(2)}`).join(' ');
   const markX = crossing?.days != null ? x(crossing.days / 30.4375) : -1;
   const mark = markX >= start && markX <= end
-    ? `<line class="cursor-line" x1="${markX}" x2="${markX}" y1="${y(index.threshold.target)}" y2="${bottom}" stroke-dasharray="3 3"/>
-    <circle cx="${markX}" cy="${y(index.threshold.target)}" r="5" fill="#7ae7cd" stroke="#1a1627" stroke-width="2"/>
-    <text class="marker-label" x="${markX + (markX > width * .65 ? -7 : 7)}" y="${y(index.threshold.target) + 18}" text-anchor="${markX > width * .65 ? 'end' : 'start'}">${month.format(new Date(crossing.date))}</text>`
+    ? `<line class="cursor-line" x1="${markX}" x2="${markX}" y1="${y(crossing.target)}" y2="${bottom}" stroke-dasharray="3 3"/>
+    <circle cx="${markX}" cy="${y(crossing.target)}" r="5" fill="#7ae7cd" stroke="#1a1627" stroke-width="2"/>
+    <text class="marker-label" x="${markX + (markX > width * .65 ? -7 : 7)}" y="${y(crossing.target) + 18}" text-anchor="${markX > width * .65 ? 'end' : 'start'}">${month.format(new Date(crossing.date))}</text>`
     : '';
   container.innerHTML = svgFrame(width, height, `
-    ${grid(width, height, 0, 100, [0, 25, 50, 100], start, y, dates, index.threshold.target)}
+    ${grid(width, height, 0, 100, [0, 25, 50, 100], start, y, dates, crossing.target)}
     ${indexAxes(width, height)}
     <path class="trend-line" d="${path}" fill="none" stroke-width="2.4" stroke-dasharray="5 4" stroke-linecap="round"/>
     <circle cx="${start}" cy="${y(index.score)}" r="3.5" fill="#d3bbff"/>${mark}

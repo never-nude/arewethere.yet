@@ -11,19 +11,6 @@ const inputNames = {
   releases: 'the number of model launches in the past 45 days',
 };
 
-export function scoreMovement(index) {
-  const prior = index.history.at(-2);
-  if (!Number.isFinite(prior?.score) || !Number.isFinite(index.delta)) return 'Daily change unavailable';
-  const magnitude = Math.abs(index.delta);
-  const change = magnitude ? (index.delta > 0 ? 'Up ' : 'Down ') + points.format(magnitude) +
-    (magnitude === 1 ? ' point' : ' points') : 'Unchanged';
-  const since = day.format(Date.parse(prior.date));
-  const previous = new Map(prior.factors.map(factor => [factor.id, factor.contribution]));
-  const coverageChanged = index.factors.some(factor =>
-    Number.isFinite(factor.contribution) !== Number.isFinite(previous.get(factor.id)));
-  return change + ' since ' + since + (coverageChanged ? '. The set of available readings changed.' : '');
-}
-
 export function dailyReading(index) {
   const previous = index.history.at(-2);
   if (!Number.isFinite(index.delta) || !Number.isFinite(previous?.score)) return '';
@@ -36,7 +23,7 @@ export function dailyReading(index) {
   }
   const prior = new Map(previous.factors.map(factor => [factor.id, factor]));
   const changes = index.factors.filter(factor => factor.contribution !== prior.get(factor.id)?.contribution);
-  if (!changes.length) return since + headline;
+  if (!changes.length) return since + headline + ' Each indicator kept the same contribution.';
 
   const coverageChanges = changes.filter(factor =>
     Number.isFinite(factor.contribution) !== Number.isFinite(prior.get(factor.id)?.contribution));

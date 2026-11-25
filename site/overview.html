@@ -4,119 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#100e1a">
-  <title>The Singularity Watchdog Briefing · Overview</title>
-  <meta name="description" content="What changed in the singularity evidence today, how the week compares, and what researchers still need to show.">
-  <link rel="canonical" href="https://arewethereyet.now/overview.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="The Singularity Watchdog Briefing">
-  <meta property="og:description" content="The daily evidence score, the week in context, and the tests still to watch. Sources are checked four times a day.">
-  <meta property="og:url" content="https://arewethereyet.now/overview.html">
+  <title>The Singularity Watchdog · At a glance</title>
+  <link rel="canonical" href="https://arewethereyet.now/">
+  <meta property="og:title" content="The Singularity Watchdog">
+  <meta property="og:url" content="https://arewethereyet.now/">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The Singularity Watchdog Briefing">
-  <meta name="twitter:description" content="The daily evidence score, the week in context, and the tests still to watch. Sources are checked four times a day.">
-  <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
-  <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png?v=4">
-  <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=4">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://arewethereyet.now/assets/watch-touch.png?v=4">
-  <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./overview.css">
-  <link rel="stylesheet" href="./countdown-summary.css">
-  <link rel="stylesheet" href="./glossary.css">
-  <link rel="stylesheet" href="./view-switch.css">
-  <link rel="stylesheet" href="./language-menu.css">
-  <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./overview.js"></script>
-</head>
-<body class="overview-home">
-  <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="topbar">
-    <div class="home-wrap home-header">
-      <a href="./" class="wordmark"><img class="wordmark-icon" src="./favicon.svg?v=4" width="30" height="30" alt=""> Singularity Watch</a>
-      <div class="page-tools">
-        <nav class="view-switch" aria-label="Site views">
-          <a href="./">Front page</a><a href="./overview.html" aria-current="page">Overview</a><a href="./dashboard.html">Full dashboard</a>
-        </nav>
-        <site-language-menu></site-language-menu>
-      </div>
-    </div>
-  </header>
-  <main id="main" class="home-wrap" tabindex="-1">
-    <header class="home-intro">
-      <p class="home-edition" id="home-edition" hidden><time id="home-date"></time> <span>· UTC edition</span></p>
-      <h1 id="home-question">The Singularity Watchdog Briefing</h1>
-    </header>
-
-    <div class="home-brief">
-      <section class="home-instrument" aria-labelledby="home-score-title">
-        <h2 id="home-score-title">Evidence score</h2>
-        <div class="home-number"><output id="home-score" aria-describedby="home-score-meaning" aria-live="off">—</output><span> / 100</span></div>
-        <div class="home-scale" aria-hidden="true"><i id="home-fill"></i></div>
-        <p id="home-movement">Checking the daily change…</p>
-        <p id="home-score-meaning">A singularity would mean AI helps build better AI faster with each generation. Eight indicators earn up to 100 points for evidence of that cycle. Its timing remains unknown.</p>
-        <div id="home-countdown" class="countdown-summary">
-          <h3 class="countdown-summary-title">Countdown to the 75-point review threshold</h3>
-          <a href="./dashboard.html#watch-clock">See the one-point-per-month scenario</a>
-        </div>
-        <a class="home-detail-link" href="./#front-points">See what earns each point <span aria-hidden="true">→</span></a>
-        <div class="home-freshness">
-          <b>Four scheduled source checks a day</b>
-          <span id="home-last-check" role="status">Checking the latest reading…</span>
-        </div>
-      </section>
-      <div class="home-report">
-        <section aria-labelledby="home-day-title">
-          <h2 id="home-day-title">What changed today</h2>
-          <p id="home-daily-reading">Loading the daily comparison…</p>
-          <p>Weaker test results can lower the score. A delayed report can leave an older reading in place, and a missing input leaves its points unfilled.</p>
-          <p id="home-answer" class="home-answer" hidden></p>
-        </section>
-        <section aria-labelledby="home-week-title">
-          <h2 id="home-week-title">The past week</h2>
-          <p id="home-week-reading">Loading the weekly comparison…</p>
-        </section>
-        <section aria-labelledby="home-watch-title">
-          <h2 id="home-watch-title">What to watch</h2>
-          <p id="home-watch-reading">Checking which evidence is still needed…</p>
-          <a class="home-detail-link" href="./dashboard.html#evidence-gates">Inspect the three evidence tests <span aria-hidden="true">→</span></a>
-        </section>
-      </div>
-    </div>
-
-    <section class="home-milestones" aria-labelledby="home-milestones-title">
-      <div>
-        <h2 id="home-milestones-title">How the four milestones fit together</h2>
-        <p>General intelligence (AGI) would match skilled people across many fields. Superintelligence (ASI) would surpass leading experts. Recursive self-improvement (RSI) could begin with a research specialist that helps build a stronger successor. A singularity would mean each new generation makes that improvement faster.</p>
-      </div>
-      <div class="home-links">
-        <a class="home-detail-link" href="./#front-milestones-title">See the four checklists <span aria-hidden="true">→</span></a>
-        <a class="home-detail-link" href="./dashboard.html#atlas">Explore the milestone map <span aria-hidden="true">→</span></a>
-      </div>
-    </section>
-    <noscript><p class="home-fallback">Enable JavaScript to see the daily briefing or <a href="./data/signals.json">read the source data</a>.</p></noscript>
-  </main>
-  <footer class="home-wrap home-footer"><a href="./dashboard.html#methodology">Methods and sources</a><a href="./dashboard.html#history-chart">Explore the index history <span aria-hidden="true">→</span></a></footer>
   <script>
-    // Keep links shared before the dashboard moved to its own page.
-    function openDashboardSection() {
-      const fragment = location.hash.slice(1).split(':~:')[0];
-      if (fragment && !document.getElementById(fragment)) {
-        const dashboard = new URL('./dashboard.html', location.href);
-        dashboard.search = location.search;
-        dashboard.hash = location.hash;
-        location.replace(dashboard.href);
-      }
-    }
-    openDashboardSection();
-    window.addEventListener('hashchange', openDashboardSection);
+    const frontPage = new URL(location.protocol === 'file:' ? './index.html' : './', location.href);
+    frontPage.search = location.search;
+    frontPage.hash = location.hash;
+    location.replace(frontPage.href);
   </script>
+  <noscript><meta http-equiv="refresh" content="0;url=./"></noscript>
+</head>
+<body>
+  <p><a href="./">Open the Singularity Watchdog at a glance</a></p>
 </body>
 </html>

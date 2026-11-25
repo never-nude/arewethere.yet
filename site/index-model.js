@@ -1,5 +1,4 @@
 const dayMs = 86_400_000;
-const watchLine = 75;
 const releaseWindow = 45;
 
 export const singularityDefinition = 'A sustained feedback loop in which AI systems drive substantial, accelerating gains in their successors’ capabilities across multiple generations.';
@@ -8,7 +7,7 @@ export const indexMethodology = [
   'The score totals weighted evidence points on a 0–100 scale. Weights and reference targets are editorial choices. The score tracks proxy indicators alongside evidence of AI research automation.',
   'Inputs use dated observations or announcements. Missing factors leave their evidence points unfilled and lower the coverage readout. The coverage range shows how many points missing inputs could add.',
   'Model measurements are placed on the model release date for retrospective comparison. Research results enter the index on the report publication date. Values carry forward between observations, except for the stated rolling windows.',
-  'The 75-point watch line marks the composite index. Confirming self-accelerating AI requires separate evidence for the three criteria below.',
+  'A scenario projects from a score and monthly pace chosen by the reader. Confirmation of self-accelerating AI requires independent evidence for all three criteria below.',
 ];
 
 const sources = {
@@ -231,7 +230,7 @@ function confirmation(record, asOf) {
   return url.protocol === 'https:' ? { ...record, date } : null;
 }
 
-function makeThreshold(frame, history, evidence, benchmarkDate) {
+function makeThreshold(frame, evidence, benchmarkDate) {
   const reliability = frame.factors.find((factor) => factor.id === 'reliability');
   const autonomy = frame.factors.find((factor) => factor.id === 'research-autonomy');
   const acceleration = frame.factors.find((factor) => factor.id === 'research-acceleration');
@@ -268,16 +267,11 @@ function makeThreshold(frame, history, evidence, benchmarkDate) {
       date: verifiedCompounding?.date ?? null,
     },
   ];
-  const numericCrossing = history.find((point, index) => point.score != null && point.score >= watchLine
-    && index > 0 && history[index - 1].score != null && history[index - 1].score < watchLine);
   const observed = criteria.every((criterion) => criterion.status === 'met');
   return {
-    target: watchLine,
     observed,
     crossingDate: observed ? criteria.map((criterion) => criterion.date).sort().at(-1) : null,
-    numericCrossingDate: numericCrossing?.date ?? null,
     criteria,
-    scenario: null,
   };
 }
 
@@ -337,17 +331,23 @@ export function buildIndex(payload = {}, { days = 180 } = {}) {
     methodology: indexMethodology,
     ...current,
     history,
-    threshold: makeThreshold(current, history, payload.thresholdEvidence, day(input.get('reliability')?.asOf)),
+    threshold: makeThreshold(current, payload.thresholdEvidence, day(input.get('reliability')?.asOf)),
   };
 }
 
-export function projectThreshold(index, { monthlyPoints } = {}) {
-  const target = index?.threshold?.target ?? watchLine;
-  const scenario = { date: null, target, monthlyPoints: Number.isFinite(monthlyPoints) ? monthlyPoints : null, days: null };
-  if (index?.score == null || !day(index.date)) return { ...scenario, status: 'no-reading' };
-  if (index.score >= target) return { ...scenario, date: index.threshold?.numericCrossingDate ?? null, status: 'at-line' };
-  if (scenario.monthlyPoints == null || scenario.monthlyPoints <= 0) return { ...scenario, status: 'no-crossing' };
-  const days = Math.ceil((target - index.score) / scenario.monthlyPoints * 30.4375);
-  if (days > 365.25 * 25) return { ...scenario, days, status: 'outside-window' };
+export function projectThreshold(index, { monthlyPoints, target } = {}) {
+  const validTarget = Number.isFinite(target) && target >= 0 && target <= 100;
+  const scenario = {
+    date: null, days: null, target: validTarget ? target : null,
+    monthlyPoints: Number.isFinite(monthlyPoints) ? monthlyPoints : null,
+  };
+  if (!validTarget) return { ...scenario, status: 'no-target' };
+  if (!Number.isFinite(index?.score) || !day(index.date)) return { ...scenario, status: 'no-reading' };
+  const gap = target - index.score;
+  if (gap === 0) return { ...scenario, date: index.date, days: 0, status: 'at-line' };
+  if (scenario.monthlyPoints === null) return { ...scenario, status: 'no-pace' };
+  if (Math.sign(gap) !== Math.sign(monthlyPoints)) return { ...scenario, status: 'no-crossing' };
+  const days = Math.ceil(gap / monthlyPoints * 30.4375);
+  if (days > 365.25 * 5) return { ...scenario, days, status: 'outside-window' };
   return { ...scenario, days, date: offset(index.date, days), status: 'conditional' };
 }

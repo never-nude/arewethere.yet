@@ -1,6 +1,6 @@
 import { buildIndex, projectThreshold } from './index-model.js';
+import { renderCountdownSummary } from './countdown-summary.js';
 import { dailyReading } from './reading-brief.js';
-import { getCountdown } from './countdown.js';
 import { historyPlot, scenarioPlot, factorPlot } from './plots.js';
 import { renderTerrain } from './terrain.js';
 import { renderRelationshipMap } from './relationship-map.js';
@@ -27,7 +27,6 @@ const checkTime = new Intl.DateTimeFormat(undefined, {
 });
 const shortTime = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit' });
 const checkUrl = new URL('./data/signals.json', import.meta.url);
-const dayMs = 86_400_000;
 const pageSize = 5;
 
 let dataset;
@@ -105,14 +104,9 @@ function renderReading() {
   byId('current-delta').title = 'Change from the prior day';
   byId('index-daily-reading').textContent = dailyReading(index);
   byId('index-fill').style.width = (score ?? 0) + '%';
-  byId('watch-tick').style.left = threshold.target + '%';
   const available = index.factors.filter(factor => Number.isFinite(factor.contribution)).length;
   byId('score-coverage').textContent = available + ' of ' + index.factors.length + ' inputs have readings';
   byId('score-coverage').title = coverage + '% of the index weight has a reading';
-  byId('watch-line-label').textContent = threshold.target + '-point watch line';
-  byId('index-gap').textContent = score == null ? '' : score < threshold.target
-    ? 'The current score is ' + num(threshold.target - score) + ' points below it.'
-    : 'The current score has reached it.';
   if (score != null) byId('index-meter').setAttribute('aria-valuenow', score);
   else byId('index-meter').removeAttribute('aria-valuenow');
   byId('observed').textContent = threshold.observed
@@ -133,40 +127,6 @@ function renderReading() {
     item.append(element('span', '', label), element('strong', '', points + ' / ' + weight));
     return item;
   }));
-}
-
-function renderCountdown() {
-  if (!index) return;
-  const { status, daysRemaining, date: targetDate, target, monthlyPoints, anchorDate } = getCountdown(index);
-  const conditional = status === 'conditional';
-  byId('countdown-evidence-date').textContent = date(index.date) || 'its latest data check';
-  const labels = {
-    conditional: 'Scenario date for reaching the review threshold',
-    elapsed: 'Scenario date reached',
-    'at-line': 'Watch line reached',
-    observed: 'Singularity evidence verified',
-    'no-reading': 'Waiting for an evidence reading',
-  };
-  const notes = {
-    conditional: `Starting from the ${date(anchorDate, true)} reading, the score would reach ${target} at +${num(monthlyPoints)} index point per month.`,
-    elapsed: `The score is still below ${target}. This scenario assumed a steady gain of +${num(monthlyPoints)} index point per month.`,
-    'at-line': 'The watch line calls for a closer look. Confirming the Singularity requires independent evidence across successive AI generations.',
-    observed: 'The watch’s independent evidence criteria have been met.',
-    'no-reading': 'The countdown needs a current evidence index reading.',
-  };
-  byId('countdown-value').hidden = !conditional;
-  byId('countdown-days').value = conditional ? num(daysRemaining) : '';
-  byId('countdown-state').textContent = labels[status];
-  byId('countdown-note').textContent = notes[status];
-  const time = byId('countdown-date');
-  time.hidden = !targetDate;
-  time.dateTime = targetDate ?? '';
-  time.textContent = date(targetDate);
-}
-
-function tickCountdown() {
-  renderCountdown();
-  setTimeout(tickCountdown, dayMs - Date.now() % dayMs);
 }
 
 function renderTicker() {
@@ -207,7 +167,7 @@ function renderReplay() {
   byId('replay-latest').disabled = pos === frames.length - 1;
   byId('history-caption').textContent = date(frames[0].date, true) + ' – ' + date(frames.at(-1).date);
   byId('replay-date').textContent = date(frame.date) + ' · ' + frame.coverage + '% coverage';
-  historyPlot(byId('history-chart'), frames, pos, index.threshold.target, selectReplay);
+  historyPlot(byId('history-chart'), frames, pos, selectReplay);
   const delta = element('span');
   setChange(delta, frame.delta);
   byId('replay-readout').replaceChildren(element('strong', '', num(frame.score)), delta);
@@ -235,22 +195,40 @@ function selectReplay(position) {
 
 function renderScenario() {
   if (!index) return;
-  const pace = Number(byId('scenario-pace').value);
-  const result = projectThreshold(index, { monthlyPoints: pace });
-  byId('scenario-rate').textContent = changeText(pace, '');
-  byId('leader-scenario-rate').textContent = changeText(pace, '');
-  byId('leader-scenario-pace').value = pace;
-  setPressed('scenario-presets', 'pace', pace);
-  scenarioPlot(byId('scenario-chart'), index, pace, result);
-  let description = 'No watch-line crossing at this pace within five years.';
-  if (result.status === 'at-line') description = 'The index is already at or above the watch line.';
-  else if (result.status === 'no-reading') description = 'A current index reading is needed to plot this illustration.';
-  else if (result.date && result.days <= 60 * 30.4375) description = 'At this pace, the index would reach ' + num(result.target) + ' points on ' + date(result.date) + '.';
-  byId('scenario-caption').textContent = description;
-  const milestones = measureMilestoneProgress(index);
+  const scoreField = byId('scenario-target');
+  const paceField = byId('scenario-pace');
+  const target = scoreField.valueAsNumber;
+  const pace = paceField.valueAsNumber;
+  const result = projectThreshold(index, { target, monthlyPoints: pace });
+  const chart = byId('scenario-chart');
+  const caption = byId('scenario-caption');
+  const complete = Number.isFinite(target) && scoreField.validity.valid && Number.isFinite(pace);
+  chart.hidden = !complete || !Number.isFinite(index.score);
+  if (chart.hidden) chart.replaceChildren();
+  else scenarioPlot(chart, index, pace, result);
+
+  let message = '';
+  if (!scoreField.validity.valid) message = 'Enter a score between 0 and 100.';
+  else if (!paceField.validity.valid) message = 'Enter a monthly change in points.';
+  else if (complete) {
+    const descriptions = {
+      'at-line': 'The current score already equals your chosen score.',
+      'no-crossing': 'The index would never reach your chosen score at this pace.',
+      'outside-window': 'Your chosen score falls beyond this five-year scenario.',
+      'no-reading': 'A current evidence reading is needed for this calculation.',
+      conditional: 'At this pace, the score would reach ' + num(target) + ' on ' + date(result.date) + '.',
+    };
+    message = descriptions[result.status] ?? '';
+  }
+  if (caption.textContent !== message) caption.textContent = message;
+
+  const timeline = byId('dependency-timeline');
+  const showTimeline = complete && pace > 0 && result.status === 'conditional';
+  timeline.hidden = !showTimeline;
+  if (!showTimeline) timeline.replaceChildren();
   renderOrganizationForecast(byId('organization-forecast'), {
-    payload: dataset, index, projection: result,
-    onDateChange: (day) => renderDependencyTimeline(byId('dependency-timeline'), index, result, milestones, day),
+    payload: dataset, index, projection: showTimeline ? result : undefined,
+    onDateChange: showTimeline ? day => renderDependencyTimeline(timeline, index, result, measureMilestoneProgress(index), day) : undefined,
   });
 }
 
@@ -442,7 +420,7 @@ async function reload() {
       relationships.update({ index, verdicts: milestoneVerdicts });
       if (atLatest) selectedDate = index.date;
       renderReading();
-      renderCountdown();
+      renderCountdownSummary(byId('watch-clock'), index, dataset);
       renderMilestoneProgress(byId('milestone-progress'), index);
       renderTicker();
       renderReplay();
@@ -492,16 +470,7 @@ byId('replay-back').addEventListener('click', () => selectReplay(Number(byId('re
 byId('replay-forward').addEventListener('click', () => selectReplay(Number(byId('replay').value) + 1));
 byId('replay-latest').addEventListener('click', () => selectReplay(datesInRange().length - 1));
 byId('scenario-pace').addEventListener('input', renderScenario);
-byId('leader-scenario-pace').addEventListener('input', (event) => {
-  byId('scenario-pace').value = event.target.value;
-  renderScenario();
-});
-byId('scenario-presets').addEventListener('click', (event) => {
-  const button = event.target.closest('button[data-pace]');
-  if (!button) return;
-  byId('scenario-pace').value = button.dataset.pace;
-  renderScenario();
-});
+byId('scenario-target').addEventListener('input', renderScenario);
 byId('news-filters').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-category]');
   if (!button || !dataset) return;
@@ -520,7 +489,7 @@ const plots = new ResizeObserver(() => {
   if (!index) return;
   const frames = datesInRange();
   const position = frames.findIndex((frame) => frame.date === selectedDate);
-  historyPlot(byId('history-chart'), frames, Math.max(0, position), index.threshold.target, selectReplay);
+  historyPlot(byId('history-chart'), frames, Math.max(0, position), selectReplay);
   renderScenario();
 });
 plots.observe(byId('history-chart'));
@@ -596,11 +565,10 @@ renderLabs(byId('labs-board'));
 renderOrganizationSignals(byId('leaders'));
 renderOrganizationForecast(byId('organization-forecast'));
 installGlossary(byId('main'));
+renderCountdownSummary(byId('watch-clock'), null, null);
 reload();
-tickCountdown();
 setInterval(() => { if (!document.hidden) reload(); }, 60_000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
-  renderCountdown();
   if (Date.now() - lastAttempt >= 60_000) reload();
 });

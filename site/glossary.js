@@ -24,7 +24,7 @@ const entries = [
   ['compounding gains|compounding capability gains|compounding', 'Compounding gains', 'Improvements that make the next round of improvement more effective, so gains build on one another.'],
   ['replication|independent replication|independent replications', 'Independent replication', 'Researchers outside the original team repeat a study or test to see whether its result holds.'],
   ['evidence coverage|source coverage', 'Evidence coverage', 'The share of the scoring rules with published evidence available. Missing readings can lower coverage.'],
-  ['watch line|watch-line', 'Watch line', 'The index score of 75 points prompts a closer look at the evidence. Confirming the Singularity requires separate independent evidence.'],
+  ['scenario target', 'Scenario target', 'A score you choose to explore how a monthly gain or loss would affect the index over time.'],
   ['sycophancy|sycophantic', 'Excessive agreement', 'When an AI sides with the user even if their claim is incorrect or needs to be challenged.'],
   ['API', 'Application programming interface', 'A way for software to request a service, such as asking a model for an answer.'],
   ['UTC', 'Coordinated Universal Time', 'The common time standard used to compare dates and times across time zones.'],

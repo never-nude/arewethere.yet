@@ -29,3 +29,56 @@
   font-size: 14px;
 }
 .countdown-summary a:hover { color: var(--teal); }
+.countdown-summary details { margin-block-start: 4px; overflow-wrap: anywhere; }
+.countdown-summary summary { width: fit-content; cursor: pointer; color: var(--violet); font-size: 14px; }
+.countdown-summary summary:hover { text-decoration: underline; }
+.countdown-summary details[open] > div {
+  margin-block: 5px 10px;
+  max-width: 64ch;
+}
+.countdown-summary details p + p { margin-block-start: 8px; }
+.countdown-summary .forecast-medians {
+  margin-block: 9px;
+  padding: 0;
+  list-style: none;
+  color: var(--dim);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.countdown-summary .forecast-medians li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(30px, 1fr) minmax(5.1em, .7fr);
+  align-items: center;
+  column-gap: 9px;
+  padding-block: 3px;
+  overflow-wrap: anywhere;
+}
+.countdown-summary .forecast-medians time {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.countdown-summary .forecast-median-rail {
+  position: relative;
+  height: 2px;
+  margin-inline: 4px;
+  background: #756484;
+}
+.countdown-summary .forecast-median-rail::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset-inline-start: var(--month-position);
+  inset-block-start: 50%;
+  width: 8px;
+  height: 8px;
+  margin-inline-start: -4px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--teal);
+  transform: translateY(-50%);
+}
+.countdown-summary .single-month .forecast-median-rail { background: transparent; }
+@media (pointer: coarse) {
+  .countdown-summary summary { min-height: 44px; padding-block: 10px; }
+}
