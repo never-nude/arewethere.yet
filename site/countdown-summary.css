@@ -1,0 +1,31 @@
+.countdown-summary {
+  margin-block: 13px 7px;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--violet);
+  color: var(--ink);
+}
+.countdown-summary :is(h2, .countdown-summary-title) {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -.015em;
+}
+.countdown-summary p {
+  margin-block: 2px;
+  color: var(--dim);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.countdown-summary .countdown-summary-value {
+  color: var(--ink);
+  font-size: 21px;
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+}
+.countdown-summary a {
+  color: var(--violet);
+  text-underline-offset: .18em;
+  font-size: 14px;
+}
+.countdown-summary a:hover { color: var(--teal); }

@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f7f5ee">
-  <title>The AI singularity front page · Singularity Watch</title>
-  <meta name="description" content="What changed in the evidence for an AI singularity? Read the latest finding, see the month in context, and follow every score back to the points that earned it.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#100e1a">
+  <title>The Singularity Watchdog · Front page</title>
+  <meta name="description" content="Follow the singularity evidence score, see how it moved over the past month, and read the findings behind it at a glance.">
   <link rel="canonical" href="https://arewethereyet.now/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="The AI singularity front page">
-  <meta property="og:description" content="The latest reading, the evidence behind it, and what each point means.">
+  <meta property="og:title" content="The Singularity Watchdog">
+  <meta property="og:description" content="The evidence score, its recent direction, and a short guide to the findings behind it.">
   <meta property="og:url" content="https://arewethereyet.now/">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -19,8 +19,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The AI singularity front page">
-  <meta name="twitter:description" content="The latest reading, the evidence behind it, and what each point means.">
+  <meta name="twitter:title" content="The Singularity Watchdog">
+  <meta name="twitter:description" content="The evidence score, its recent direction, and a short guide to the findings behind it.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=4">
@@ -32,19 +32,17 @@
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./front-page.css">
+  <link rel="stylesheet" href="./countdown-summary.css">
   <script>if (location.protocol === 'file:') document.documentElement.dataset.filePreview = '';</script>
   <script type="module" src="./language-menu.js?v=3"></script>
   <script type="module" src="./front-page.js"></script>
 </head>
 <body class="front-page">
   <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="front-header">
-    <div class="front-wrap">
-      <div class="front-mast">
-        <a class="front-brand" href="./"><img src="./favicon.svg?v=4" width="44" height="44" alt=""> Singularity Watch</a>
-        <time id="front-date" aria-label="Edition date"></time>
-      </div>
-      <div class="front-nav-row page-tools">
+  <header class="topbar">
+    <div class="front-wrap front-header-inner">
+      <a class="wordmark" href="./"><img class="wordmark-icon" src="./favicon.svg?v=4" width="30" height="30" alt=""> Singularity Watch</a>
+      <div class="page-tools">
         <nav class="view-switch" aria-label="Site views">
           <a href="./" aria-current="page">Front page</a><a href="./overview.html">Overview</a><a href="./dashboard.html">Full dashboard</a>
         </nav>
@@ -54,71 +52,75 @@
   </header>
   <p class="file-preview">For the current readings, <a href="https://arewethereyet.now/">open the live front page</a>.</p>
   <main class="front-wrap" id="main" tabindex="-1">
-    <section class="front-lead" aria-labelledby="front-headline">
-      <article class="front-story">
-        <h1 id="front-headline">What the evidence shows about an AI singularity</h1>
-        <p class="front-deck">AI can already help researchers build a better model. The test for a singularity is whether each successor can help build the next and make the cycle faster.</p>
-        <p id="front-verdict"></p>
-        <a class="front-link" href="#front-milestones-title">How the four milestones fit together <span aria-hidden="true">↓</span></a>
-      </article>
-      <aside class="front-reading" aria-labelledby="front-score-title">
-        <h2 id="front-score-title">Evidence score</h2>
-        <div class="front-score-line"><output id="front-score" aria-describedby="front-score-meaning" aria-live="off">—</output><span> / 100</span></div>
-        <p id="front-score-meaning">Of 100 possible points, 50 come from tests of AI skills, 35 from research results, and 15 from computing resources, market expectations and model launches. The score measures support for the Watch’s criteria. The chance and timing of a singularity remain open questions.</p>
-        <p id="front-change"></p>
-        <a class="front-link" id="front-driver-link" href="./dashboard.html#signals">Inspect the measurements</a>
-        <details class="front-guide" id="front-points">
-          <summary>How do the 100 points add up?</summary>
-          <div id="front-score-guide"><p>Loading the eight contributions…</p></div>
-        </details>
-      </aside>
-    </section>
-    <section class="front-grid" aria-label="Recent evidence and reporting">
-      <article class="front-history" aria-labelledby="front-history-title">
-        <header class="front-section-heading"><h2 id="front-history-title">The past 30 days</h2><a class="front-link" href="./dashboard.html#history-chart">Explore the history <span aria-hidden="true">→</span></a></header>
-        <div id="front-history"></div>
-        <p id="front-history-caption">The line follows the evidence score, in points out of 100.</p>
-      </article>
-      <aside class="front-report" aria-labelledby="front-report-title">
-        <h2 id="front-report-title">Inside the research</h2>
-        <div id="front-report"><p>Loading the latest research reading…</p></div>
-      </aside>
-    </section>
-    <section class="front-milestones" aria-labelledby="front-milestones-title">
-      <header class="front-section-heading"><h2 id="front-milestones-title">Four milestones, four tests</h2><a class="front-link" href="./dashboard.html#atlas">Explore the maps <span aria-hidden="true">→</span></a></header>
-      <p class="front-section-intro">Each percentage shows the points earned on that milestone’s own 100-point checklist. The checklists measure different abilities, so adding their scores together has no useful meaning.</p>
-      <div id="front-milestones">
-        <article data-front-milestone="singularity">
-          <h3>The singularity</h3>
-          <p>Successive generations of AI drive gains that keep accelerating. Independent research would need to trace those gains to the AI’s own work.</p>
-          <div class="front-meter"><span class="front-track" aria-hidden="true"><i></i></span><output aria-label="Singularity checklist points earned" aria-live="off">—</output></div>
-          <details class="front-check"><summary>What earns singularity points?</summary><div data-front-checklist="singularity"><p>Loading the evidence checklist…</p></div></details>
-        </article>
-        <article data-front-milestone="rsi">
-          <h3>Recursive self-improvement</h3>
-          <p>An AI helps build a stronger successor that can do the same for the next generation. A research specialist could begin this loop before AI matches people across other fields.</p>
-          <div class="front-meter"><span class="front-track" aria-hidden="true"><i></i></span><output aria-label="Recursive self-improvement checklist points earned" aria-live="off">—</output></div>
-          <details class="front-check"><summary>What earns self-improvement points?</summary><div data-front-checklist="rsi"><p>Loading the evidence checklist…</p></div></details>
-        </article>
-        <article data-front-milestone="asi">
-          <h3>Artificial superintelligence</h3>
-          <p>One system consistently outperforms leading experts across fields. Such a result would also meet the test for general intelligence.</p>
-          <div class="front-meter"><span class="front-track" aria-hidden="true"><i></i></span><output aria-label="Superintelligence checklist points earned" aria-live="off">—</output></div>
-          <details class="front-check"><summary>What earns superintelligence points?</summary><div data-front-checklist="asi"><p>Loading the evidence checklist…</p></div></details>
-        </article>
-        <article data-front-milestone="agi">
-          <h3>Artificial general intelligence</h3>
-          <p>One system matches skilled people across many unfamiliar tasks. Tests of breadth and reliability help establish how well its skills carry over.</p>
-          <div class="front-meter"><span class="front-track" aria-hidden="true"><i></i></span><output aria-label="General intelligence checklist points earned" aria-live="off">—</output></div>
-          <details class="front-check"><summary>What earns general intelligence points?</summary><div data-front-checklist="agi"><p>Loading the evidence checklist…</p></div></details>
-        </article>
+    <header class="front-intro">
+      <div class="front-reading">
+        <h1 id="front-headline">The Singularity Watchdog</h1>
+        <label class="front-score-label" for="front-score">Evidence score</label>
+        <div class="front-scoreline"><strong><output id="front-score" aria-describedby="front-score-meaning" aria-live="off">—</output><small> / 100</small></strong><span id="front-change"></span></div>
+        <p id="front-score-meaning">A singularity would mean AI helps build better AI faster with each generation. Eight indicators share 100 possible evidence points. New results can raise or lower the score. The timing remains unknown.</p>
+        <a class="front-link" href="#front-points">How the points add up</a>
+        <section id="front-countdown" class="countdown-summary" aria-label="Countdown scenario">
+          <h2>Countdown to the 75-point review</h2>
+          <p>At an assumed gain of one point a month. <a href="./dashboard.html#watch-clock">Explore the countdown</a></p>
+        </section>
       </div>
+      <figure class="front-history" aria-labelledby="front-history-title">
+        <h2 id="front-history-title">The past 30 days</h2>
+        <div id="front-history"></div>
+        <figcaption id="front-history-caption">Daily evidence score, in points out of 100.</figcaption>
+      </figure>
+      <p class="front-timestamp"><span id="front-checked" role="status">Checking the latest readings…</span> Four scheduled checks a day.</p>
+    </header>
+    <section aria-labelledby="front-digest-title">
+      <div class="front-section-heading"><h2 id="front-digest-title">The dashboard at a glance</h2><time id="front-date"></time></div>
+      <ul class="front-digest">
+        <li class="front-item">
+          <h2>How long can AI work reliably?</h2>
+          <p id="front-reliability">Awaiting the latest task results.</p>
+          <a class="front-link" href="./dashboard.html#factor-reliability">See the task measurements</a>
+        </li>
+        <li class="front-item">
+          <h2 id="front-report-title">Can AI do research itself?</h2>
+          <div id="front-report"><p>Awaiting the latest research report.</p></div>
+        </li>
+        <li class="front-item">
+          <h2>How do leading models compare?</h2>
+          <p id="front-breadth">Awaiting the latest model comparison.</p>
+          <a class="front-link" href="./dashboard.html#model-leaders">See the model rankings</a>
+        </li>
+        <li class="front-item">
+          <h2>Could outages slow progress?</h2>
+          <p>A power outage could delay experiments. Its effects can reach the score through a measured change, such as a slowdown in research.</p>
+          <p id="front-incident" hidden></p>
+          <a class="front-link" href="./dashboard.html#watchdog">Explore reported disruptions</a>
+        </li>
+        <li class="front-item">
+          <h2 id="front-milestones-title">How much evidence supports each milestone?</h2>
+          <p>Each percentage is the share of that milestone’s checklist supported by evidence. Open a milestone to see what earned its points.</p>
+          <div id="front-milestones">
+            <details class="front-check" data-front-milestone="singularity"><summary><span>The singularity</span> <output aria-label="Singularity checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="singularity"></div></details>
+            <details class="front-check" data-front-milestone="rsi"><summary><span>Recursive self-improvement</span> <output aria-label="Self-improvement checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="rsi"></div></details>
+            <details class="front-check" data-front-milestone="asi"><summary><span>Artificial superintelligence</span> <output aria-label="Superintelligence checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="asi"></div></details>
+            <details class="front-check" data-front-milestone="agi"><summary><span>Artificial general intelligence</span> <output aria-label="General intelligence checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="agi"></div></details>
+          </div>
+          <a class="front-link" href="./dashboard.html#atlas">See how the milestones fit together</a>
+        </li>
+        <li class="front-item">
+          <h2>Have we reached the singularity?</h2>
+          <p id="front-verdict">The Watch looks for sustained acceleration across successive generations of AI.</p>
+          <a class="front-link" href="./dashboard.html#evidence-gates">Inspect the three tests</a>
+        </li>
+      </ul>
     </section>
-    <noscript><p>Enable JavaScript for the current edition, or <a href="./data/signals.json">read the source data</a>.</p></noscript>
+    <details class="front-guide" id="front-points">
+      <summary>How the 100 evidence points add up</summary>
+      <div id="front-score-guide"><p>Loading the eight contributions…</p></div>
+    </details>
+    <noscript><p>Enable JavaScript for the current readings, or <a href="./data/signals.json">read the source data</a>.</p></noscript>
   </main>
   <footer class="front-wrap front-footer">
-    <div><p>Four scheduled source checks a day.</p><p id="front-checked" role="status">Checking the latest edition…</p></div>
-    <a class="front-link" href="./dashboard.html#methodology">Methods and sources <span aria-hidden="true">→</span></a>
+    <a href="./overview.html">Read the daily singularity briefing</a>
+    <a href="./dashboard.html">Explore the full dashboard</a>
   </footer>
   <script>
     // Earlier editions shared overview and dashboard sections from the root address.

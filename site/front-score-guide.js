@@ -77,7 +77,7 @@ function updateIndexGuide(index) {
   let list = root.querySelector('ol');
   if (!list) {
     list = element('ol', null, 'front-factor-list');
-    root.replaceChildren(element('p', 'One index point is one hundredth of the total credit available under our scoring rules. We choose how much each input can contribute. The eight contributions add up to the headline score, with small differences possible from rounding.'), element('p', null, 'front-example'), list);
+    root.replaceChildren(element('p', 'AI skills can earn 50 points, research results 35, and computing power, market expectations and model launches the remaining 15. Each indicator earns a share of its points under the Watch’s published scoring rules. Add those contributions to get the headline score, allowing for rounding.'), element('p', null, 'front-example'), list);
   }
   const market = index.factors.find(factor => factor.id === 'forecast');
   const example = root.querySelector('.front-example');

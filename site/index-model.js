@@ -113,6 +113,24 @@ function day(value) {
   return Number.isFinite(time) && isoDay(time) === date ? date : null;
 }
 
+export { day as observationDay };
+
+export function hasSourceReading(payload) {
+  if (!Array.isArray(payload?.metrics) || !Array.isArray(payload.events) || !Array.isArray(payload.sources)) return false;
+  const asOf = day(payload.checkedAt);
+  if (!asOf || !Number.isFinite(Date.parse(payload.checkedAt))) return false;
+  const inRange = value => {
+    const date = day(value);
+    return date && date <= asOf;
+  };
+  if (Array.isArray(payload.releaseEvents) && inRange(payload.releaseStart)) return true;
+  return payload.metrics.some(metric => factorDefinitions.some(factor => factor.id === metric?.id) && (
+    (Number.isFinite(metric.value) && inRange(metric.asOf)) ||
+    [metric.history, metric.observations].some(series => Array.isArray(series) && series.some(point =>
+      Number.isFinite(point?.value) && inRange(point.publishedAt ?? point.date)))
+  ));
+}
+
 function isoDay(time) {
   return new Date(time).toISOString().slice(0, 10);
 }

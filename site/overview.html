@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
-  <title>Are we seeing signs of an AI singularity? · Overview · Singularity Watch</title>
-  <meta name="description" content="Understand the evidence score and the four milestones that Singularity Watch tracks, with four scheduled source checks a day.">
+  <title>The Singularity Watchdog Briefing · Overview</title>
+  <meta name="description" content="What changed in the singularity evidence today, how the week compares, and what researchers still need to show.">
   <link rel="canonical" href="https://arewethereyet.now/overview.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="Are we seeing signs of an AI singularity? · Overview">
-  <meta property="og:description" content="Understand the evidence score and how the four AI milestones fit together. Singularity Watch checks sources four times a day.">
+  <meta property="og:title" content="The Singularity Watchdog Briefing">
+  <meta property="og:description" content="The daily evidence score, the week in context, and the tests still to watch. Sources are checked four times a day.">
   <meta property="og:url" content="https://arewethereyet.now/overview.html">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -19,8 +19,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Are we seeing signs of an AI singularity? · Overview">
-  <meta name="twitter:description" content="Understand the evidence score and how the four AI milestones fit together. Singularity Watch checks sources four times a day.">
+  <meta name="twitter:title" content="The Singularity Watchdog Briefing">
+  <meta name="twitter:description" content="The daily evidence score, the week in context, and the tests still to watch. Sources are checked four times a day.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png?v=4">
@@ -29,6 +29,7 @@
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./overview.css">
+  <link rel="stylesheet" href="./countdown-summary.css">
   <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
@@ -49,55 +50,60 @@
     </div>
   </header>
   <main id="main" class="home-wrap" tabindex="-1">
-    <section class="home-hero" aria-labelledby="home-question">
-      <div class="home-intro">
-        <h1 id="home-question">Are we seeing signs of <span>an AI singularity?</span></h1>
-        <p>An AI can help researchers build a better model. The larger question is whether each new generation can help build the next one faster. That sustained cycle is what we mean by the singularity.</p>
-        <p class="home-answer" id="home-answer" hidden></p>
-      </div>
+    <header class="home-intro">
+      <p class="home-edition" id="home-edition" hidden><time id="home-date"></time> <span>· UTC edition</span></p>
+      <h1 id="home-question">The Singularity Watchdog Briefing</h1>
+    </header>
+
+    <div class="home-brief">
       <section class="home-instrument" aria-labelledby="home-score-title">
         <h2 id="home-score-title">Evidence score</h2>
         <div class="home-number"><output id="home-score" aria-describedby="home-score-meaning" aria-live="off">—</output><span> / 100</span></div>
         <div class="home-scale" aria-hidden="true"><i id="home-fill"></i></div>
-        <p id="home-daily-reading" class="daily-reading"></p>
-        <p id="home-score-meaning">Eight indicators contribute points, from research results to market expectations. This gauge tracks evidence. The date of a singularity remains unknown.</p>
+        <p id="home-movement">Checking the daily change…</p>
+        <p id="home-score-meaning">A singularity would mean AI helps build better AI faster with each generation. Eight indicators earn up to 100 points for evidence of that cycle. Its timing remains unknown.</p>
+        <div id="home-countdown" class="countdown-summary">
+          <h3 class="countdown-summary-title">Countdown to the 75-point review threshold</h3>
+          <a href="./dashboard.html#watch-clock">See the one-point-per-month scenario</a>
+        </div>
+        <a class="home-detail-link" href="./#front-points">See what earns each point <span aria-hidden="true">→</span></a>
         <div class="home-freshness">
-          <div><b>Four scheduled source checks a day</b></div>
-          <span id="home-last-check" role="status">Loading the latest reading…</span>
+          <b>Four scheduled source checks a day</b>
+          <span id="home-last-check" role="status">Checking the latest reading…</span>
         </div>
       </section>
-    </section>
+      <div class="home-report">
+        <section aria-labelledby="home-day-title">
+          <h2 id="home-day-title">What changed today</h2>
+          <p id="home-daily-reading">Loading the daily comparison…</p>
+          <p>Weaker test results can lower the score. A delayed report can leave an older reading in place, and a missing input leaves its points unfilled.</p>
+          <p id="home-answer" class="home-answer" hidden></p>
+        </section>
+        <section aria-labelledby="home-week-title">
+          <h2 id="home-week-title">The past week</h2>
+          <p id="home-week-reading">Loading the weekly comparison…</p>
+        </section>
+        <section aria-labelledby="home-watch-title">
+          <h2 id="home-watch-title">What to watch</h2>
+          <p id="home-watch-reading">Checking which evidence is still needed…</p>
+          <a class="home-detail-link" href="./dashboard.html#evidence-gates">Inspect the three evidence tests <span aria-hidden="true">→</span></a>
+        </section>
+      </div>
+    </div>
+
     <section class="home-milestones" aria-labelledby="home-milestones-title">
-      <div class="home-section-heading">
-        <div><h2 id="home-milestones-title">How the four milestones fit together</h2><p>Two questions run through the evidence. How capable is AI? And can it use that capability to improve the next generation? Each milestone has its own checklist. The bars show the share of evidence points earned.</p></div>
+      <div>
+        <h2 id="home-milestones-title">How the four milestones fit together</h2>
+        <p>General intelligence (AGI) would match skilled people across many fields. Superintelligence (ASI) would surpass leading experts. Recursive self-improvement (RSI) could begin with a research specialist that helps build a stronger successor. A singularity would mean each new generation makes that improvement faster.</p>
+      </div>
+      <div class="home-links">
+        <a class="home-detail-link" href="./#front-milestones-title">See the four checklists <span aria-hidden="true">→</span></a>
         <a class="home-detail-link" href="./dashboard.html#atlas">Explore the milestone map <span aria-hidden="true">→</span></a>
       </div>
-      <div class="home-milestone-grid">
-        <article data-milestone="singularity">
-          <h3>The singularity</h3>
-          <p>Successive generations of AI make gains that keep accelerating. Researchers would need to show how the AI’s own work drove that acceleration.</p>
-          <div class="home-meter"><span aria-hidden="true"><i></i></span><output aria-label="Singularity checklist points earned" aria-live="off">—</output></div>
-        </article>
-        <article data-milestone="rsi">
-          <h3>Recursive self-improvement <abbr title="Recursive self-improvement">RSI</abbr></h3>
-          <p>An AI helps build a stronger successor that can repeat the feat. A research specialist could start this loop before AI matches people across other fields.</p>
-          <div class="home-meter"><span aria-hidden="true"><i></i></span><output aria-label="Self-improvement checklist points earned" aria-live="off">—</output></div>
-        </article>
-        <article data-milestone="asi">
-          <h3>Superintelligence <abbr title="Artificial superintelligence">ASI</abbr></h3>
-          <p>One AI consistently outperforms leading experts across many fields. That would also satisfy the test for general intelligence.</p>
-          <div class="home-meter"><span aria-hidden="true"><i></i></span><output aria-label="ASI checklist points earned" aria-live="off">—</output></div>
-        </article>
-        <article data-milestone="agi">
-          <h3>General intelligence <abbr title="Artificial general intelligence">AGI</abbr></h3>
-          <p>One AI can match skilled people across many unfamiliar tasks. Independent tests of that breadth would be evidence for AGI.</p>
-          <div class="home-meter"><span aria-hidden="true"><i></i></span><output aria-label="AGI checklist points earned" aria-live="off">—</output></div>
-        </article>
-      </div>
     </section>
-    <noscript><p class="home-fallback">Enable JavaScript to see the latest scores. You can also <a href="./data/signals.json">read the source data</a>.</p></noscript>
+    <noscript><p class="home-fallback">Enable JavaScript to see the daily briefing or <a href="./data/signals.json">read the source data</a>.</p></noscript>
   </main>
-  <footer class="home-wrap home-footer"><a href="./dashboard.html#methodology">How the score works</a><a href="./dashboard.html#history-chart">See changes over time <span aria-hidden="true">→</span></a></footer>
+  <footer class="home-wrap home-footer"><a href="./dashboard.html#methodology">Methods and sources</a><a href="./dashboard.html#history-chart">Explore the index history <span aria-hidden="true">→</span></a></footer>
   <script>
     // Keep links shared before the dashboard moved to its own page.
     function openDashboardSection() {

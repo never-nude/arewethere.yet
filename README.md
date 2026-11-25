@@ -1,6 +1,6 @@
 # Singularity Watch
 
-An interactive observatory for public evidence of self-accelerating AI. The [front page](https://arewethereyet.now/) explains the latest change, the eight inputs behind the score, and the four milestone checklists. The [overview](https://arewethereyet.now/overview.html) introduces the question in plain language. The [full dashboard](https://arewethereyet.now/dashboard.html) includes source data, scoring rules, maps, history, and conditional scenarios. DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
+An interactive observatory for public evidence of self-accelerating AI. The [front page](https://arewethereyet.now/) leads with the evidence score and its 30-day trend, then summarizes the dashboard in a short list. The [overview](https://arewethereyet.now/overview.html) introduces the Watch and gives the daily briefing, weekly context and the next evidence to watch. The [full dashboard](https://arewethereyet.now/dashboard.html) includes source data, scoring rules, maps, history, and conditional scenarios. DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
 
 ## Development
 
