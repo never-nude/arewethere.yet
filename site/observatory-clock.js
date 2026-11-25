@@ -22,3 +22,24 @@ export function countdownParts(from, to) {
   return [Math.floor(months / 12), months % 12, Math.floor(seconds / 86400),
     Math.floor(seconds / 3600) % 24, Math.floor(seconds / 60) % 60, seconds % 60];
 }
+
+export const countdownUnits = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+let currentLocale, formats;
+
+export function formatCountdownPart(lang, index, value) {
+  if (lang !== currentLocale || !formats) {
+    // A translation provider can use a language tag outside this browser's ICU data.
+    let locale;
+    try { locale = Intl.NumberFormat.supportedLocalesOf(lang || 'en')[0]; } catch {}
+    formats = countdownUnits.map((unit, i) => new Intl.NumberFormat(locale || 'en', {
+      style: 'unit', unit, unitDisplay: 'long', minimumIntegerDigits: i === 0 ? 1 : 2,
+      useGrouping: false,
+    }));
+    currentLocale = lang;
+  }
+  const parts = formats[index].formatToParts(value);
+  // Some plural forms (such as Arabic duals) express the quantity in the unit itself.
+  const digits = parts.find(part => part.type === 'integer')?.value ??
+    new Intl.NumberFormat(formats[index].resolvedOptions().locale, {minimumIntegerDigits: index === 0 ? 1 : 2}).format(value);
+  return { digits, label: parts.filter(part => part.type === 'unit').map(part => part.value).join(' ') };
+}

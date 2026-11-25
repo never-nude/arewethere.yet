@@ -1,4 +1,4 @@
-import { installGlossary } from './glossary.js?v=20261125-terms';
+import { installGlossary } from './glossary.js';
 
 const briefingTerms = [
   ['superhuman AI researcher|superhuman AI researchers', 'Superhuman AI researcher', 'For this forecast, an AI would automate all coding on an AI research project and choose experiments as well as its best human researchers.'],
@@ -13,6 +13,6 @@ export function installBriefingGlossary(root) {
     additionalEntries: briefingTerms,
     inlineButtons: true,
     // Keep links, checklist toggles, and the publication’s name single-purpose.
-    skipSelector: 'h1, a, button, summary, label, .front-term-hint, .observatory-field, #edition, #next-check',
+    skipSelector: 'h1, a, button, summary, label, .front-term-hint, .observatory-field, .mc-sr, .mc-catalog-table thead, #edition, #next-check',
   });
 }

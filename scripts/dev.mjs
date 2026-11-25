@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPageRenderer } from "./publish-html.mjs";
 import { createApp } from "../src/runtime.mjs";
 
 const siteRoot = fileURLToPath(new URL("../site/", import.meta.url));
@@ -16,7 +17,11 @@ const app = createApp({
   development: true,
   async readAsset(path) {
     try {
-      return await readFile(resolve(path.startsWith("/data/") ? dataRoot : siteRoot, `.${path}`));
+      const source = await readFile(resolve(path.startsWith("/data/") ? dataRoot : siteRoot, `.${path}`));
+      if (!path.endsWith(".html")) return source;
+      const feed = JSON.parse(await readFile(resolve(dataRoot, "data/observatory.json"), "utf8"));
+      const render = await createPageRenderer(new URL("../site/", import.meta.url), feed);
+      return render(path.slice(1), source.toString("utf8"));
     } catch (error) {
       if (["ENOENT", "EISDIR", "ENOTDIR"].includes(error.code)) return null;
       throw error;
@@ -35,6 +40,7 @@ const server = createServer(async (incoming, outgoing) => {
   try {
     const response = await app.fetch(new Request(new URL(incoming.url, origin), {
       method: incoming.method,
+      headers: { accept: incoming.headers.accept || "*/*" },
     }));
     outgoing.writeHead(response.status, Object.fromEntries(response.headers));
     outgoing.end(Buffer.from(await response.arrayBuffer()));

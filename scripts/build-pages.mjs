@@ -12,6 +12,7 @@ import { checkResearchForecast } from '../site/research-forecast.js';
 import { buildObservatoryAssessment } from '../site/observatory-model.js';
 import { deriveField } from '../site/observatory-field-model.js';
 import { checkTimes, checkTimeZone, checkpointForRun, checkpointWindow, fourCheckStartDay } from '../site/checkpoint-schedule.js';
+import { publishHtml } from './publish-html.mjs';
 import { collectModelResources } from './model-resources.mjs';
 import firstResources from '../site/data/first-training-resources.js';
 import { loadCandidateQueue } from './candidate-observations.mjs';
@@ -211,6 +212,7 @@ for (const row of bundled) {
 if (legacyBytes) await writeFile(new URL('data/legacy-v1.json', target), legacyBytes);
 await writeFile(new URL(firstResourceUrl, target), JSON.stringify(firstResources));
 await writeFile(new URL('data/observatory.json', target), JSON.stringify(feed));
+await publishHtml(target, feed);
 await writeFile(new URL('data/signals.json', target), JSON.stringify(record.signals));
 const publicCompanion = {...record.companion};
 if (feed.supplementalOutlook) publicCompanion.supplementalOutlook = feed.supplementalOutlook;

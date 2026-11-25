@@ -1,3 +1,4 @@
+import { unitSuffix } from './observatory-display.js';
 import { indicatorObservations } from './observatory-forecast.js';
 
 const series = [
@@ -73,9 +74,9 @@ export function renderTrends(root, assessment) {
     caption.textContent = 'Each dot marks the highest measured result for a model in its ' + dateBasis + ' month. Months without a measurement are empty.';
     if (issued) {
       caption.append(' The diamond is the ' + ym.format(Date.parse(prediction.targetStart)) + ' estimate of ' +
-        number(prediction.centralValue, unit) + ' ' + prediction.unit + '. ');
+        number(prediction.centralValue, unit) + unitSuffix(prediction.unit) + '. ');
       if (band) caption.append('The bar shows the range based on past errors, ' + number(prediction.range.low, unit) +
-        ' to ' + number(prediction.range.high, unit) + ' ' + prediction.unit + '. ');
+        ' to ' + number(prediction.range.high, unit) + unitSuffix(prediction.unit) + '. ');
     }
     if (prediction) {
       const a = node('a', issued ? 'How this prediction was made' : 'Why this series has no prediction');
@@ -103,7 +104,7 @@ export function renderTrends(root, assessment) {
         mark('text', { x: left - 6, y: y(v) + 4, 'text-anchor': 'end' }, number(v, unit)));
     for (const p of points) {
       const dot = mark('circle', { cx: x(p.referenceOn), cy: y(p.value), r: 3.6, fill: '#73e8cc' });
-      dot.append(mark('title', {}, p.referenceOn + ' · ' + p.system + ' · ' + number(p.value, unit) + ' ' + unit));
+      dot.append(mark('title', {}, p.referenceOn + ' · ' + p.system + ' · ' + number(p.value, unit) + unitSuffix(unit)));
       svg.append(dot);
     }
     svg.append(mark('text', { x: left, y: height - 10 }, ym.format(t0)));
@@ -119,13 +120,13 @@ export function renderTrends(root, assessment) {
             ' M' + (estimateX - 7) + ' ' + y1 + 'h14', fill: 'none', stroke: color, 'stroke-width': 2 }));
       }
       const diamond = mark('path', { d: 'M' + estimateX + ' ' + (center - 6) + 'l6 6-6 6-6-6z', fill: color });
-      diamond.append(mark('title', {}, 'Estimate · ' + number(prediction.centralValue, unit) + ' ' + prediction.unit));
+      diamond.append(mark('title', {}, 'Estimate · ' + number(prediction.centralValue, unit) + unitSuffix(prediction.unit)));
       svg.append(diamond, mark('text', { x: estimateX, y: top - 8, 'text-anchor': 'middle' }, 'Estimate'),
         mark('text', { x: estimateX, y: height - 10, 'text-anchor': 'middle' }, ym.format(Date.parse(prediction.targetStart))));
     }
     chart.append(svg);
     for (const p of points.toReversed()) {
-      const li = node('li', p.referenceOn + ' · ' + p.system + ' · ' + number(p.value, unit) + ' ' + unit + ' · ');
+      const li = node('li', p.referenceOn + ' · ' + p.system + ' · ' + number(p.value, unit) + unitSuffix(unit) + ' · ');
       const a = node('a', p.source);
       a.href = p.sourceUrl;
       li.append(a);

@@ -1,3 +1,5 @@
+import { chronologicalMilestones, unitSuffix } from './observatory-display.js';
+
 function matchesEdition(bulletin, assessment, manifest) {
   return Boolean(bulletin?.outlook && bulletin.basedOnCheckpoint === assessment.checkpointAt &&
     manifest.currentRecord?.checkpointAt === assessment.checkpointAt &&
@@ -50,7 +52,7 @@ function sourceLink(item) {
 }
 
 const indexScore = new Intl.NumberFormat('en',{maximumFractionDigits:2});
-const shortDate = new Intl.DateTimeFormat('en', {month:'short',year:'2-digit',timeZone:'UTC'});
+const shortDate = new Intl.DateTimeFormat('en', {month:'short',year:'numeric',timeZone:'UTC'});
 const miniNames = {agi:'Artificial general intelligence', asi:'Artificial superintelligence', rsi:'Recursive self-improvement', singularity:'Singularity'};
 const growthTitle = fit => fit?.winner === 'Exponential' && finite(fit.doublingDays) && fit.supported
   ? 'Estimated doubling time · ' + format(fit.doublingDays) + ' days'
@@ -141,7 +143,7 @@ function historicalChart(rows, {unit, measure, bars=false, log=false, describe})
     const p=points[i];
     slider.value=i;rule.setAttribute('x1',x(p));rule.setAttribute('x2',x(p));
     marks.forEach((m,j)=>m?.classList.toggle('selected',j===i));
-    const value=finite(p.value)?format(p.value)+' '+unit:'Outside recorded coverage';
+    const value=finite(p.value)?format(p.value)+unitSuffix(unit):'Outside recorded coverage';
     const stamp=p.start ? date(p.start)+'–'+date(p.date) : date(p.date);
     readout.replaceChildren(el('strong',value), el('span',[p.label,stamp].filter(Boolean).join(' · ')));
     const explanation=describe?.(p);
@@ -266,12 +268,12 @@ function impactView(body, events) {
   const grid=el('div',null,'pace-impacts');
   for(const item of items) {
     const card=el('article');
-    const value=format(item.value)+' '+(item.unit||'');
+    const value=format(item.value)+unitSuffix(item.unit);
     card.append(el('h3',item.label),el('strong',value,'pace-impact-value'));
     if(finite(item.fromValue)&&finite(item.toValue))
       card.append(el('p',format(item.fromValue)+(item.unit==='percentage points'?'%':'')+' → '+format(item.toValue)+(item.unit==='percentage points'?'%':'')+(item.fromDate&&item.toDate?' · '+date(item.fromDate)+'–'+date(item.toDate):''),'pace-note'));
     if(finite(item.low)&&finite(item.high))
-      card.append(el('p',(item.intervalLabel||'Reported range')+' · '+format(item.low)+'–'+format(item.high)+' '+item.unit,'pace-note'));
+      card.append(el('p',(item.intervalLabel||'Reported range')+' · '+format(item.low)+'–'+format(item.high)+unitSuffix(item.unit),'pace-note'));
     if(item.scope)card.append(el('p',item.scope,'pace-note'));
     const source=sourceLink(item);if(source)card.append(source);
     if(item.followupUrl) {
@@ -290,7 +292,7 @@ function forecastEffect(body, pace, outlook) {
   const head=table.createTHead().insertRow();
   for (const name of ['Milestone','Reference','Sustained acceleration']) {const th=el('th',name);th.scope='col';head.append(th);}
   const rows=table.createTBody();
-  for (const id of ['singularity','rsi','asi','agi']) {
+  for (const {id} of chronologicalMilestones(outlook.milestones, outlook)) {
     const m=milestones.find(row=>row.id===id);
     if (!m)continue;
     const tr=rows.insertRow(), th=el('th',miniNames[id]);th.scope='row';

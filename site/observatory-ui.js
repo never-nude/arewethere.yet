@@ -1,12 +1,15 @@
-import { countdownParts, referenceInstant } from './observatory-clock.js';
+import { scenarioRange, singularityReference } from './observatory-reference.js';
+import { chronologicalMilestones, unitSuffix } from './observatory-display.js';
+import { protectEditionTerms } from './translation-terms.js';
+import { countdownParts, countdownUnits, formatCountdownPart, referenceInstant } from './observatory-clock.js';
 import { renderInvestment } from './observatory-investment.js';
 import { renderMetricCharts } from './observatory-charts.js';
-import { renderCalculations } from './observatory-calculations.js?v=pace1';
+import { renderCalculations } from './observatory-calculations.js';
 import { selectOutlook, renderAcceleration, paceHeadline } from './observatory-acceleration.js';
 import { renderTrends } from './observatory-trends.js';
-import { checkpointWindow, editionLabel } from './checkpoint-schedule.js?v=20261125-visuals';
-import { mountField } from './observatory-field.js?v=20261125-visuals';
-import { installBriefingGlossary } from './front-glossary.js?v=20261125-terms';
+import { checkpointWindow, editionLabel } from './checkpoint-schedule.js';
+import { mountField } from './observatory-field.js';
+import { installBriefingGlossary } from './front-glossary.js';
 
 const base = new URL('./', import.meta.url);
 const dashboard = document.body.dataset.view === 'dashboard';
@@ -38,7 +41,7 @@ const summaries = {
   asi: 'Broad performance above leading experts',
   singularity: 'Sustained acceleration driven by AI research',
 };
-const editorialOrder = ['singularity', 'rsi', 'asi', 'agi'];
+const singularitySequence = 'A singularity depends on self-reinforcing research changing the wider pace of progress, so its estimated year can precede broad superiority to experts.';
 const main = byId('main');
 let manifest,
   assessment,
@@ -78,7 +81,7 @@ function small(t) {
 }
 function displayValue(o) {
   if (!Number.isFinite(o.value)) return '';
-  return number.format(o.value) + (o.unit ? ' ' + o.unit : '');
+  return number.format(o.value) + unitSuffix(o.unit);
 }
 function obsSource(o) {
   return link(o.source, o.sourceUrl);
@@ -95,8 +98,7 @@ function observationBody(o) {
           number.format(o.low) +
           '–' +
           number.format(o.high) +
-          ' ' +
-          (o.unit || ''),
+          unitSuffix(o.unit),
       ),
     );
   box.append(
@@ -199,11 +201,6 @@ function spanYears(years) {
 }
 function scenarioYear(year, horizon) {
   return Number.isFinite(year) ? String(year) : 'beyond ' + horizon;
-}
-function scenarioRange(f) {
-  const {low, high} = f.range;
-  if (!Number.isFinite(low)) return 'Beyond ' + f.horizonYear;
-  return low === high ? String(low) : String(low) + (Number.isFinite(high) ? '–' + high : ' to beyond ' + f.horizonYear);
 }
 function scenarioSummary(m, f) {
   const row = el('div', null, 'obs-arrival-row');
@@ -338,7 +335,8 @@ function milestonePane(pane, m, forecast, a) {
   pane.replaceChildren(...components, link('Full evidence for ' + shortNames[m.id], u));
 }
 
-function milestoneInstrument(container, a) {
+function milestoneInstrument(container, a, ordered) {
+  const ids = ordered.map(m => m.id);
   const rail = el('div', null, 'obs-milestone-tabs');
   rail.id = 'milestone-tabs';
   rail.setAttribute('role', 'tablist');
@@ -349,8 +347,8 @@ function milestoneInstrument(container, a) {
   pane.setAttribute('role', 'tabpanel');
   pane.tabIndex = 0;
   const controls = new Map();
-  for (const id of editorialOrder) {
-    const m = a.milestones.find(x => x.id === id);
+  for (const m of ordered) {
+    const id = m.id;
     const f = arrivalOutlook?.milestones.find(x => x.id === id);
     const strict = a.forecasts.find(x => x.id === id);
     const control = el('button', null, 'obs-progress-row');
@@ -393,11 +391,11 @@ function milestoneInstrument(container, a) {
       if (matchMedia('(max-width: 740px)').matches) pane.scrollIntoView({ block: 'nearest', behavior: 'instant' });
     });
     control.addEventListener('keydown', event => {
-      const i = editorialOrder.indexOf(key);
-      const actions = { ArrowDown: (i + 1) % 4, ArrowUp: (i + 3) % 4, Home: 0, End: 3 };
+      const i = ids.indexOf(key);
+      const actions = { ArrowDown: (i + 1) % ids.length, ArrowUp: (i + ids.length - 1) % ids.length, Home: 0, End: ids.length - 1 };
       if (!Object.hasOwn(actions, event.key)) return;
       event.preventDefault();
-      select(editorialOrder[actions[event.key]], true);
+      select(ids[actions[event.key]], true);
     });
   }
   const legend = el('div', null, 'obs-gate-legend');
@@ -409,15 +407,16 @@ function milestoneInstrument(container, a) {
   const track = el('div', null, 'obs-milestone-rail');
   track.append(rail, legend);
   container.replaceChildren(track, pane);
-  select(selectedMilestone);
+  if (ids.length) select(controls.has(selectedMilestone) ? selectedMilestone : ids[0]);
 }
 function renderMilestones(a) {
+  const ordered = chronologicalMilestones(a.milestones, arrivalOutlook, a.forecasts);
   const container = byId('assessment-list');
   byId('arrival-intro').textContent = arrivalOutlook
     ? 'The reference year shows when a milestone could arrive under the model’s main assumptions. The range spans the dated scenarios. A milestone could also remain out of reach.'
     : 'This edition records which criteria were independently assessed. It predates the scenario estimates. An unresolved criterion leaves the evidence score open.';
   if (!dashboard) byId('arrival-intro').textContent = arrivalOutlook
-    ? 'Select a milestone to explore its evidence. The years show the reference forecast.'
+    ? 'Select a milestone to explore its evidence. The milestones are ordered by reference year. ' + singularitySequence
     : 'Select a milestone to explore its evidence. This edition predates the scenario forecasts.';
   const note = byId('arrival-note');
   note.replaceChildren();
@@ -429,12 +428,12 @@ function renderMilestones(a) {
     note.append(' · ', link('How the years and ranges are calculated', dashboard ? '#forecasts' : './dashboard.html#forecasts'));
   }
   if (!dashboard) {
-    milestoneInstrument(container, a);
+    milestoneInstrument(container, a, ordered);
     return;
   }
   container.replaceChildren(
-    ...editorialOrder.map((id) => {
-      const m = a.milestones.find((i) => i.id === id),
+    ...ordered.map(m => {
+      const id = m.id,
         value = Number.isFinite(m.score) ? m.score + ' / 100' : 'Indeterminate';
       const estimate = arrivalOutlook?.milestones.find(f => f.id === id);
       const line = estimate ? scenarioSummary(m, estimate) : el('div', null, 'obs-row');
@@ -488,7 +487,9 @@ function renderMilestones(a) {
       }
       inside.append(ul);
       if (estimate) inside.append(link('Inspect the timing assumptions', '#arrival-' + id));
-      box.append(details('Definition, evidence and scoring', inside));
+      const disclosure = details('Definition, evidence and scoring', inside);
+      disclosure.open = id === 'singularity';
+      box.append(disclosure);
       return box;
     }),
   );
@@ -558,8 +559,7 @@ function predictionValue(value, unit) {
   if (!Number.isFinite(value)) return 'Unavailable';
   const formatted = Math.abs(value) >= 1e12 ? value.toExponential(2) : predictionNumber.format(value);
   if (unit === 'h' || unit === 'hours') return formatted + (value === 1 ? ' hour' : ' hours');
-  if (unit === '%') return formatted + '%';
-  return formatted + (unit ? ' ' + unit : '');
+  return formatted + unitSuffix(unit);
 }
 function verificationWindow(f) {
   return f.verifyThrough ? day.formatRange(new Date(f.verifyOn), new Date(f.verifyThrough)) : date(f.verifyOn);
@@ -673,18 +673,17 @@ function renderArrivalForecasts(a) {
   root.replaceChildren();
   if (!arrivalOutlook) {
     method.append(el('p', 'This edition reports the projection its original evidence model supported for each milestone.', 'obs-sub'));
-    for (const f of a.forecasts.filter(f => f.id !== 'singularity')) {
+    for (const f of chronologicalMilestones(a.forecasts.filter(f => f.id !== 'singularity'), null, a.forecasts)) {
       root.append(details(labels[f.id] + ' · ' + (f.centralDate ? period(f.centralDate) : f.status), forecastBody(f)));
     }
     return;
   }
   const model = arrivalOutlook;
   method.append(el('p', model.method, 'obs-sub'));
-  method.append(el('p', 'A specialized system could improve its successors before it matches people across unfamiliar work. Under the Watch’s definitions, superintelligence includes general intelligence. A singularity depends on self-reinforcing research changing the wider pace of progress, so its estimated year can precede broad superiority to experts.'));
+  method.append(el('p', 'A specialized system could improve its successors before it matches people across unfamiliar work. Under the Watch’s definitions, superintelligence includes general intelligence. ' + singularitySequence));
   const sources = new Map(model.sources.map(s => [s.id, s]));
-  for (const id of editorialOrder) {
-    const f = model.milestones.find(row => row.id === id);
-    if (!f) continue;
+  for (const f of chronologicalMilestones(model.milestones, model)) {
+    const id = f.id;
     const section = el('article', null, 'obs-arrival-detail');
     section.id = 'arrival-' + id;
     const title = el('h3', f.label);
@@ -733,7 +732,6 @@ function renderArrivalForecasts(a) {
       list(model.limitations) : el('p', model.limitations)));
   }
 }
-const clockUnits = ['Years', 'Months', 'Days', 'Hours', 'Minutes', 'Seconds'];
 function updateClock() {
   if (!Number.isFinite(targetInstant)) return;
   const instant = selectedArchive ? Date.parse(assessment.checkpointAt) : Date.now();
@@ -745,10 +743,13 @@ function updateClock() {
     targetInstant = null;
     return;
   }
-  const digits = timer.querySelectorAll('.obs-digit');
+  const cells = timer.querySelectorAll('.obs-time-part');
   parts.forEach((value, index) => {
-    const text = index === 0 ? String(value) : String(value).padStart(2, '0');
-    if (digits[index].textContent !== text) digits[index].textContent = text;
+    const { digits, label } = formatCountdownPart(document.documentElement.lang, index, value);
+    const digitNode = cells[index].querySelector('.obs-digit');
+    const unitNode = cells[index].querySelector('.obs-time-unit');
+    if (digitNode.textContent !== digits) digitNode.textContent = digits;
+    if (unitNode.textContent !== label) unitNode.textContent = label;
   });
 }
 function clock(a) {
@@ -773,11 +774,13 @@ function clock(a) {
     timer.setAttribute('role', 'timer');
     timer.setAttribute('aria-label', 'Time until the forecast reference date');
     timer.setAttribute('aria-live', 'off');
-    for (const unit of clockUnits) {
+    for (const unit of countdownUnits) {
       const part = el('span', null, 'obs-time-part');
       const value = el('b', '00', 'obs-digit');
       value.translate = false;
-      part.append(value, el('span', unit, 'obs-time-unit'));
+      const unitNode = el('span', unit, 'obs-time-unit');
+      unitNode.translate = false;
+      part.append(value, unitNode);
       timer.append(part);
     }
     const reference = el('div', null, 'obs-clock-reference');
@@ -836,7 +839,7 @@ function validation(a) {
               ' · selection error ' +
               number.format(m.selectionMAE) +
               ', later error ' +
-              (Number.isFinite(m.holdoutMAE) ? number.format(m.holdoutMAE) + ' ' + v.unit : 'unavailable'),
+              (Number.isFinite(m.holdoutMAE) ? number.format(m.holdoutMAE) + unitSuffix(v.unit) : 'unavailable'),
           ),
         ),
       );
@@ -1104,6 +1107,11 @@ function paint(a) {
   const selected = selectOutlook(a, manifest, selectedArchive);
   outlookSupplement = selected.bulletin;
   arrivalOutlook = selected.outlook;
+  if (dashboard) {
+    const {headline, range} = singularityReference(a, arrivalOutlook);
+    byId('dashboard-reference').textContent = [headline + '.', range].filter(Boolean).join(' ');
+  }
+  protectEditionTerms(document.body, a.observations);
   records.clear();
   for (const o of a.observations) records.set(o.id, o);
   metadata();
@@ -1182,6 +1190,12 @@ async function refresh() {
     if (first) linkedSection();
   } catch (e) {
     console.error('Observatory:', e.message);
+    if (!assessment && byId('edition').querySelector('time')) {
+      byId('next-check').textContent = new URL(location.href).searchParams.has('assessment')
+        ? 'Requested archive edition unavailable. Showing the latest published edition.'
+        : 'Live update unavailable. Showing the published edition.';
+      return;
+    }
     byId('edition').textContent = assessment
       ? 'Update unavailable · showing the edition from ' + time(assessment.checkpointAt)
       : 'Assessment unavailable. The public data link below opens the source feed.';
@@ -1190,6 +1204,7 @@ async function refresh() {
   }
 }
 installBriefingGlossary(main);
+new MutationObserver(updateClock).observe(document.documentElement, {attributes: true, attributeFilter: ['lang']});
 metadata();
 refresh();
 window.setInterval(() => {

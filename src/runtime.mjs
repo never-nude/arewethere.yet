@@ -12,6 +12,8 @@ const contentTypes = new Map([
   ["mjs", "text/javascript; charset=utf-8"],
   ["png", "image/png"],
   ["svg", "image/svg+xml"],
+  ["txt", "text/plain; charset=utf-8"],
+  ["xml", "application/xml; charset=utf-8"],
   ["webp", "image/webp"],
   ["woff", "font/woff"],
   ["woff2", "font/woff2"],
@@ -93,7 +95,18 @@ export function createApp({ readAsset, readSignals, readSnapshot, development = 
       const path = assetPath(pathname);
       const type = path && contentType(path);
       const bytes = type ? await readAsset(path) : null;
-      if (bytes == null) return errorResponse(404, method === "HEAD" ? null : "Not found");
+      if (bytes == null) {
+        if (request.headers.get("accept")?.includes("text/html")) {
+          const notFound = await readAsset("/404.html");
+          if (notFound != null) {
+            return new Response(method === "HEAD" ? null : notFound, {
+              status: 404,
+              headers: { "content-type": contentType("/404.html"), "cache-control": "no-cache" },
+            });
+          }
+        }
+        return errorResponse(404, method === "HEAD" ? null : "Not found");
+      }
 
       const cacheableAsset = path.startsWith("/assets/");
       return new Response(method === "HEAD" ? null : bytes, {
