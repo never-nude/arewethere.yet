@@ -311,3 +311,23 @@ test('every what-if question names real dials and stops, and the gauge covers th
   assert.equal(gaugeShare(gaugeTop), 1);
   assert.equal(gaugeShare(99), 1);
 });
+
+test('doubling is offered only when the pace model supports it, and starts from where the pace points today', () => {
+  const {doubling, ladder} = buildClock(feed, now);
+  assert.equal(doubling.days, 111);
+  assert.deepEqual(doubling.steps.map(step => step.squares), [1, 2, 4, 8, 16, 32, 64]);
+  assert.equal(doubling.steps[0].time, now);
+  assert.equal(doubling.steps[0].hours, ladder.today.hours);
+  assert.equal(doubling.steps[0].text, 'a full work week');
+  assert.equal(doubling.steps[2].hours, ladder.today.hours * 4);
+  // The squares agree with the ladder: a work month by the second press, a work year by the sixth.
+  assert.equal(doubling.steps[2].text, 'a full work month');
+  assert.ok(doubling.steps[5].hours < 2000 && doubling.steps[6].hours > 2000);
+  // Only the first press stays inside the lead time the pace model has tested.
+  assert.deepEqual(doubling.steps.map(step => step.tested), [true, false, false, false, false, false, false]);
+
+  const series = bulletin.outlook.pace.series.find(row => row.id === 'horizon50');
+  const early = structuredClone(bulletin);
+  early.outlook.pace.series = [{...series, points: series.points.slice(0, 5), publishedEstimate: undefined}];
+  assert.equal(buildClock({...feed, supplementalPaceOutlook: early}, now).doubling, null);
+});

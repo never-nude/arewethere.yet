@@ -33,6 +33,7 @@ let firstDraw = true, drawnWidth = 0, loadedAt = 0, timer = 0;
 let turned = whatIfStart(), asked = null, gauge = null;
 let fieldChart = null, fieldTip = null, fieldAt = null, fieldWidth = 0, litLab = null, openOnly = false;
 let future = 'reference', age = null, stopsKey = '';
+let doubled = 0;
 
 function renderHero() {
   byId('reply').textContent = view.arrived ? 'We are.' : 'Not yet.';
@@ -397,6 +398,50 @@ function renderPace() {
     return row;
   }));
   box.hidden = false;
+  renderDoubling();
+}
+
+// One press, one doubling. The new squares are the bright ones.
+function renderDoubling() {
+  const box = byId('doubling'), plan = view.doubling;
+  if (!plan) { box.hidden = true; return; }
+  const last = plan.steps.length - 1, step = plan.steps[Math.min(doubled, last)], grid = byId('double-squares');
+  if (grid.children.length !== plan.steps[last].squares) {
+    grid.replaceChildren(...Array.from({length: plan.steps[last].squares}, (_, index) => {
+      const cell = el('i');
+      cell.style.setProperty('--n', index % 16);
+      return cell;
+    }));
+  }
+  [...grid.children].forEach((cell, index) => {
+    cell.classList.toggle('is-on', index < step.squares);
+    cell.toggleAttribute('data-gap', index < step.squares && index >= step.squares / 2);
+  });
+  const now = Date.now(), when = doubled ? 'By ' + approxWhen(step.time, now) : 'Today';
+  byId('double-read').replaceChildren(el('b', '', when + ': about ' + plainHours(step.hours) + '.'), ' That is ' + step.text + '.');
+  grid.setAttribute('aria-label', when + ', the longest job would be about ' + plainHours(step.hours) + ', ' + step.text + ': ' +
+    step.squares + (step.squares === 1 ? ' square.' : ' squares.'));
+  byId('double-note').textContent = 'Each square is one job as long as today’s limit. Every press adds ' + plan.days +
+    ' days, and each one leans harder on the pace holding.';
+  byId('double-go').disabled = doubled >= last;
+  byId('double-back').disabled = doubled === 0;
+  box.hidden = false;
+}
+
+function wireDoubling() {
+  byId('double-go').addEventListener('click', () => { doubled = Math.min(doubled + 1, (view?.doubling?.steps.length ?? 1) - 1); renderDoubling(); });
+  byId('double-back').addEventListener('click', () => { doubled = 0; renderDoubling(); });
+  // The climb only replays where motion is welcome.
+  const replay = byId('replay'), moving = matchMedia('(prefers-reduced-motion: no-preference)');
+  const offer = () => { replay.hidden = !moving.matches; };
+  offer();
+  moving.addEventListener('change', offer);
+  replay.addEventListener('click', () => {
+    if (!view?.ladder) return;
+    hideTip();
+    firstDraw = true;
+    renderLadder();
+  });
 }
 
 // The four moments. The rows are built once for each edition. Picking a future
@@ -630,6 +675,7 @@ wireLadder();
 wireWhatIf();
 wireField();
 wireStops();
+wireDoubling();
 load();
 setInterval(renderStamp, 30000);
 document.addEventListener('visibilitychange', () => {

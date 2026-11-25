@@ -265,6 +265,16 @@ html { scroll-behavior: smooth; }
 .squares i { aspect-ratio: 1; border-radius: 2px; background: var(--rule); transition: background-color .2s ease calc(var(--n) * 3ms), box-shadow .2s ease calc(var(--n) * 3ms); }
 .squares i.is-on { background: var(--span); }
 .squares i.is-on[data-gap] { background: var(--violet); box-shadow: 0 0 9px rgb(152 135 239 / .6); }
+.squares.is-wide { grid-template-columns: repeat(16, 1fr); gap: 4px; max-width: 520px; margin-top: 16px; }
+.squares.is-wide i { border-radius: 3px; }
+.doubling { margin-top: clamp(40px, 6vw, 72px); }
+.double-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.go { min-height: 48px; padding: 0 24px; border: 0; border-radius: 24px; background: var(--violet); color: var(--night); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+.go:hover { background: var(--chalk); }
+.go:disabled { opacity: .4; cursor: default; }
+.double-read { max-width: 34em; margin-top: 16px; color: var(--haze); font-size: clamp(17px, 1.6vw, 20px); line-height: 1.4; }
+.double-read b { color: var(--chalk); font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; letter-spacing: -.02em; }
+.replay { margin-top: 12px; }
 .pair-reading { color: var(--haze); font-size: 16px; }
 .pair-reading b { color: var(--chalk); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
 .effect-source { color: var(--mist); font-size: 14px; }
