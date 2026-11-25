@@ -210,6 +210,20 @@ function buildPace(ladder) {
   };
 }
 
+// What doubling does, one press at a time: where the pace points today, then
+// twice that, and twice again. Offered only when the pace model supports the rule.
+function buildDoubling(ladder, now) {
+  const {trend, today} = ladder;
+  if (!trend?.supported || !Number.isFinite(trend.doublingDays) || !(today?.hours > 0)) return null;
+  return {
+    days: Math.round(trend.doublingDays),
+    steps: Array.from({length: 7}, (_, n) => {
+      const time = now + n * trend.doublingDays * dayMs, hours = today.hours * 2 ** n;
+      return {time, hours, text: spanPhrase(hours), squares: 2 ** n, tested: trend.testedUntil !== null && time <= trend.testedUntil};
+    }),
+  };
+}
+
 const plainStops = {
   rsi: {name: 'AI that improves itself', term: 'recursive self-improvement'},
   agi: {name: 'AI as able as a skilled person', term: 'artificial general intelligence'},
@@ -493,6 +507,7 @@ export function buildClock(feed, now = Date.now()) {
     lead: ladder ? buildLead(ladder) : null,
     ladder,
     pace: ladder ? buildPace(ladder) : null,
+    doubling: ladder ? buildDoubling(ladder, now) : null,
     arrival, stops, horizonYear,
     nowYear: new Date(now).getUTCFullYear(),
     work: buildWork(outlook),

@@ -52,6 +52,7 @@
           <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><line class="key-dash" x1="1" y1="6" x2="33" y2="6"/></svg>The pace, carried forward</li>
           <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><rect class="key-wash" x="1" y="1" width="32" height="10" rx="2"/></svg>If it speeds up or slows</li>
         </ul>
+        <p class="replay"><button type="button" class="reset" id="replay" hidden>Play the climb again</button></p>
         <figcaption>Each dot is the best AI of its month, tested on real computer jobs by METR, an independent lab. Finishing a job means succeeding about half the time. The dashes carry the same pace forward and fade where that guess has never been tested.</figcaption>
         <details class="numbers">
           <summary>See the numbers</summary>
@@ -118,6 +119,16 @@
       <figure>
         <ol class="moments" id="moments"></ol>
         <figcaption>Record holders on the same test, drawn to scale.</figcaption>
+      </figure>
+      <figure class="doubling" id="doubling" hidden>
+        <p class="pick-title">And if it keeps doubling?</p>
+        <div class="double-row">
+          <button type="button" class="go" id="double-go">Double it</button>
+          <button type="button" class="reset" id="double-back">Start over</button>
+        </div>
+        <div class="squares is-wide" id="double-squares" role="img"></div>
+        <p class="double-read" id="double-read" role="status"></p>
+        <figcaption id="double-note"></figcaption>
       </figure>
     </section>
 
