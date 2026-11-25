@@ -1,6 +1,6 @@
+import { chronologicalMilestones } from './observatory-display.js';
 import {outlookAnchors as anchors} from './observatory-outlook-sources.js';
 
-const ids = ['agi', 'rsi', 'asi', 'singularity'];
 const names = {
   agi: 'Artificial general intelligence',
   rsi: 'Recursive self-improvement',
@@ -26,10 +26,8 @@ function verifiedFirstLink(assessment, asOf) {
 // The bulletin records rounded years. Show arithmetic only when it reproduces the
 // issued result. Other versions, overrides and missing inputs keep the issued basis.
 export function calculationGuide(assessment, outlook) {
-  const records = new Map((outlook?.milestones ?? []).map(m => [m.id, m]));
-  const rows = ids.filter(id => records.has(id)).map(id => {
-    const m = records.get(id);
-    return {id, year: m.centralYear, status: m.status, equation: '', explanation: m.basis, assumption: ''};
+  const rows = chronologicalMilestones(outlook?.milestones ?? [], outlook).map(m => {
+    return {id: m.id, year: m.centralYear, status: m.status, equation: '', explanation: m.basis, assumption: ''};
   });
   const guide = {rows, conditions: []};
   if (outlook?.version === '2.0.0' && outlook.pace?.milestones) {
@@ -73,7 +71,7 @@ export function calculationGuide(assessment, outlook) {
     const review = outlook.asOf && verifiedFirstLink(assessment, outlook.asOf);
     // The frozen v1 bulletin includes the rounded research-panel year in its basis.
     // Panelists can revise it independently of the bundled catalog.
-    const panelYear = Number(records.get('rsi').basis?.match(/research-automation date \(about (\d{4})\)/)?.[1]);
+    const panelYear = Number(rsi.explanation?.match(/research-automation date \(about (\d{4})\)/)?.[1]);
     if (review) {
       const year = Number(review.slice(0, 4));
       if (year + 1 === rsi.year) {
@@ -187,8 +185,7 @@ const paths = [
 // Observations supply a date across every path modeled in the same edition.
 export function scenarioTimeline(outlook) {
   if (!outlook?.milestones?.length) return null;
-  const records = new Map(outlook.milestones.map(m => [m.id, m]));
-  const known = ['singularity', 'asi', 'rsi', 'agi'].map(id => records.get(id)).filter(Boolean);
+  const known = chronologicalMilestones(outlook.milestones, outlook);
   const options = paths.filter(p => known.some(m => m.scenarios?.some(s => s.label === p.issued)));
   const onlyObserved = known.length && known.every(m => m.status === 'Observed');
   if (!options.length && onlyObserved) options.push({key: 'observed', label: 'Observed'});

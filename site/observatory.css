@@ -684,3 +684,30 @@
 .obs-problem-marks i { width: 8px; height: 8px; border-radius: 2px; border: 1px solid #81758e; }
 .obs-problem-marks .obs-problem-solved { border-color: var(--node); background-color: var(--node); }
 .obs-problem-marks + figcaption { margin-top: 5px; }
+
+.obs-footer h2 { font-size: 20px; line-height: 1.25; }
+.obs-footer p { max-width: 68ch; margin-block: 6px; color: var(--dim); }
+.obs-footer nav { display: flex; flex-wrap: wrap; gap: 2px 20px; }
+.obs-footer a { align-content: center; }
+
+.observatory main a:not(:where(.obs-hero-actions a)),
+.observatory button.glossary-term {
+  display: inline-block;
+  min-width: 24px;
+  min-height: 24px;
+  align-content: center;
+  max-width: 100%;
+}
+.observatory summary { min-height: 24px; align-content: center; }
+.observatory .wordmark,
+.observatory .view-switch a,
+.observatory .obs-section-nav a,
+.observatory .obs-hero-actions a,
+.observatory .obs-footer a,
+.observatory :is(button:not(.glossary-term), select, input:is([type="range"], [type="search"])),
+.observatory .calc-tab-options label span,
+.observatory label.mc-cost-filter {
+  min-height: 44px;
+  align-content: center;
+}
+.observatory :is(.mc-step, .of-camera button) { min-width: 44px; }

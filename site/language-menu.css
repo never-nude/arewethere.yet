@@ -23,3 +23,8 @@ site-language-menu select { width: 8.25rem; max-width: 34vw; padding: .35rem .3r
 
 /* Chart coordinates and numerical fractions use a fixed left-to-right scale. */
 html[dir="rtl"] :is(.reading-value, .index-meter, .meter-scale) { direction: ltr; }
+
+.translation-note {
+  margin: .6rem auto; width: min(100% - 2rem, 72rem);
+  color: #c9bedb; font: .85rem/1.45 Geist, system-ui, sans-serif;
+}

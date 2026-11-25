@@ -1,3 +1,4 @@
+import { unitSuffix } from './observatory-display.js';
 import {deriveField, fieldAxes, pathwayKinds} from './observatory-field-model.js';
 import {editionLabel} from './checkpoint-schedule.js';
 import {createFieldRenderer} from './observatory-field-renderer.js';
@@ -19,7 +20,7 @@ function button(text,handler,title){
   const b=el('button',text);b.type='button';b.addEventListener('click',handler);if(title)b.setAttribute('aria-label',title);return b;
 }
 function appendSource(list,row){
-  const li=el('li'),value=Number.isFinite(row.value)?' · '+new Intl.NumberFormat('en',{maximumSignificantDigits:3}).format(row.value)+' '+(row.unit||''):'';
+  const li=el('li'),value=Number.isFinite(row.value)?' · '+new Intl.NumberFormat('en',{maximumSignificantDigits:3}).format(row.value)+unitSuffix(row.unit):'';
   const line=el('span',(row.label||row.topic)+value);li.append(line);
   let url;try{url=new URL(row.sourceUrl);}catch{/* Missing source remains visible as text. */}
   const sourceDate=row.publishedOn ?? row.measuredOn;

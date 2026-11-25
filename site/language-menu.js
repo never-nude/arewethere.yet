@@ -48,7 +48,15 @@ class SiteLanguageMenu extends HTMLElement {
     select.translate = false;
     select.className = 'notranslate';
     const active = currentLanguage();
-    const script = new Intl.Locale(providerLanguage[active] ?? active).maximize().script;
+    const locale = providerLanguage[active] ?? active;
+    if (active !== 'en') {
+      document.documentElement.lang = locale;
+      const note = document.createElement('p');
+      note.className = 'translation-note';
+      note.textContent = 'Machine translation by Google; wording may be inexact.';
+      (this.closest('header') || this).after(note);
+    }
+    const script = new Intl.Locale(locale).maximize().script;
     document.documentElement.dir = ['Arab', 'Hebr', 'Nkoo', 'Thaa'].includes(script) ? 'rtl' : 'ltr';
     const original = new Option(translationLanguages.en, 'en');
     original.lang = 'en';

@@ -32,14 +32,14 @@
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./observatory-terms.css">
-  <link rel="stylesheet" href="./observatory.css?v=20261125-visuals">
-  <link rel="stylesheet" href="./observatory-field.css?v=20261125-visuals">
+  <link rel="stylesheet" href="./observatory.css">
+  <link rel="stylesheet" href="./observatory-field.css">
   <link rel="stylesheet" href="./observatory-charts.css">
   <link rel="stylesheet" href="./observatory-investment.css">
-  <link rel="stylesheet" href="./observatory-calculations.css?v=pace1">
+  <link rel="stylesheet" href="./observatory-calculations.css">
   <link rel="stylesheet" href="./observatory-acceleration.css">
-  <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./observatory-ui.js?v=20261125-pace"></script>
+  <script type="module" src="./language-menu.js"></script>
+  <script type="module" src="./observatory-ui.js"></script>
 </head>
 <body class="observatory" data-view="brief">
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -50,8 +50,8 @@
   <main id="main" class="obs-wrap" tabindex="-1">
     <section id="countdown" class="obs-hero" aria-labelledby="projection-title">
       <h1 id="projection-title">Projected singularity:</h1>
-      <div id="clock-reading"><p class="obs-clock-state">Loading the forecast…</p></div>
-      <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
+      <div id="clock-reading"><!-- published-forecast --><p>Read the <a href="./data/observatory.json">published forecast</a>.</p><!-- /published-forecast --></div>
+      <div class="obs-schedule"><span id="edition" role="status"><!-- edition-time -->Published assessment<!-- /edition-time --></span><span id="next-check"></span></div>
     </section>
 
     <section id="milestone-progress" class="obs-panel obs-milestones-brief" aria-labelledby="milestone-heading">
@@ -61,7 +61,7 @@
       <details class="obs-detail obs-reading-note">
         <summary>How to read the evidence and the years</summary>
         <p>Each marker stands for one condition the Watch requires. Independent findings for the same system or its successors can confirm or rule out a condition. Once every condition has a finding, the evidence score is the share met, expressed out of 100. An unresolved condition keeps the total open.</p>
-        <p>Superintelligence includes the abilities required for AGI. A specialist system could improve its successor before it reaches AGI. For a singularity, that feedback would also have to speed up technological progress more broadly.</p>
+        <p>Superintelligence includes the abilities required for <bdi translate="no">AGI</bdi>. A specialist system could improve its successor before it reaches <bdi translate="no">AGI</bdi>. For a singularity, that feedback would also have to speed up technological progress more broadly.</p>
         <p id="arrival-note" class="obs-small"></p>
       </details>
     </section>
@@ -80,15 +80,15 @@
           <dd>The ability to learn across different kinds of problems and apply that learning in an unfamiliar situation. People and other animals can show it.</dd>
         </div>
         <div id="term-agi">
-          <dt>Artificial general intelligence (AGI)</dt>
+          <dt>Artificial general intelligence (<bdi translate="no">AGI</bdi>)</dt>
           <dd>An AI that reliably performs at the level of skilled people across many kinds of unfamiliar work.</dd>
         </div>
         <div id="term-rsi">
-          <dt>Recursive self-improvement (RSI)</dt>
+          <dt>Recursive self-improvement (<bdi translate="no">RSI</bdi>)</dt>
           <dd>An AI helps build a better successor. That successor then uses its improved abilities to help build a better one in turn.</dd>
         </div>
         <div id="term-asi">
-          <dt>Artificial superintelligence (ASI)</dt>
+          <dt>Artificial superintelligence (<bdi translate="no">ASI</bdi>)</dt>
           <dd>An AI that reliably and substantially outperforms leading human experts across many intellectual fields.</dd>
         </div>
         <div id="term-singularity">
@@ -106,6 +106,18 @@
     </section>
     <noscript><p>JavaScript displays the measurements and interactive field. <a href="./data/observatory.json">Read the published assessment as JSON</a>.</p></noscript>
   </main>
-  <footer class="obs-wrap obs-footer"><a href="./dashboard.html">Explore the full dashboard</a><a href="./dashboard.html#methodology">Methodology</a><a href="./data/observatory.json">Public data</a></footer>
+  <footer class="obs-wrap obs-footer">
+    <section id="about" aria-labelledby="about-heading">
+      <h2 id="about-heading">About Singularity Watch</h2>
+      <p>How fast is AI changing, and what does that mean for people? We follow published measurements, show how they shape our forecasts, and explain where the evidence is still thin.</p>
+      <nav aria-label="About Singularity Watch">
+        <a href="./dashboard.html">Explore the full dashboard</a>
+        <a href="./dashboard.html#methodology">How the forecasts work</a>
+        <a href="./data/observatory.json">Public assessment data (JSON)</a>
+        <a href="https://github.com/never-nude/arewethere.yet">Source code on GitHub</a>
+      </nav>
+      <!-- Draft for Mike’s approval: Maintained by [approved author name]. Questions or corrections? Contact [approved public address]. -->
+    </section>
+  </footer>
 </body>
 </html>

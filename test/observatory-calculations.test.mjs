@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import test from 'node:test';
+import {chronologicalMilestones, unitSuffix} from '../site/observatory-display.js';
 import {calculationGuide, scenarioTimeline} from '../site/observatory-calculations.js';
 import {buildArrivalOutlook} from '../site/observatory-outlook-model.js';
 
@@ -12,10 +13,10 @@ test('the published launch calculation shows the three actual calendar constrain
   assert.deepEqual(conditions.map(c => c.year), [2035, 2045, 2062]);
   assert.equal(Math.max(...conditions.map(c => c.year)), rows.find(r => r.id === 'singularity').year);
   assert.deepEqual(rows.map(r => r.equation), [
-    '(2042 + 2050) ÷ 2 = 2046',
     '(2027 + 2036) ÷ 2 + 2 years ≈ 2034',
-    '2046 + 24.4 years ≈ 2070',
+    '(2042 + 2050) ÷ 2 = 2046',
     'Latest of 2035, 2045, 2062 = 2062',
+    '2046 + 24.4 years ≈ 2070',
   ]);
 });
 
@@ -44,11 +45,11 @@ test('direct verification or an unknown method displays the issued basis', () =>
   ]};
   const observed = calculationGuide(assessment, buildArrivalOutlook(assessment));
   assert.deepEqual(observed.conditions, []);
-  assert.equal(observed.rows.at(-1).explanation, assessment.forecasts[0].reason);
-  assert.equal(observed.rows.at(-1).equation, '');
+  assert.equal(observed.rows.find(r => r.id === 'singularity').explanation, assessment.forecasts[0].reason);
+  assert.equal(observed.rows.find(r => r.id === 'singularity').equation, '');
   const unknown = calculationGuide({}, {...outlook, version: '2.0.0'});
   assert.deepEqual(unknown.conditions, []);
-  assert.ok(unknown.rows.every((r, i) => r.equation === '' && r.explanation === outlook.milestones[i].basis));
+  assert.ok(unknown.rows.every(r => r.equation === '' && r.explanation === outlook.milestones.find(m => m.id === r.id).basis));
   assert.deepEqual(calculationGuide({}, null), {rows: [], conditions: []});
 });
 
@@ -57,7 +58,7 @@ test('all timeline positions reflect the selected edition on one year scale', ()
   assert.equal(guide.start, 2026);
   assert.equal(guide.end, 2100);
   assert.equal(guide.selected, 'reference');
-  assert.deepEqual(guide.milestones.map(m => m.id), ['singularity', 'asi', 'rsi', 'agi']);
+  assert.deepEqual(guide.milestones.map(m => m.id), ['rsi', 'agi', 'singularity', 'asi']);
   for (const m of guide.milestones) {
     const issued = outlook.milestones.find(row => row.id === m.id);
     for (const p of guide.options) {
@@ -98,7 +99,7 @@ test('acceleration is a separate selectable published scenario and retains the i
   for(const m of v2.milestones)m.scenarios.push({label:'Sustained acceleration',year:m.centralYear-10});
   const guide=calculationGuide(base,v2);
   assert.equal(guide.conditions.at(-1).year,2062);
-  assert.equal(scenarioTimeline(v2).milestones[0].values.acceleration,2052);
+  assert.equal(scenarioTimeline(v2).milestones.find(m => m.id === 'singularity').values.acceleration,2052);
   assert.equal(scenarioTimeline(v2).selected,'reference');
 });
 
@@ -113,4 +114,16 @@ test('only a live edition with a matching checkpoint and evidence hash accepts a
   assert.equal(selectOutlook(edition,{...manifest,currentRecord:{...manifest.currentRecord,sha256:'b'.repeat(64)}}).outlook,outlook);
   assert.equal(selectOutlook({...edition,checkpointAt:'2026-11-25T05:00:00.000Z'},manifest).outlook,outlook);
   assert.equal(selectOutlook({checkpointAt:edition.checkpointAt},{...manifest,supplementalPaceOutlook:null,supplementalOutlook:bulletin}).outlook,bulletin.outlook);
+});
+
+test('edition order uses the reference year including for archived and open estimates', () => {
+  const rows = [{id: 'asi'}, {id: 'singularity'}, {id: 'rsi'}, {id: 'agi'}];
+  const oldForecasts = [{id: 'singularity', centralDate: '2062-07-01'}, {id: 'asi', centralDate: '2070-07-01'}];
+  const model = {milestones: [{id: 'asi', centralYear: null}, {id: 'rsi', centralYear: 2034}, {id: 'agi', centralYear: 2034}]};
+  assert.deepEqual(chronologicalMilestones(rows, null, oldForecasts).map(r => r.id), ['singularity', 'asi', 'rsi', 'agi']);
+  assert.deepEqual(chronologicalMilestones(rows, model, oldForecasts).map(r => r.id), ['rsi', 'agi', 'singularity', 'asi']);
+});
+
+test('measurement unit suffixes attach symbols and separate words', () => {
+  assert.deepEqual(['%', '% reduction', '×', 'ECI', null].map(unitSuffix), ['%', '% reduction', '×', ' ECI', '']);
 });
