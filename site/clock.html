@@ -66,6 +66,7 @@
         <h2 id="arrival-q">So when do we arrive?</h2>
         <ul class="eta" id="eta"></ul>
         <p class="aside">Arriving means the singularity: AI building better AI until all of technology speeds up. Finishing long jobs is one stop on the way, not the destination.</p>
+        <p class="onward"><a href="#whatif">See what could change it</a></p>
         <p class="stamp" id="stamp"></p>
       </div>
     </section>
@@ -120,21 +121,56 @@
       </figure>
     </section>
 
+    <section class="band field" id="field" aria-labelledby="field-q" hidden>
+      <h2 id="field-q">Who else is on the road?</h2>
+      <p class="answer" id="field-answer"></p>
+      <figure>
+        <div class="asks" id="field-labs" role="group" aria-label="Spotlight a lab"></div>
+        <div class="chart" id="field-chart" tabindex="0" role="group" aria-roledescription="chart" aria-label="Every scored AI model by release date and combined test score" aria-describedby="field-help"></div>
+        <p class="sr" id="field-help">Use the left and right arrow keys to step through the record holders.</p>
+        <p class="sr" id="field-live" aria-live="polite"></p>
+        <ul class="legend" aria-label="How to read the chart">
+          <li><span class="key-lab" data-lab="openai" aria-hidden="true"></span>OpenAI</li>
+          <li><span class="key-lab" data-lab="anthropic" aria-hidden="true"></span>Anthropic</li>
+          <li><span class="key-lab" data-lab="google" aria-hidden="true"></span>Google</li>
+          <li><span class="key-lab" aria-hidden="true"></span>Every other lab</li>
+          <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><path class="record-line" d="M1 10H12V5H23V2H33"/></svg>Best score so far</li>
+        </ul>
+        <figcaption>Each dot is one AI model, placed by the day it came out and by its combined score on dozens of tests, worked out by <a id="field-source" href="https://epoch.ai/eci">Epoch AI</a>. Higher is more capable. Tap a lab to light it up.</figcaption>
+        <details class="numbers">
+          <summary>See the record holders</summary>
+          <div class="table-wrap"><table>
+            <thead><tr><th scope="col">When</th><th scope="col">Model</th><th scope="col">Lab</th><th scope="col">Score</th></tr></thead>
+            <tbody id="field-rows"></tbody>
+          </table></div>
+        </details>
+      </figure>
+    </section>
+
     <section class="band stops" id="stops" aria-labelledby="stops-q" hidden>
       <h2 id="stops-q">What are the stops along the way?</h2>
       <p class="answer" id="stops-answer"></p>
       <figure>
-        <ul class="legend" aria-label="How to read the chart">
-          <li><span class="key-pin is-experts" aria-hidden="true"></span>Experts’ survey answers</li>
-          <li id="stops-key-pace"><span class="key-pin is-pace" aria-hidden="true"></span>If today’s speed-up lasts</li>
-          <li><span class="key-span" aria-hidden="true"></span>Earliest to latest scenario</li>
-        </ul>
+        <div class="pick">
+          <p class="pick-title" id="futures-title">Pick a future</p>
+          <div class="asks" id="futures" role="group" aria-labelledby="futures-title"></div>
+          <div class="age">
+            <label for="age">How old are you now?</label>
+            <output id="age-out" for="age">Slide to set</output>
+            <input type="range" id="age" min="5" max="95" step="1" value="35">
+          </div>
+        </div>
         <div class="stops-chart" id="stops-chart"></div>
+        <ul class="legend" aria-label="How to read the chart">
+          <li><span class="key-pin is-experts" aria-hidden="true"></span>The future you picked</li>
+          <li><span class="key-mark" aria-hidden="true"></span>The other published scenarios</li>
+          <li><span class="key-span" aria-hidden="true"></span>Earliest to latest</li>
+        </ul>
         <figcaption id="stops-note"></figcaption>
         <details class="numbers">
           <summary>See the numbers</summary>
           <div class="table-wrap"><table>
-            <thead><tr><th scope="col">Moment</th><th scope="col">Experts’ survey answers</th><th scope="col">If today’s speed-up lasts</th><th scope="col">Earliest scenario</th><th scope="col">Latest scenario</th></tr></thead>
+            <thead><tr id="stops-head"></tr></thead>
             <tbody id="stops-rows"></tbody>
           </table></div>
         </details>

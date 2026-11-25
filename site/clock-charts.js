@@ -1,6 +1,6 @@
 // The ladder chart for the visual front page. It is drawn at the real pixel
 // width of its container, so labels keep their size on a phone.
-import {approxWhen, monthYear, plainHours, rangeWhen} from './clock-model.js';
+import {approxWhen, longMonthYear, monthYear, namedLabs, plainHours, rangeWhen} from './clock-model.js';
 
 const ns = 'http://www.w3.org/2000/svg';
 
@@ -221,4 +221,90 @@ export function ladderRows(ladder, now) {
         stop.earliest && stop.latest ? rangeWhen(stop.earliest, stop.latest) : '']);
   }
   return rows;
+}
+
+const labClass = lab => namedLabs.includes(lab) ? ' is-' + lab.toLowerCase() : '';
+
+// Every scored model as a dot. Any two dots can sit side by side here, so only
+// three labs carry a colour of their own. A fourth would not stay distinct for
+// every reader. A spotlight uses a ring and brightness, never another colour.
+export function drawField(host, field, {width, lit = null, openOnly = false}) {
+  const compact = width < 720;
+  const height = compact ? 380 : Math.round(Math.min(520, Math.max(420, width * 0.42)));
+  const margin = compact ? {top: 20, right: 10, bottom: 30, left: 34} : {top: 24, right: 24, bottom: 34, left: 52};
+  const left = margin.left, right = width - margin.right, top = margin.top, bottom = height - margin.bottom;
+  const {from, to, low, high} = field.domain;
+  const x = time => left + (time - from) / (to - from) * (right - left);
+  const y = score => bottom - (score - low) / (high - low) * (bottom - top);
+  const {points, frontier, leader} = field, opener = frontier[0];
+  const root = svg('svg', {
+    class: 'field-svg', viewBox: '0 0 ' + width + ' ' + height, width, height, role: 'img',
+    'aria-label': points.length + ' AI models by release date and combined test score. The best score rose from ' + Math.round(opener.score) +
+      ' in ' + longMonthYear(opener.time) + ' to ' + Math.round(leader.score) + ' in ' + longMonthYear(leader.time) + ', held by ' + leader.system +
+      (leader.lab ? ' from ' + leader.lab : '') + '.',
+  });
+
+  const grid = svg('g', {class: 'field-grid'});
+  for (let mark = Math.ceil(low / 25) * 25; mark < high; mark += 25) {
+    const at = fixed(y(mark));
+    grid.append(svg('line', {class: 'rung', x1: left, x2: right, y1: at, y2: at}));
+    grid.append(svg('text', {class: 'year-name', x: left - 8, y: at + 5, 'text-anchor': 'end'}, String(mark)));
+  }
+  for (let year = new Date(from).getUTCFullYear() + 1; Date.UTC(year, 0, 1) < to; year++) {
+    const at = fixed(x(Date.UTC(year, 0, 1)));
+    if (at < left + 14 || at > right - 16) continue;
+    grid.append(svg('line', {class: 'year-tick', x1: at, x2: at, y1: bottom, y2: bottom + 5}));
+    grid.append(svg('text', {class: 'year-name', x: at, y: bottom + 22, 'text-anchor': 'middle'}, String(year)));
+  }
+  root.append(grid);
+
+  const quiet = svg('g'), loud = svg('g'), items = [], radius = compact ? 3.4 : 4.4;
+  for (const point of points) {
+    const on = (!lit || point.lab === lit) && (!openOnly || point.open);
+    const item = {x: x(point.time), y: y(point.score), point, on};
+    (namedLabs.includes(point.lab) ? loud : quiet).append(svg('circle', {
+      class: 'model' + labClass(point.lab) + (on ? (lit || openOnly ? ' is-lit' : '') : ' is-dim'),
+      cx: fixed(item.x), cy: fixed(item.y), r: on && (lit || openOnly) ? radius + 1 : radius,
+    }));
+    items.push(item);
+  }
+
+  // The best score so far, as steps: flat until someone beats it.
+  let steps = 'M' + fixed(x(opener.time)) + ' ' + fixed(y(opener.score));
+  for (const point of frontier.slice(1)) steps += 'H' + fixed(x(point.time)) + 'V' + fixed(y(point.score));
+  steps += 'H' + fixed(Math.min(right, x(to)));
+  root.append(quiet, svg('path', {class: 'record-line' + (lit || openOnly ? ' is-dim' : ''), d: steps}), loud);
+
+  const names = svg('g', {class: 'names'}), lx = x(leader.time), ly = y(leader.score);
+  label(names, {class: 'point-name', x: fixed(lx - 10), y: fixed(ly - 10), 'text-anchor': 'end'},
+    [[fitName(leader.system, lx - 10 - left - 40, 14), {class: 'point-system'}], [', ' + Math.round(leader.score)]]);
+  root.append(names);
+
+  const ring = svg('circle', {class: 'field-ring', r: radius + 6, hidden: ''});
+  root.append(ring);
+  host.replaceChildren(root);
+  return {
+    items, height,
+    records: items.filter(item => item.point.lead),
+    // The closest lit dot in both directions, so any model can be reached.
+    nearest(px, py) {
+      let best = null, reach = Infinity;
+      for (const item of items) {
+        if (!item.on) continue;
+        const gap = (item.x - px) ** 2 + (item.y - py) ** 2;
+        if (gap < reach) { reach = gap; best = item; }
+      }
+      return best;
+    },
+    mark(item) {
+      if (!item) { ring.setAttribute('hidden', ''); return; }
+      ring.removeAttribute('hidden');
+      ring.setAttribute('cx', fixed(item.x));
+      ring.setAttribute('cy', fixed(item.y));
+    },
+  };
+}
+
+export function fieldRows(field) {
+  return field.frontier.map(point => [monthYear(point.time), point.system, point.lab ?? 'Not listed', String(Math.round(point.score))]);
 }

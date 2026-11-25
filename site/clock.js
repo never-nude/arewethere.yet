@@ -1,9 +1,10 @@
 // The visual front page at /clock. It reads the same published feed as the rest
 // of the site, redraws after each scheduled check and once an hour in between.
 import {
-  approxWhen, buildClock, dayMonthYear, dials, plainHours, rangeWhen, whatIfQuestions, whatIfStart, whatIfView, yearsAway,
+  approxWhen, buildClock, dayMonthYear, dials, futures, monthYear, namedLabs, plainHours, rangeWhen, whatIfQuestions,
+  whatIfStart, whatIfView, yearsAway,
 } from './clock-model.js';
-import {drawLadder, ladderRows} from './clock-charts.js';
+import {drawField, drawLadder, fieldRows, ladderRows} from './clock-charts.js';
 import {dialIcon, drawGauge, drawSquares} from './clock-visuals.js';
 import {checkTimeZone, checkpointWindow} from './checkpoint-schedule.js';
 
@@ -30,6 +31,8 @@ const numberWords = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 let view = null, chart = null, tip = null, current = null;
 let firstDraw = true, drawnWidth = 0, loadedAt = 0, timer = 0;
 let turned = whatIfStart(), asked = null, gauge = null;
+let fieldChart = null, fieldTip = null, fieldAt = null, fieldWidth = 0, litLab = null, openOnly = false;
+let future = 'reference', age = null, stopsKey = '';
 
 function renderHero() {
   byId('reply').textContent = view.arrived ? 'We are.' : 'Not yet.';
@@ -59,15 +62,20 @@ function showTip(item, announce = false) {
   current = item;
   chart.mark(item);
   const {head, lines} = describe(item);
-  tip.replaceChildren(el('b', '', head), ...lines.map(text => el('div', '', text)));
-  tip.hidden = false;
-  const host = byId('ladder-chart'), wide = tip.offsetWidth, tall = tip.offsetHeight;
+  fillTip(byId('ladder-chart'), tip, item, head, lines);
+  if (announce) byId('ladder-live').textContent = head + '. ' + lines.join('. ') + '.';
+}
+
+// A tooltip sits beside its mark and flips to stay inside the chart.
+function fillTip(host, box, item, head, lines) {
+  box.replaceChildren(el('b', '', head), ...lines.map(text => el('div', '', text)));
+  box.hidden = false;
+  const wide = box.offsetWidth, tall = box.offsetHeight;
   let left = item.x + 16;
   if (left + wide > host.clientWidth - 4) left = item.x - wide - 16;
   let top = item.y - tall - 14;
   if (top < 0) top = item.y + 18;
-  tip.style.transform = 'translate(' + Math.round(Math.max(4, left)) + 'px,' + Math.round(top) + 'px)';
-  if (announce) byId('ladder-live').textContent = head + '. ' + lines.join('. ') + '.';
+  box.style.transform = 'translate(' + Math.round(Math.max(4, left)) + 'px,' + Math.round(top) + 'px)';
 }
 
 function hideTip() {
@@ -128,6 +136,114 @@ function wireLadder() {
   }).observe(host);
 }
 
+// The field of every scored model. Pointing reaches the nearest dot in either
+// direction, and the arrow keys walk the record holders.
+function showModel(item, announce = false) {
+  if (!fieldChart || !fieldTip || !item) return;
+  if (item === fieldAt && !announce) return;
+  fieldAt = item;
+  fieldChart.mark(item);
+  const point = item.point, lines = [
+    point.lab ?? 'Lab not listed',
+    monthYear(point.time) + (point.lead ? ', a new top score' : ''),
+    Math.round(point.score) + ' points' + (point.open ? ', free to download' : ''),
+  ];
+  fillTip(byId('field-chart'), fieldTip, item, point.system, lines);
+  if (announce) byId('field-live').textContent = point.system + '. ' + lines.join('. ') + '.';
+}
+
+function hideModel() {
+  fieldAt = null;
+  fieldChart?.mark(null);
+  if (fieldTip) fieldTip.hidden = true;
+}
+
+function drawFieldNow() {
+  const host = byId('field-chart'), width = Math.round(host.clientWidth);
+  if (!view?.field || !width) return;
+  fieldAt = null;
+  fieldChart = drawField(host, view.field, {width, lit: litLab, openOnly});
+  fieldWidth = width;
+  host.style.minHeight = fieldChart.height + 'px';
+  fieldTip = el('div', 'tip');
+  fieldTip.hidden = true;
+  host.append(fieldTip);
+  for (const button of byId('field-labs').children) {
+    const kind = button.dataset.pick;
+    button.setAttribute('aria-pressed', String(kind === 'all' ? !litLab && !openOnly : kind === 'open' ? openOnly : litLab === button.dataset.name));
+  }
+}
+
+function renderField() {
+  const box = byId('field'), field = view.field;
+  if (!field) { box.hidden = true; return; }
+  box.hidden = false;
+  if (litLab && !field.labs.some(lab => lab.name === litLab)) litLab = null;
+  const chip = (text, count, pick, name) => {
+    const button = el('button', 'ask');
+    button.type = 'button';
+    button.dataset.pick = pick;
+    if (name) button.dataset.name = name;
+    if (name && namedLabs.includes(name)) button.dataset.lab = name.toLowerCase();
+    button.append(text + ' ', el('span', 'ask-count', String(count)));
+    return button;
+  };
+  byId('field-labs').replaceChildren(
+    chip('All models', field.points.length, 'all'),
+    ...field.labs.slice(0, 8).map(lab => chip(lab.name, lab.models, 'lab', lab.name)),
+    chip('Free to download', field.points.filter(point => point.open).length, 'open'),
+  );
+  byId('field-answer').textContent = field.answer;
+  byId('field-rows').replaceChildren(...fieldRows(field).map(cells));
+  const credit = byId('field-source');
+  credit.textContent = field.source.name;
+  if (field.source.url) credit.href = field.source.url;
+  drawFieldNow();
+}
+
+function wireField() {
+  const host = byId('field-chart');
+  const point = event => {
+    if (!fieldChart) return;
+    const box = host.getBoundingClientRect();
+    showModel(fieldChart.nearest(event.clientX - box.left, event.clientY - box.top));
+  };
+  host.addEventListener('pointermove', point);
+  host.addEventListener('pointerdown', point);
+  host.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') hideModel(); });
+  document.addEventListener('pointerdown', event => { if (!host.contains(event.target)) hideModel(); });
+  host.addEventListener('blur', hideModel);
+  host.addEventListener('keydown', event => {
+    const steps = fieldChart?.records ?? [];
+    if (!steps.length) return;
+    const last = steps.length - 1, here = fieldAt ? steps.indexOf(fieldAt) : -1;
+    const step = {
+      ArrowRight: here < 0 ? last : Math.min(last, here + 1),
+      ArrowLeft: here < 0 ? last : Math.max(0, here - 1),
+      Home: 0, End: last,
+    }[event.key];
+    if (event.key === 'Escape') hideModel();
+    if (step === undefined) return;
+    event.preventDefault();
+    showModel(steps[step], true);
+  });
+  byId('field-labs').addEventListener('click', event => {
+    const button = event.target.closest('[data-pick]');
+    if (!button) return;
+    if (button.dataset.pick === 'all') { litLab = null; openOnly = false; }
+    else if (button.dataset.pick === 'open') openOnly = !openOnly;
+    else litLab = litLab === button.dataset.name ? null : button.dataset.name;
+    hideModel();
+    drawFieldNow();
+  });
+  new ResizeObserver(() => {
+    const width = Math.round(host.clientWidth);
+    if (!view?.field || !width || Math.abs(width - fieldWidth) < 4) return;
+    hideModel();
+    drawFieldNow();
+  }).observe(host);
+}
+
 const wait = ms => {
   const minutes = Math.max(1, Math.round(ms / 60000)), hours = Math.floor(minutes / 60), rest = minutes % 60;
   return hours ? hours + ' hr' + (rest ? ' ' + rest + ' min' : '') : rest + ' min';
@@ -150,8 +266,8 @@ function renderArrival() {
   const answers = [];
   if (stop.pace !== null) answers.push({kind: 'pace', year: stop.pace, text: String(stop.pace), how: 'if today’s speed-up lasts'});
   answers.push(stop.reference !== null
-    ? {kind: 'experts', year: stop.reference, text: String(stop.reference), how: 'on experts’ survey answers'}
-    : {kind: 'experts', year: Infinity, text: 'After ' + view.horizonYear, how: 'on experts’ survey answers'});
+    ? {kind: 'experts', year: stop.reference, text: String(stop.reference), how: 'on experts’ middle guess'}
+    : {kind: 'experts', year: Infinity, text: 'After ' + view.horizonYear, how: 'on experts’ middle guess'});
   byId('eta').replaceChildren(...answers.sort((a, b) => a.year - b.year).map(answer => {
     const line = el('li'), pin = el('span', 'key-pin is-' + answer.kind), how = el('span', 'how');
     line.dataset.stop = stop.id;
@@ -283,72 +399,141 @@ function renderPace() {
   box.hidden = false;
 }
 
+// The four moments. The rows are built once for each edition. Picking a future
+// or setting an age only slides the markers, so the movement can be seen.
+function wireStops() {
+  byId('futures').replaceChildren(...futures.map(item => {
+    const button = el('button', 'ask', item.name);
+    button.type = 'button';
+    button.dataset.future = item.id;
+    return button;
+  }));
+  byId('futures').addEventListener('click', event => {
+    const id = event.target.closest('[data-future]')?.dataset.future;
+    if (!id) return;
+    future = id;
+    placeStops();
+  });
+  const input = byId('age');
+  try {
+    const kept = Number(localStorage.getItem('clock-age'));
+    if (Number.isInteger(kept) && kept >= 5 && kept <= 95) { age = kept; input.value = kept; }
+  } catch { /* Private windows have no storage. The slider still works. */ }
+  input.addEventListener('input', () => {
+    age = Number(input.value);
+    try { localStorage.setItem('clock-age', String(age)); } catch { /* as above */ }
+    placeStops();
+  });
+}
+
+function stopsRange() {
+  const from = view.nowYear, to = Math.max(view.horizonYear, from + 10);
+  return {from, to, at: year => Math.min(1, Math.max(0, (year - from) / (to - from)))};
+}
+
 function renderStops() {
   const box = byId('stops');
   const stops = view.stops.filter(stop => stop.reference !== null || stop.low !== null);
   if (!stops.length) { box.hidden = true; return; }
-  const from = view.nowYear, to = Math.max(view.horizonYear, from + 10);
-  const at = year => Math.min(1, Math.max(0, (year - from) / (to - from))).toFixed(4);
-  const ticks = [];
-  for (let year = Math.ceil((from + 6) / 20) * 20; year <= to; year += 20) ticks.push(year);
-
-  const rows = stops.map(stop => {
-    const row = el('div', 'stop'), name = el('div', 'stop-name'), track = el('div', 'stop-track');
-    row.dataset.stop = stop.id;
-    name.append(el('b', '', stop.name));
-    if (stop.term) name.append(el('span', '', stop.term));
-    const said = [];
-    if (stop.reference !== null) said.push('experts’ survey answers point to ' + stop.reference);
-    if (stop.pace !== null) said.push(stop.pace + ' if today’s speed-up lasts');
-    if (stop.low !== null) said.push('scenarios run from ' + stop.low + ' to ' + (stop.high ?? 'beyond ' + view.horizonYear));
-    track.setAttribute('role', 'img');
-    track.setAttribute('aria-label', stop.name + ': ' + said.join('; ') + '.');
-    for (const year of ticks) {
-      const line = el('span', 'stop-tick');
-      line.style.setProperty('--at', at(year));
-      track.append(line);
+  const {from, to, at} = stopsRange();
+  const key = JSON.stringify([from, to, stops.map(stop => [stop.id, stop.paths, stop.low, stop.high, stop.needs, stop.sign])]);
+  if (key !== stopsKey) {
+    stopsKey = key;
+    const ticks = [];
+    for (let year = Math.ceil((from + 6) / 20) * 20; year <= to; year += 20) ticks.push(year);
+    const rows = stops.map(stop => {
+      const row = el('div', 'stop'), name = el('div', 'stop-name'), track = el('div', 'stop-track');
+      row.dataset.stop = stop.id;
+      name.append(el('b', '', stop.name));
+      if (stop.term) name.append(el('span', '', stop.term));
+      track.setAttribute('role', 'img');
+      for (const year of ticks) {
+        const line = el('span', 'stop-tick');
+        line.style.setProperty('--at', at(year).toFixed(4));
+        track.append(line);
+      }
+      if (stop.low !== null) {
+        const span = el('span', 'stop-span');
+        span.style.setProperty('--from', at(stop.low).toFixed(4));
+        span.style.setProperty('--to', at(stop.high ?? to).toFixed(4));
+        track.append(span);
+      }
+      for (const year of new Set(Object.values(stop.paths).filter(Number.isInteger))) {
+        const mark = el('span', 'stop-mark');
+        mark.style.setProperty('--at', at(year).toFixed(4));
+        track.append(mark);
+      }
+      const pin = el('span', 'pin');
+      pin.append(el('i'), el('b'), el('small'));
+      track.append(pin);
+      row.append(name, track);
+      if (stop.needs.length || stop.sign) {
+        const more = el('details', 'needs'), shown = stop.needs.filter(need => need.met).length;
+        more.append(el('summary', '', 'What has to be shown first'));
+        if (stop.needs.length) {
+          const list = el('ul');
+          list.append(...stop.needs.map(need => {
+            const line = el('li', need.met ? 'is-met' : '', need.text);
+            line.prepend(el('i'));
+            return line;
+          }));
+          more.append(list, el('p', 'needs-count', (shown ? shown : 'None') + ' of ' + stop.needs.length + ' shown so far.'));
+        }
+        if (stop.sign) more.append(el('p', 'needs-sign', 'Latest sign: ' + stop.sign));
+        row.append(more);
+      }
+      return row;
+    });
+    const axis = el('div', 'stop-axis'), labels = el('div', 'stop-ticks');
+    labels.setAttribute('aria-hidden', 'true');
+    for (const [year, text] of [[from, 'Now'], ...ticks.map(year => [year, String(year)])]) {
+      const label = el('span', '', text);
+      label.style.setProperty('--at', at(year).toFixed(4));
+      labels.append(label);
     }
-    if (stop.low !== null) {
-      const span = el('span', 'stop-span');
-      span.style.setProperty('--from', at(stop.low));
-      span.style.setProperty('--to', at(stop.high ?? to));
-      track.append(span);
-    }
-    const pin = (kind, year) => {
-      const mark = el('span', 'pin is-' + kind), place = Number(at(year));
-      mark.style.setProperty('--at', place);
-      if (place < 0.06) mark.dataset.edge = 'start';
-      if (place > 0.94) mark.dataset.edge = 'end';
-      mark.append(el('i'), el('b', '', String(year)));
-      track.append(mark);
-    };
-    if (stop.reference !== null) pin('experts', stop.reference);
-    if (stop.pace !== null) pin('pace', stop.pace);
-    row.append(name, track);
-    return row;
-  });
-  const axis = el('div', 'stop-axis'), labels = el('div', 'stop-ticks');
-  labels.setAttribute('aria-hidden', 'true');
-  for (const [year, text] of [[from, 'Now'], ...ticks.map(year => [year, String(year)])]) {
-    const label = el('span', '', text);
-    label.style.setProperty('--at', at(year));
-    labels.append(label);
+    axis.append(labels);
+    byId('stops-chart').replaceChildren(...rows, axis);
+    const shown = futures.filter(item => item.id !== 'never' && stops.some(stop => Number.isInteger(stop.paths[item.id])));
+    byId('stops-head').replaceChildren(el('th', '', 'Moment'), ...shown.map(item => el('th', '', item.name)));
+    for (const cell of byId('stops-head').children) cell.scope = 'col';
+    byId('stops-rows').replaceChildren(...stops.map(stop => cells([stop.name, ...shown.map(item => stop.paths[item.id] ?? 'After ' + view.horizonYear)])));
   }
-  axis.append(labels);
-  byId('stops-chart').replaceChildren(...rows, axis);
 
   const decades = stops.every(stop => stop.low !== null && (stop.high ?? to) - stop.low >= 20);
   byId('stops-answer').textContent = (numberWords[stops.length] ?? stops.length) + ' big moment' + (stops.length === 1 ? '' : 's') +
     '. For each one, the guesses ' + (decades ? 'span decades.' : 'differ widely.');
-  byId('stops-key-pace').hidden = !stops.some(stop => stop.pace !== null);
   const never = stops.filter(stop => stop.never).length;
   byId('stops-note').textContent = never === stops.length ? 'For each of them, one scenario never arrives this century.'
     : never ? 'For some of them, one scenario never arrives this century.' : '';
   byId('stops-note').hidden = !never;
-  byId('stops-rows').replaceChildren(...stops.map(stop => cells([
-    stop.name, stop.reference ?? 'After ' + view.horizonYear, stop.pace ?? 'Same', stop.low ?? 'None', stop.high ?? 'After ' + view.horizonYear,
-  ])));
   box.hidden = false;
+  placeStops();
+}
+
+function placeStops() {
+  if (!view) return;
+  const {at} = stopsRange(), picked = futures.find(item => item.id === future) ?? futures[2];
+  for (const button of byId('futures').children) {
+    button.setAttribute('aria-pressed', String(button.dataset.future === picked.id));
+    button.hidden = !view.stops.some(stop => button.dataset.future in stop.paths);
+  }
+  byId('age-out').textContent = age === null ? 'Slide to set' : String(age);
+  for (const row of byId('stops-chart').querySelectorAll('.stop')) {
+    const stop = view.stops.find(item => item.id === row.dataset.stop), pin = row.querySelector('.pin');
+    if (!stop) continue;
+    const known = picked.id in stop.paths, year = stop.paths[picked.id] ?? null, place = year === null ? 1 : at(year);
+    pin.hidden = !known;
+    pin.style.setProperty('--at', place.toFixed(4));
+    pin.dataset.edge = place < 0.08 ? 'start' : place > 0.9 ? 'end' : 'mid';
+    pin.dataset.off = String(year === null);
+    const then = year !== null && age !== null ? age + year - view.nowYear : null;
+    pin.querySelector('b').textContent = year === null ? 'not this century' : String(year);
+    pin.querySelector('small').textContent = then === null ? '' : 'you’d be ' + then;
+    const said = [stop.name + ', ' + picked.name.toLowerCase() + ': ' + (known ? year ?? 'not this century' : 'no published year') + '.'];
+    if (then !== null) said.push('You would be ' + then + '.');
+    if (stop.low !== null) said.push('Published scenarios run from ' + stop.low + ' to ' + (stop.high ?? 'beyond ' + view.horizonYear) + '.');
+    row.querySelector('.stop-track').setAttribute('aria-label', said.join(' '));
+  }
 }
 
 function renderWork() {
@@ -403,6 +588,7 @@ function render() {
   renderArrival();
   renderWhatIf();
   renderPace();
+  renderField();
   renderStops();
   renderWork();
 }
@@ -442,6 +628,8 @@ async function load() {
 
 wireLadder();
 wireWhatIf();
+wireField();
+wireStops();
 load();
 setInterval(renderStamp, 30000);
 document.addEventListener('visibilitychange', () => {
