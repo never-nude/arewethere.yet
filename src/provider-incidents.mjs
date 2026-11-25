@@ -55,7 +55,7 @@ function impactLevel(statuses, title, severity) {
   return 'unknown';
 }
 
-function normalize(provider, { id, title, startedAt, resolvedAt, status, services = [], statuses = [], severity }) {
+function normalize(provider, { id, title, startedAt, publishedAt, resolvedAt, status, services = [], statuses = [], severity }) {
   if (typeof id !== 'string' || !/^[a-z0-9-]+$/i.test(id) || typeof title !== 'string') return null;
   const name = title.trim();
   const start = timestamp(startedAt);
@@ -70,6 +70,7 @@ function normalize(provider, { id, title, startedAt, resolvedAt, status, service
     detail: affected.length ? 'Reported services include ' + affected.join(', ') + '.' : '',
     date: start.slice(0, 10),
     startedAt: start,
+    publishedAt: timestamp(publishedAt),
     resolvedAt: end && end >= start ? end : null,
     status: ['resolved', 'postmortem'].includes(status) ? 'resolved' : status === 'monitoring' ? 'monitoring' : 'reported',
     impact: impactLevel(statuses, name, severity),
@@ -88,7 +89,7 @@ function statusPageIncident(provider, row) {
   const end = timestamp(row.resolved_at);
   const reportedAt = start && (!end || start <= end) ? start : row.created_at;
   return normalize(provider, {
-    id: row.id, title: row.name, startedAt: reportedAt,
+    id: row.id, title: row.name, startedAt: reportedAt, publishedAt: row.created_at,
     resolvedAt: end, status: row.status, severity: row.impact,
     services: [...affected, ...components].map((component) => component?.name),
     statuses: affected.map((component) => component?.new_status),
@@ -117,7 +118,7 @@ async function openAiRows(fetcher, provider) {
       .map((update) => timestamp(update?.published_at)).filter(Boolean).sort().at(-1);
     const components = [...impacts, ...affected];
     return normalize(provider, {
-      id: row.id, title: row.name, startedAt: starts[0] ?? row.published_at,
+      id: row.id, title: row.name, startedAt: starts[0] ?? row.published_at, publishedAt: row.published_at,
       resolvedAt: resolution, status: row.status,
       services: components.map((component) => componentNames.get(component?.component_id)),
       statuses: components.map((component) => component?.status),
@@ -134,7 +135,7 @@ async function workspaceRows(fetcher, provider) {
     if (!services.length || typeof row.external_desc !== 'string') return null;
     const title = row.external_desc.replace(/^\s*\*\*(?:summary|title):?\*\*:?\s*:?\s*/i, '').split(/\r?\n/)[0].trim();
     return normalize(provider, {
-      id: row.id, title, startedAt: row.begin, resolvedAt: row.end,
+      id: row.id, title, startedAt: row.begin, publishedAt: row.created, resolvedAt: row.end,
       status: row.end ? 'resolved' : 'reported', services, statuses: [row.status_impact],
     });
   });

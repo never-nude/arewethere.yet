@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 import { createApp } from "../src/runtime.mjs";
 
 const siteRoot = fileURLToPath(new URL("../site/", import.meta.url));
+const dataRoot = fileURLToPath(new URL("../dist-pages/", import.meta.url));
+try { await readFile(resolve(dataRoot, "data/observatory.json")); }
+catch { await import("./build-pages.mjs"); }
 const port = Number(process.env.PORT ?? 4173);
 const host = "127.0.0.1";
 const origin = `http://${host}:${port}`;
@@ -13,15 +16,14 @@ const app = createApp({
   development: true,
   async readAsset(path) {
     try {
-      return await readFile(resolve(siteRoot, `.${path}`));
+      return await readFile(resolve(path.startsWith("/data/") ? dataRoot : siteRoot, `.${path}`));
     } catch (error) {
       if (["ENOENT", "EISDIR", "ENOTDIR"].includes(error.code)) return null;
       throw error;
     }
   },
   async readSignals() {
-    const { getSignals } = await import("../src/signals.mjs");
-    return getSignals();
+    return JSON.parse(await readFile(resolve(dataRoot, "data/signals.json"), "utf8"));
   },
   async readSnapshot() {
     const { snapshot } = await import("../src/snapshot.js");

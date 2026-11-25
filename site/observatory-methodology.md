@@ -1,0 +1,85 @@
+# How the milestone observatory evaluates evidence
+
+**Evidence methodology 2.0.0 · Forecast model 1.0.0**
+
+The observatory asks what published evidence establishes about a particular system or successor lineage. These are working definitions. Researchers can reasonably choose other definitions, comparison groups or equivalence margins. The version and individual review rules travel with each checkpoint.
+
+## Four distinct assessments
+
+| Milestone | Evidence required |
+| --- | --- |
+| Artificial general intelligence (AGI) | The same system reaches skilled human performance across a representative battery of cognitive domains, transfers to unfamiliar task families under fixed resources, and reproduces those findings on fresh cases under independent evaluation. |
+| Recursive self-improvement (RSI) | A controlled comparison identifies a material AI contribution to an improved successor. The improved successor subsequently makes a further verified improvement within the same lineage. |
+| Artificial superintelligence (ASI) | That system satisfies the AGI conditions and reliably exceeds leading experts across representative domains by a preregistered, practically meaningful margin. |
+| Technological singularity | Successor research forms a self-reinforcing loop. Comparable capability gains accelerate across successive generations, with plausible alternative causes addressed. Independent settings corroborate a sustained change in the broader rate of technological progress. |
+
+Each reviewer publishes the protocol, comparison population, endpoint, uncertainty and rationale. The AGI breadth condition calls for reasoning, language, quantitative work and practical problem solving, with a skilled-human comparison in each domain. The ASI comparison uses leading experts. Equivalence and superiority margins must be justified for the actual task and measurement error. There is no universal cutoff on a general-purpose benchmark. For acceleration, three successive intervals give the minimum observations for two successive increases in rate. This mathematical minimum is necessary and additional evidence is required to establish persistence and causation.
+
+An ASI assessment incorporates its own AGI requirements, so both can be observed together. A specialized research system could begin RSI earlier. The singularity has its own additional requirements.
+
+## Scoring and coverage
+
+A criterion can be independently met, independently tested and unmet, unmeasured, or disputed by conflicting evaluations. An eligible finding identifies the same named system or lineage, dated independent source measurements, the reviewed protocol, reviewer and rationale. Each distinct criterion requires at least one endpoint specific to it. Updating a model name or reusing the same benchmark measurement creates no extra credit.
+
+The public fraction counts independently assessed necessary conditions. The separate completion count includes only those met. If every criterion has a determinate result for a single system, the score is 100 times the count met divided by the total, rounded to a whole point. Each required condition counts once because the definition requires all of them. The arithmetic expresses checklist completion. It gives no statistical estimate of capability, time remaining, risk or probability. If any condition is missing or contradictory, the total is **indeterminate**. The coverage counts remain available.
+
+A verified zero describes the named system on the fully evaluated conditions. A missing measurement has no numeric score. If different systems supply different partial findings, each is evaluated separately. A fully verified system takes priority for the displayed assessment, followed by the candidate with the most met and then the most assessed conditions. The archive retains the underlying observations and reviews. This selection cannot determine the abilities of untested systems.
+
+## Observations and provenance
+
+Each accepted observation has a source link, evidence classification and limitations. Its record distinguishes the date of measurement, publication, model release or reporting period, and collection. Unknown dates remain empty. Model release dates position some historical test series. Researchers often conducted or published those tests later. A result can enter the evidence record only when its source is available at the checkpoint. The historical series tests are retrospective.
+
+METR contributes measured task horizons at defined success rates and a limited research-productivity study. Epoch supplies model-level benchmark estimates and training-compute estimates. Its open/closed-weight subsets overlap the pooled dataset, so the model imports the pooled benchmark observations once. A release announcement cannot satisfy a capability criterion. An external forecast or market price cannot set an internal milestone date.
+
+Additional sources include public independent evaluations, scientific publications, an official electricity data service and documented infrastructure estimates. Read the annotated observations for the exact model, geography, date and measurement. A country's electricity demand does not measure its available AI compute. Combined foundry capacity does not measure AI accelerator output. Coverage lists identify evidence gaps, including unresolved questions about deployment and repeatable autonomous research.
+
+Organization views group the recorded systems by the source's developer attribution, preserving joint attributions. The best benchmark reading has its own uncertainty interval. A laboratory research-productivity measurement applies to that laboratory. Oversight, strategic behavior and intervention remain a separate assessment with their own evaluation conditions.
+
+## Forecasts and validation
+
+For the measured indicator series, the engine compares three families: persistence at the last observed value, linear change per calendar day, and log-linear change where values are positive. It uses the strongest observation on each date and then the highest value in each observed calendar month. Data-free months stay empty. A monthly peak can fall in a subsequent month. METR's 50% and 80% task horizons have different meanings and separate models.
+
+Each comparison starts with four training observations and predicts the next observed month using earlier observations only. At least four prediction origins are needed. The first 60% of prediction origins (rounded down, at least two) select a model by mean absolute error. The last block, withheld from selection, evaluates the selected family against persistence. The dashboard reports both errors in the original unit, how many comparisons were possible, and whether the selected model improved on persistence. These tests replay the current vintage of a dataset and are vulnerable to retrospective revision, sampling and benchmark selection.
+
+A milestone projection has a stricter evidence requirement:
+
+1. Each remaining necessary criterion needs a registered, independently reviewed quantitative endpoint and a justified threshold mapping to that actual criterion for the same named system. Different dimensions can use different units. A growth trend in a convenient proxy cannot supply a missing mapping.
+2. Each series needs at least 12 distinct dated occasions within a consistent protocol, unit and direction. Each prior result must have been published before the next measurement. The target registration must predate the reserved validation block. The selected growing or declining family must outperform persistence both in one-step tests and in a separate fixed-origin forecast spanning the held-out block. The projected crossing must fall within the longest lead time that was directly backtested.
+3. Estimate the threshold crossing for each necessary criterion. The milestone crossing is the latest required crossing for a coherent system. The earliest eligible coherent system determines the frontier projection. A conflicting finding prevents publication of a projected date.
+4. Check sensitivity to linear versus log-linear fits, the signal's recent versus full history, and the larger 90th percentile of the one-step and fixed-origin absolute held-out errors. The range spans those scenarios. A scenario which fails to cross within five years leaves the upper range open. Stagnation and extraordinary disruptions can put arrival outside the horizon with no assigned probability. The model reports calendar months and uses month end for the countdown convention.
+5. An independently documented change in the *net critical-path schedule* can shift an eligible criterion's date. This requires a new, system-specific observation in calendar days linked to the event and the criterion, newer than the capability measurements used in the fit. The latest net measurement replaces older ones for the same path, avoiding repeated charges for overlapping outages. Infrastructure, research or investment observations lacking such a mapping remain visible context.
+
+The five-year horizon, sample minimums and split are declared modeling choices. An average error on historical benchmark observations cannot validate the date of an unprecedented transition. In particular, the range is a conditional sensitivity envelope. No calibrated 90% or 95% probability is implied. When the data cannot support the complete chain of inference, the published result is **Not reliably estimable**. The optional clock then has no destination. When every criterion is independently met, the archive records the first checkpoint at which that result was verified.
+
+## Extraordinary events
+
+Each event carries separate documented consequences. The same event may impair service availability, shift investment and accelerate a particular research program. A provider incident can document a local service interruption. Attributing a global effect, a cause, or AI involvement needs additional evidence.
+
+A reviewed attribution of direct AI involvement, indirect influence or independence must cite a dated, event-specific independent investigation or official finding that supports that attribution. Otherwise attribution stays unknown. The scenario register covers health, disasters, conflict, political violence, cyber incidents, regulation, finance, supply, energy and scientific breakthroughs. No unsupported occurrence probabilities or default delay penalties are attached. The capability field moves only from independently adjudicated capabilities.
+
+## Coordinates and paths in the 3D field
+
+The four colored spheres are fixed conceptual reference landmarks. Their positions locate ideas in a shared view. Their geometric separation has no measured unit. Only the white sphere can carry a measured position, built from three ordinal evidence axes for the same named system.
+
+| Axis | First verified stage | Second verified stage |
+| --- | --- | --- |
+| X · Breadth and generalization | Representative skilled-human breadth | Successful transfer to unfamiliar task families |
+| Y · Capability relative to people | Broad, reliable skilled-human performance | Replicated superiority to leading experts |
+| Z · Autonomous research | An attributable improvement to a successor | A repeated cycle involving that successor |
+
+For each axis the coordinate is the number of consecutive independently verified stages divided by two. A definite failure at the first stage can establish a zero for that system. Missing or conflicting evidence leaves the coordinate unresolved. The field keeps the documented lower and possible upper stages in its archive. A white sphere **parked outside the field** means that a coherent position cannot be measured. A position also stays unresolved if different systems lead on different axes without one system at least matching the others on all three. Infrastructure effects and forecasts cannot place the marker. Corrections can reverse a prior placement.
+
+Paths distinguish logical requirements, supported steps, plausible routes, unsupported inferences and incompatible routes. Their arrows and labels describe relationships under the published definitions. Highlighting a criterion documents a satisfied condition. Its light or length has no conversion into probability or time. The accessible text view and replay use the same archived field state as the three-dimensional view.
+
+## Reviewing a new finding
+
+The version-controlled review ledger is read by the production collector at every scheduled assessment. It starts with empty arrays wherever no eligible material has been verified. Corrections are published in a later ledger revision and checkpoint, while past records retain the evidence they used. The immutable checkpoint includes the source snapshot and deterministic model outputs.
+
+| Ledger field | What a curator records |
+| --- | --- |
+| `observations` | Stable ID, topic, label, original source and HTTPS URL, measured system, organization, classification, known observation and publication dates, value and unit if available, limitations and optional uncertainty bounds. Publish separate records for distinct endpoints. |
+| `criterionReviews` | Methodology version, criterion ID, same-system identifier, `met` or `unmet`, supporting observation IDs, named reviewer, timestamp, rationale and public protocol URL. Contradictory current reviews remain visible. Remove a superseded review only in a new documented edition. |
+| `criterionTrajectories` | Criterion and system, source observation IDs for one consistent endpoint, arithmetic target, threshold direction (`above` or `below`), calibration rationale, registration date, reviewer, review date and protocol URL. |
+| `events` | Event identity, source, publication date and distinct consequences. Each consequence has an affected area, direction, description and supporting observation IDs. A direct attribution requires a source observation of topic `event-attribution` naming this event and supporting the proposed finding. A measured schedule change requires topic `research-schedule`, the matching system, event and criterion, unit `days`, and basis `Net critical-path shift`. |
+
+The issued cutoff controls what evidence enters the next assessment. Dates and model versions in prior checkpoints remain available for comparing what was knowable at the time. The legacy headline index uses a different method and cannot be spliced onto this series.

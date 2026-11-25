@@ -8,6 +8,8 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "test": "node --test",
+    "replay": "node scripts/replay-assessment.mjs",
     "build": "node scripts/build-pages.mjs"
   }
 }

@@ -5,20 +5,28 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 0,6,16 * * *'
+    - cron: '0 0 * * *'
+      timezone: 'America/New_York'
+    - cron: '0 16 * * *'
       timezone: 'America/New_York'
     - cron: '30 9 * * *'
       timezone: 'America/New_York'
 
 concurrency:
   group: singularity-pages
-  cancel-in-progress: false
+  queue: max
 
 permissions:
   contents: read
 
 jobs:
   build:
+    permissions:
+      contents: write
+      actions: read
+    env:
+      OBSERVATORY_CANDIDATE_DIR: ${{ github.workspace }}/.pending-evidence
+      OBSERVATORY_ARCHIVE_DIR: ${{ github.workspace }}/.observatory-archive
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -27,11 +35,32 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
-      - name: Build dashboard and check public sources
+      - name: Restore the durable assessment archive
+        run: bash scripts/prepare-archive.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Identify the original scheduled run
+        if: github.event_name == 'schedule'
+        run: |
+          created=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .created_at)
+          echo "OBSERVATORY_RUN_CREATED_AT=$created" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Test measurement, archive and checkpoint rules
+        run: node --test
+      - name: Read intervening discovery captures
+        run: bash scripts/read-candidates.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Build using the validated assessment
         run: npm run build
         env:
           PREVIOUS_SIGNALS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/data/signals.json
-          REQUIRE_LIVE: ${{ github.event_name == 'schedule' }}
+          OBSERVATORY_CRON: ${{ github.event.schedule }}
+      - name: Persist new immutable records before publishing
+        run: bash scripts/persist-archive.sh
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist-pages

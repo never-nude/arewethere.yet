@@ -1,25 +1,52 @@
 # Singularity Watch
 
-An interactive observatory for public evidence of self-accelerating AI. The [abridged dashboard](https://arewethereyet.now/) summarizes the current score, what contributed, the four milestones and a dated external forecast for AI research automation. The [full dashboard](https://arewethereyet.now/dashboard.html) includes source data, scoring rules, maps, history, and conditional scenarios. DIVERGE uses the hosted companion feed at [never-nude.github.io/singularity](https://never-nude.github.io/singularity/).
+[At a glance](https://arewethereyet.now/) presents the current evidence for four AI milestones. The [full dashboard](https://arewethereyet.now/dashboard.html) publishes the criteria, system-specific observations, benchmark history, forecasts, three-dimensional field, human oversight studies and checkpoint archive. Both views use the same published assessment. The [scientific methodology](site/observatory-methodology.md) gives the rules, assumptions and thresholds.
 
-## Development
+## Reading an assessment
 
-Use Node.js 24. Run `npm run dev` for the local site and live source checks. Run `npm run build` to fetch public data and generate a static GitHub Pages bundle in `dist-pages/`. The build and interface have no package dependencies.
+AGI requires reliable human-level breadth and transfer. ASI requires broad superiority to leading experts and therefore includes the AGI requirements. RSI requires a documented chain in which a system helps improve a successor that can itself repeat the process. A singularity requires independent evidence of sustained AI-driven acceleration and a change in the wider pace of technological progress. Several milestones can be first observed in one edition.
 
-GitHub Actions publishes on pushes to `main` and schedules source checks daily at midnight, 6 a.m., 9:30 a.m., and 4 p.m. Eastern time, including weekends and holidays. The last two checks use the regular NYSE opening and closing times as clock anchors. [NYSE trading hours](https://www.nyse.com/trade/hours-calendars)
+Each necessary criterion is counted once. One named system or lineage must supply the evidence. A directly tested negative, an unanswered question and conflicting studies have different states. A numeric score is available only after all required criteria have independent assessments. It equals the rounded percentage of those criteria met. Counts for available assessments, confirmed criteria and total criteria accompany the result. Inputs, forecasts, launch announcements and prediction-market prices cannot establish milestone achievement. Raw measurements remain useful when the milestone itself is indeterminate.
 
-Public figures arrive on their publishers’ schedules. If all sources fail during a scheduled run, the previous Pages deployment stays live. A compatible new METR dataset replaces the current benchmark data automatically, and a changed format is flagged for review.
+The optional singularity clock uses the observatory’s own forecast. Dates require comparable independent measurements calibrated to every outstanding criterion of a single candidate. The engine compares persistence, linear and log-linear trends, holds out later observations and examines variations in the model and measurement window. A five-year modeling horizon admits outcomes beyond that interval. A release count or external calendar prediction cannot set the clock. Proxy backtests report error in the measurement’s native units and do not validate a singularity forecast. The archived result includes the reason when the model cannot identify a date.
 
-## The evidence index
+## Evidence and field
 
-The weighted score combines benchmark task horizons and breadth, research autonomy and speed, training compute, forecast market sentiment, and tracked frontier releases. Methodology, input values, source dates, and weights are visible in the site. The score is an editorial measure of evidence. Historical model observations are backfilled by release date.
+The evidence register distinguishes the measured system, organization, source, classification, uncertainty, test date, publication date, source reference date and retrieval time. A missing exact date stays undisclosed. Historical benchmark charts use model release dates. Read each series in its original unit. Studies of particular tests, labs, infrastructure or behavior carry limits on extrapolation.
 
-The countdown uses six forecasters’ median months for a superhuman AI researcher. Their milestone requires automating the coding on an AI research project and matching its best researchers’ judgment about experiments. The published range reflects differences between forecasters. Source checks look for revised estimates, and the passage of a forecast month cannot confirm the milestone. [AI Futures Project forecast](https://blog.aifutures.org/p/q35-timelines-update-looks-like-the)
+Live sources include METR task evaluations, Epoch AI benchmark and computing data, publisher feeds, operator incident reports and Great Britain’s National Energy System Operator. Versioned readings also include ARC Prize, the UK AI Security Institute, IEA, TSMC, DeepSeek, Google DeepMind, Meta, Waymo and published algorithmic-efficiency research. Software consumes numerical feeds; dated reports and criterion reviews require editorial maintenance. Geographic, language and sector coverage varies. The register records which topics have evidence. An outage alone cannot establish its cause, AI involvement, or a slowdown in global research.
 
-The optional calculator projects a reader-chosen score at a reader-chosen monthly pace. The working definition of the singularity requires independent evidence of an AI-led feedback loop that sustains accelerating capability gains across generations. The site tracks three explicit evidence criteria and records an observed date only when all three have been documented.
+The WebGL field uses conceptual, fixed milestone anchors and evidence stages on three axes. X represents breadth and generalization, Y capability relative to people, and Z autonomous research and self-improvement. A system requires independent evidence on all three axes for a measured current position. Without it the white sphere occupies a separate unplaced shelf. Paths distinguish logical requirements, measured support, possible routes, unsupported inferences and incompatible claims. A keyboard-accessible selector and evidence panel also work when graphics are unavailable. Archived editions support comparison and replay.
 
-## Paths and acceleration watch
+## Publication and history
 
-The evidence snapshot places the Singularity at the top and evidence for AGI at the base. Each milestone has its own meter for points earned on its evidence checklist. In the 3D map, height shows the degree of self-improvement required. The two floor axes show breadth and performance relative to people. Its arrows show possible sequences and fill in proportion to the evidence for each step. Path scores use published weights and report source coverage separately. The browser checks a public play-money forecast every minute while open. Scheduled builds incorporate published benchmark updates.
+Official recalibrations are scheduled every calendar day at **midnight, 9:30 a.m. and 4 p.m. America/New_York**. Local civil time follows daylight saving time. The morning and afternoon times reference NYSE hours even on weekends and holidays. Discovery runs between checkpoints can stage source material. Only the official workflow can replace an existing edition. A push, ordinary manual build or duplicate execution republishes the same validated state. The first installation records a separately labeled commissioning baseline at the time it actually collected evidence.
 
-The acceleration watch looks for large, corroborating capability and research gains over 7 and 30 days. Open- and closed-weight model leaders share the same Epoch benchmark scale. The long-run timeline uses documented landmarks from 1958 and displays the daily numerical index when a reading is available.
+An edition records its scheduled instant, actual validation and evidence cutoff, observations, rules, model versions, forecasts, external events, coordinates, paths, original inputs, source revision and predecessor hash. The workflow stores content-addressed records on the append-only-by-workflow assessment-archive Git branch before publishing with GitHub Pages. It rejects checksum or chain inconsistencies and non-fast-forward writes. Repository administrators retain standard GitHub administrative powers. Recovery can publish a previously stored record. Missed checkpoints stay absent from the archive. Until another run succeeds, the front page identifies the last validated edition and its age relative to the schedule.
+
+- [Published assessment and archive index](https://arewethereyet.now/data/observatory.json)
+- [Source payload](https://arewethereyet.now/data/signals.json)
+- [DIVERGE-compatible companion feed](https://arewethereyet.now/data/companion.json)
+- [Frozen legacy edition](https://arewethereyet.now/data/legacy-v1.json)
+
+The companion retains its previous schema and labels the former weighted index as legacy. It also points to the new assessment. The legacy edition preserves the last published readings, reconstructed scale and external researcher forecast with the previous code revision. Earlier v1 daily reconstructions do not constitute archived v2 checkpoints.
+
+## Build and reproduce
+
+Use Node.js 24. No dependency installation is required.
+
+```sh
+npm test
+npm run build
+npm run dev
+```
+
+The build generates static files in `dist-pages/`. Development serves current UI files with the frozen data from that build. If there is no built assessment, the development server creates one. Local builds retain their baseline in the ignored `.observatory-archive/` directory. Set `OBSERVATORY_ARCHIVE_DIR` to a new empty local directory for a separate commissioning test.
+
+To reproduce an archived assessment, retrieve its source record through the dashboard and check out the code revision in `sourceRevision`. For a record with a predecessor, download that raw JSON as well. The replay verifies its hash and recalculates the assessment and field from the recorded inputs without network access.
+
+```sh
+npm run replay -- checkpoint.json previous.json
+```
+
+For a commissioning record, omit the predecessor argument. The [review ledger](src/observatory-ledger.json) is versioned with the methodology. New findings and calibrated series receive explicit evidence references and retain their review dates. Historic editions keep the data and decisions originally published.

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
-  <title>The Singularity Watchdog · At a glance</title>
-  <meta name="description" content="Follow the singularity evidence score, see how it moved over the past month, and read the findings behind it at a glance.">
+  <title>The Singularity Observatory</title>
+  <meta name="description" content="A brief assessment of four AI milestones, the evidence behind them, and what has changed.">
   <link rel="canonical" href="https://arewethereyet.now/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="The Singularity Watchdog">
-  <meta property="og:description" content="The evidence score, its recent direction, and a short guide to the findings behind it.">
+  <meta property="og:title" content="The Singularity Observatory">
+  <meta property="og:description" content="A brief assessment of four AI milestones, the evidence behind them, and what has changed.">
   <meta property="og:url" content="https://arewethereyet.now/">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -19,8 +19,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The Singularity Watchdog">
-  <meta name="twitter:description" content="The evidence score, its recent direction, and a short guide to the findings behind it.">
+  <meta name="twitter:title" content="The Singularity Observatory">
+  <meta name="twitter:description" content="A brief assessment of four AI milestones, the evidence behind them, and what has changed.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=4">
@@ -28,111 +28,35 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/watch-touch.png?v=4">
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
-  <link rel="stylesheet" href="./front-page.css">
-  <link rel="stylesheet" href="./countdown-summary.css">
-  <script>if (location.protocol === 'file:') document.documentElement.dataset.filePreview = '';</script>
+  <link rel="stylesheet" href="./glossary.css">
+  <link rel="stylesheet" href="./observatory.css">
+  <link rel="stylesheet" href="./observatory-field.css">
   <script type="module" src="./language-menu.js?v=3"></script>
-  <script type="module" src="./front-page.js"></script>
+  <script type="module" src="./observatory-ui.js"></script>
 </head>
-<body class="front-page">
+<body class="observatory" data-view="brief">
   <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="topbar">
-    <div class="front-wrap front-header-inner">
-      <a class="wordmark" href="./"><img class="wordmark-icon" src="./favicon.svg?v=4" width="30" height="30" alt=""> Singularity Watch</a>
-      <div class="page-tools">
-        <nav class="view-switch" aria-label="Site views">
-          <a href="./" aria-current="page">At a glance</a><a href="./dashboard.html">Full dashboard</a>
-        </nav>
-        <site-language-menu></site-language-menu>
-      </div>
-    </div>
-  </header>
-  <p class="file-preview">For the current readings, <a href="https://arewethereyet.now/">open the live front page</a>.</p>
-  <main class="front-wrap" id="main" tabindex="-1">
-    <header class="front-intro">
-      <div class="front-reading">
-        <div class="front-edition"><span class="front-edition-label">Daily briefing</span><time id="front-date"></time></div>
-        <h1 id="front-headline">The Singularity Watchdog</h1>
-        <label class="front-score-label" for="front-score">Evidence score</label>
-        <div class="front-scoreline"><strong><output id="front-score" aria-describedby="front-score-meaning" aria-live="off">—</output><small> / 100</small></strong><span id="front-direction"></span></div>
-        <p id="front-score-meaning">Each point is one of 100 the Watch awards for evidence about AI skills, research and related trends. At zero, the available readings earn no credit. At 100, all eight indicators meet the Watch’s chosen targets.</p>
-        <p class="front-test-reading"><span id="front-verdict">Confirming the singularity takes independent evidence that AI is speeding up the development of its successors.</span> <a class="front-tests-link" href="./dashboard.html#evidence-gates">See the three tests</a></p>
-        <a class="front-forecast-cue" href="#front-countdown">AI researcher forecast <span id="front-forecast-window"></span></a>
-        <p id="front-scale-record"></p>
-        <details class="front-guide" id="front-scale">
-          <summary>When did the score first pass 20?</summary>
-          <div id="front-scale-detail"><p>Checking the historical readings…</p></div>
-          <a href="#front-points">See how today’s eight indicators earned their points</a>
-        </details>
-      </div>
+  <header class="topbar"><div class="obs-wrap obs-header">
+    <a href="./" class="wordmark"><img src="./favicon.svg?v=4" height="30" width="30" alt=""> Singularity Watch</a>
+    <div class="page-tools"><nav class="view-switch" aria-label="Site views"><a href="./" aria-current="page">At a glance</a><a href="./dashboard.html">Full dashboard</a></nav><site-language-menu></site-language-menu></div>
+  </div></header>
+  <main id="main" class="obs-wrap" tabindex="-1">
+    <header class="obs-heading"><h1>The Singularity Observatory</h1>
+      <p>What can AI do today, and how much evidence is there that it can accelerate its own development?</p>
     </header>
-    <section class="front-findings" aria-labelledby="front-digest-title">
-      <div class="front-section-heading"><h2 id="front-digest-title">What the evidence shows</h2></div>
-      <p class="front-term-hint">Tap or hover over a dotted term for its meaning.</p>
-      <ul class="front-digest">
-        <li class="front-item">
-          <h3>What moved the score</h3>
-          <p id="front-change">Checking the latest change…</p>
-        </li>
-        <li class="front-item">
-          <h3><a href="./dashboard.html#factor-reliability">How long AI can work reliably</a></h3>
-          <p id="front-reliability">Awaiting the latest task results.</p>
-        </li>
-        <li class="front-item">
-          <h3 id="front-report-title"><a id="front-report-link" href="./dashboard.html#factor-research-autonomy">How much research AI can do on its own</a></h3>
-          <p id="front-report">Awaiting the latest research result.</p>
-        </li>
-        <li class="front-item">
-          <h3><a href="./dashboard.html#model-leaders">Which models lead on skills tests</a></h3>
-          <p id="front-breadth">Awaiting the latest model scores.</p>
-        </li>
-      </ul>
-    </section>
-    <section class="front-forecast" aria-label="Research milestone countdown">
-      <div id="front-countdown" class="countdown-summary">
-        <h2 class="countdown-summary-title">Superhuman AI researcher forecast</h2>
-        <p>Six forecasters’ November 2026 estimates span May to November 2027. <a href="https://blog.aifutures.org/p/q35-timelines-update-looks-like-the">Forecast and assumptions</a></p>
-      </div>
-    </section>
-    <section class="front-score-section" aria-labelledby="front-contributions-title">
-        <h2 id="front-contributions-title">Where the points come from</h2>
-        <ul class="front-contributions" aria-label="Points by source of evidence">
-          <li data-group="skills"><span class="front-contribution-name">AI skills</span><span class="front-contribution-value">— / 50</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
-          <li data-group="research"><span class="front-contribution-name">AI research</span><span class="front-contribution-value">— / 35</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
-          <li data-group="context"><span class="front-contribution-name">Compute, markets &amp; releases</span><span class="front-contribution-value">— / 15</span><span class="front-contribution-track" aria-hidden="true"><i></i></span></li>
-        </ul>
-        <details class="front-guide" id="front-points">
-          <summary>See how each of the eight indicators earns points</summary>
-          <div id="front-score-guide"><p>Loading the eight contributions…</p></div>
-        </details>
-    </section>
-    <section class="front-trend" aria-labelledby="front-history-title">
-      <h2 id="front-history-title">The past 30 days</h2>
-      <p id="front-history-caption">Daily score out of 100.</p>
-      <details class="front-chart-disclosure" id="front-chart-details"><summary>View daily scores on the chart</summary>
-        <figure class="front-history" aria-labelledby="front-history-title"><div id="front-history"></div></figure>
-      </details>
-    </section>
-    <section class="front-milestone-section" aria-labelledby="front-milestones-title">
-      <h2 id="front-milestones-title">Four milestones</h2>
-      <p>Each percentage is the share of a different evidence checklist met so far. Open a row for its definition and the evidence behind it.</p>
-      <div id="front-milestones">
-        <details class="front-check" data-front-milestone="singularity"><summary><span>The singularity</span> <output aria-label="Singularity checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="singularity"></div></details>
-        <details class="front-check" data-front-milestone="rsi"><summary><span>Recursive self-improvement</span> <output aria-label="Self-improvement checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="rsi"></div></details>
-        <details class="front-check" data-front-milestone="asi"><summary><span>Artificial superintelligence</span> <output aria-label="Superintelligence checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="asi"></div></details>
-        <details class="front-check" data-front-milestone="agi"><summary><span>Artificial general intelligence</span> <output aria-label="General intelligence checklist points earned" aria-live="off">—</output></summary><div data-front-checklist="agi"></div></details>
-      </div>
-      <a href="./dashboard.html#atlas">See how the milestones connect</a>
-    </section>
-    <p class="front-timestamp"><span id="front-checked" role="status">Checking the latest readings…</span> Four scheduled checks a day.</p>
-    <noscript><p>Enable JavaScript for the current readings, or <a href="./data/signals.json">read the source data</a>.</p></noscript>
+    <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
+
+    <div class="obs-brief-grid">
+      <div class="obs-brief-main"><section id="milestone-progress" class="obs-panel"><p id="measured-lead" class="obs-measured-lead"></p><h2>Milestone assessments</h2><p class="obs-sub">A score counts independently tested criteria. An open question keeps the total indeterminate.</p><div id="assessment-list"></div></section><details id="countdown" class="obs-clock"><summary>Reveal the singularity forecast</summary><div id="clock-reading"></div></details></div>
+      <section id="atlas" class="obs-panel obs-field"><h2>Milestone field</h2><div id="observatory-field"></div></section>
+    </div>
+    <div class="obs-bottom-grid"><section id="watchdog" class="obs-panel"><h2>What changed</h2><div id="changes"></div></section>
+      <section id="signals" class="obs-panel"><h2>Evidence in brief</h2><div id="brief-evidence"></div></section>
+    </div>
+    <noscript><p>JavaScript displays the measurements and interactive field. <a href="./data/observatory.json">Read the published assessment as JSON</a>.</p></noscript>
   </main>
-  <footer class="front-wrap front-footer">
-    <a href="./dashboard.html">Explore the full dashboard</a>
-  </footer>
-  <script src="./legacy-sections.js"></script>
+  <footer class="obs-wrap obs-footer"><a href="./dashboard.html">Explore the full dashboard</a><a href="./dashboard.html#methodology">Methodology</a><a href="./data/observatory.json">Public data</a></footer>
 </body>
 </html>

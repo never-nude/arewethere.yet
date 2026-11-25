@@ -6,6 +6,8 @@ import {
   sourceDefinitions,
   studyDate,
 } from "./snapshot.js";
+import { collectGridDemand, reviewedObservations } from './global-evidence.mjs';
+import ledger from './observatory-ledger.json' with { type: 'json' };
 import { getProviderIncidents } from './provider-incidents.mjs';
 
 const metrAssets = "https://metr.org/assets/images/q4-2026-capability-update/";
@@ -354,7 +356,7 @@ function feedResult(definition, result) {
 export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
   const checkedAt = now.toISOString();
   const startDay = new Date(now.getTime() - 365 * day).toISOString().slice(0, 10);
-  let [h50, h80, epoch, eci, manifold, openai, anthropic, metrNews, providerIncidents] = await Promise.allSettled([
+  let [h50, h80, epoch, eci, manifold, openai, anthropic, metrNews, providerIncidents, grid] = await Promise.allSettled([
     getBenchmark(fetcher, "horizon", metrAssets + "cad6b5d98261f80c.json", "TH1.1 and TH2"),
     getBenchmark(fetcher, "reliability", metrAssets + "1dfa453dcd603b2d.json", "TH2 (Verifiable)"),
     getCompute(fetcher),
@@ -364,6 +366,7 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
     getAnthropicReleases(fetcher, startDay),
     getFeed(fetcher, sourceDefinitions.metrNews, "https://metr.org/feed.xml", startDay),
     getProviderIncidents(fetcher, checkedAt),
+    collectGridDemand(fetcher, now),
   ]);
   const benchmarkReports = metrNews.value?.benchmarkUpdates?.sort((a, b) => byDate(b, a)) ?? [];
   const latestBenchmarkReport = benchmarkReports[0];
@@ -415,9 +418,15 @@ export async function getSignals({ fetcher = fetch, now = new Date() } = {}) {
     releaseEvents,
     releaseStart,
     incidents: providerIncidents.value?.incidents ?? [],
+    observatoryObservations: [...reviewedObservations.filter(row => row.publishedOn <= checkedAt.slice(0, 10)), ...(grid.value ? [grid.value] : []), ...ledger.observations],
+    criterionReviews: ledger.criterionReviews,
+    criterionTrajectories: ledger.criterionTrajectories,
+    observatoryEvents: ledger.events,
+    reviewedLedgerVersion: ledger.methodologyVersion,
     incidentSources: providerIncidents.value?.incidentSources ?? [],
     sources: [
       benchmarkSource,
+      { id: 'neso', name: 'GB grid demand', provider: 'NESO', url: 'https://www.neso.energy/data-portal/daily-demand-update/demand_data_update', status: grid.value ? 'live' : 'unavailable', asOf: grid.value?.measuredOn ?? null, detail: 'Operator-reported demand in Great Britain.' },
       sourceResult(sourceDefinitions.epoch, compute.status, compute.asOf),
       sourceResult(sourceDefinitions.epochEci, breadth.status, breadth.asOf),
       sourceResult(sourceDefinitions.manifold, forecast.status, forecast.asOf),
