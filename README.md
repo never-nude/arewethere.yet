@@ -10,6 +10,8 @@ Each necessary criterion is counted once. One named system or lineage must suppl
 
 The optional singularity clock uses the observatory’s own forecast. Dates require comparable independent measurements calibrated to every outstanding criterion of a single candidate. The engine compares persistence, linear and log-linear trends, holds out later observations and examines variations in the model and measurement window. A five-year modeling horizon admits outcomes beyond that interval. A release count or external calendar prediction cannot set the clock. Proxy backtests report error in the measurement’s native units and do not validate a singularity forecast. The archived result includes the reason when the model cannot identify a date.
 
+The front page also gives a testable short-term outlook. For example, the watch can predict the highest published benchmark score for a model released during the next calendar month. Each issued prediction has a target month, a unit, a verification date and a source. Open-weight and closed-weight models have separate comparisons. The dashboard preserves the original predictions alongside subsequent outcomes so readers can inspect the error.
+
 ## Evidence and field
 
 The evidence register distinguishes the measured system, organization, source, classification, uncertainty, test date, publication date, source reference date and retrieval time. A missing exact date stays undisclosed. Historical benchmark charts use model release dates. Read each series in its original unit. Studies of particular tests, labs, infrastructure or behavior carry limits on extrapolation.
@@ -22,6 +24,8 @@ The WebGL field uses conceptual, fixed milestone anchors and evidence stages on 
 
 Official recalibrations are scheduled every calendar day at **midnight, 9:30 a.m. and 4 p.m. America/New_York**. Local civil time follows daylight saving time. The morning and afternoon times reference NYSE hours even on weekends and holidays. Discovery runs between checkpoints can stage source material. Only the official workflow can replace an existing edition. A push, ordinary manual build or duplicate execution republishes the same validated state. The first installation records a separately labeled commissioning baseline at the time it actually collected evidence.
 
+**Launch test** is the first official reading following commissioning. The owner requested an immediate collection for that edition. Its timestamp is the actual collection time, and its record links back to the commissioning baseline. Its predictions have the same verification rules as later editions. Subsequent official readings follow the daily schedule.
+
 An edition records its scheduled instant, actual validation and evidence cutoff, observations, rules, model versions, forecasts, external events, coordinates, paths, original inputs, source revision and predecessor hash. The workflow stores content-addressed records on the append-only-by-workflow assessment-archive Git branch before publishing with GitHub Pages. It rejects checksum or chain inconsistencies and non-fast-forward writes. Repository administrators retain standard GitHub administrative powers. Recovery can publish a previously stored record. Missed checkpoints stay absent from the archive. Until another run succeeds, the front page identifies the last validated edition and its age relative to the schedule.
 
 - [Published assessment and archive index](https://arewethereyet.now/data/observatory.json)
@@ -29,7 +33,7 @@ An edition records its scheduled instant, actual validation and evidence cutoff,
 - [DIVERGE-compatible companion feed](https://arewethereyet.now/data/companion.json)
 - [Frozen legacy edition](https://arewethereyet.now/data/legacy-v1.json)
 
-The companion retains its previous schema and labels the former weighted index as legacy. It also points to the new assessment. The legacy edition preserves the last published readings, reconstructed scale and external researcher forecast with the previous code revision. Earlier v1 daily reconstructions do not constitute archived v2 checkpoints.
+The companion retains its previous schema and labels the former weighted index as legacy. Its `assessment` section links to the exact published edition and carries the four milestone assessments, milestone forecasts, dated indicator predictions and recorded outcomes. The legacy edition preserves the last published readings, reconstructed scale and external researcher forecast with the previous code revision. Earlier v1 daily reconstructions do not constitute archived v2 checkpoints.
 
 ## Build and reproduce
 

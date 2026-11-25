@@ -344,6 +344,22 @@ function metricResult(result, id) {
   };
 }
 
+// When a source is offline, its archived per-model dataset is usually more
+// complete than the bundled sample even if their headline dates coincide.
+export function checkpointMetrics(current, previous) {
+  const priorById = new Map(previous?.metrics?.map(metric => [metric.id, metric]));
+  return current.metrics.map(metric => {
+    if (metric.status === 'live') return { ...metric, retrievedAt: current.checkedAt };
+    if (metric.evidenceType) return metric;
+    const prior = priorById.get(metric.id);
+    if (Number.isFinite(prior?.value) && (!metric.asOf || prior.asOf >= metric.asOf)) {
+      const retrievedAt = prior.retrievedAt ?? (prior.status === 'live' ? previous.checkedAt : snapshot.checkedAt);
+      return { ...prior, status: 'snapshot', retrievedAt };
+    }
+    return metric.status === 'snapshot' ? { ...metric, retrievedAt: snapshot.checkedAt } : metric;
+  });
+}
+
 function sourceResult(definition, status, asOf) {
   const detail = status === "snapshot" ? `Using a saved reading. ${definition.detail}` : definition.detail;
   return { ...definition, asOf, status, detail };

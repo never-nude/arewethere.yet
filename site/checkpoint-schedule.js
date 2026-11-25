@@ -6,6 +6,12 @@ const formatter = new Intl.DateTimeFormat('en-US', {
 });
 const dayMs = 86400000;
 
+export function editionLabel(record) {
+  if (record.kind === 'commissioning') return 'Launch baseline';
+  if (record.trigger?.type === 'initial-measurement') return record.trigger.label || 'Launch test';
+  return 'Scheduled assessment';
+}
+
 function parts(instant) {
   return Object.fromEntries(formatter.formatToParts(instant)
     .filter(part => part.type !== 'literal').map(part => [part.type, Number(part.value)]));

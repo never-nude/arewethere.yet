@@ -295,3 +295,101 @@ test('conditional date model requires calibrated repetitions for every necessary
   assert.equal(delayed.forecasts[0].drivers[0].adjustment.days, 90);
   assert.deepEqual(delayed.milestones, start.milestones);
 });
+
+function monthlyInput(at, extra = [], status = 'live') {
+  const observations = Array.from({ length: 35 }, (_, index) => {
+    const date = new Date(Date.UTC(2024, index, 4)).toISOString().slice(0, 10);
+    return ['Open weights', 'Closed weights'].map((access, i) => ({
+      date, access, value: 115 + i * 20 + index / 2, label: access + ' model ' + index,
+    }));
+  }).flat();
+  return { checkedAt: at, events: [], metrics: [{
+    id: 'breadth', source: 'Epoch AI', sourceUrl: 'https://epoch.ai/eci', label: 'Broad capability',
+    unit: 'ECI', status, observations: observations.concat(extra),
+  }] };
+}
+
+test('first monthly forecasts use a matched calendar horizon, disclose uncertainty, and preserve older replay', () => {
+  const data = monthlyInput(checkpoint);
+  const a = assess(data, { checkpointAt: checkpoint });
+  const f = a.indicatorForecasts.find((row) => row.id === 'breadth-open');
+  assert.equal(f.status, 'Issued');
+  assert.equal(f.issuedAt, checkpoint);
+  assert.equal(f.targetStart, '2026-12-01');
+  assert.equal(f.targetEnd, '2026-12-31');
+  assert.equal(f.verifyOn, '2027-02-01');
+  assert.equal(f.verifyThrough, '2027-02-07');
+  assert.equal(f.centralValue, 132.5);
+  assert.equal(f.model, 'Linear trend');
+  assert.ok(f.basis.holdoutCount >= 4);
+  assert.ok(f.basis.lastSelectionVerifiedOn <= f.basis.firstHoldoutOrigin);
+  assert.ok(f.basis.selectionCount + f.basis.holdoutCount < f.basis.originCount);
+  assert.ok(f.basis.holdoutMAE < f.basis.baselineMAE);
+  assert.ok(f.range.low <= f.centralValue && f.range.high >= f.centralValue);
+  assert.equal(a.indicatorForecasts.filter((r) => r.status === 'Issued').length, 2);
+  assert.match(a.changes.join(' '), /Issued the 2026-12 prediction/);
+  assert.ok(a.forecasts.every((r) => r.centralDate === null));
+  const legacy = assess(data, { checkpointAt: checkpoint, includeIndicatorForecasts: false });
+  assert.ok(!Object.hasOwn(legacy, 'indicatorForecasts'));
+  assert.doesNotMatch(legacy.changes.join(' '), /monthly prediction|Issued the/);
+
+  const offline = assess(monthlyInput(checkpoint, [], 'snapshot'), { checkpointAt: checkpoint });
+  assert.ok(offline.indicatorForecasts.every((r) => r.centralValue === null));
+  const noHistory = monthlyInput(checkpoint);
+  noHistory.metrics[0].observations = noHistory.metrics[0].observations.slice(-4);
+  assert.ok(assess(noHistory, { checkpointAt: checkpoint }).indicatorForecasts.every((r) => r.centralValue === null));
+});
+
+test('monthly forecast excludes later publications as evidence at origin and as retrospective verification targets', () => {
+  const data = monthlyInput(checkpoint);
+  const assessOpen = (payload) => assess(payload, { checkpointAt: checkpoint }).indicatorForecasts[0];
+  const original = assessOpen(data);
+  // An old release first reported today is eligible for the current fit, but
+  // cannot alter a historical prediction or a target already scored in a past window.
+  data.metrics[0].observations.push({
+    label: 'Late retrospective evaluation', access: 'Open weights', value: 9999,
+    date: '2025-05-01', publishedAt: '2026-11-24',
+  });
+  const revised = assessOpen(data);
+  assert.equal(revised.model, original.model);
+  assert.equal(revised.basis.holdoutMAE, original.basis.holdoutMAE);
+  assert.equal(revised.basis.baselineMAE, original.basis.baselineMAE);
+  assert.equal(revised.basis.holdoutCount, original.basis.holdoutCount);
+  // Release dates alone cannot recreate a backtest if all known publication dates are later.
+  data.metrics[0].observations.forEach((row) => { row.publishedAt = '2026-11-24'; });
+  const late = assessOpen(data);
+  assert.equal(late.status, 'Insufficient evidence');
+  assert.equal(late.basis.originCount, 0);
+});
+
+test('saved monthly forecast is immutable and resolves against the first eligible live verification edition', () => {
+  const launch = assess(monthlyInput(checkpoint), { checkpointAt: checkpoint });
+  const changed = '2026-11-26T14:30:00.000Z';
+  const future = { date: '2026-12-13', label: 'December open model', value: 134, access: 'Open weights' };
+  const unrelated = { date: '2026-12-20', label: 'No weight-access group', value: 999, access: 'Unknown' };
+  const same = assess(monthlyInput(changed, [
+    { date: '2026-11-23', label: 'Late November model', value: 189, access: 'Open weights' }, future,
+  ]), { checkpointAt: changed, previous: launch });
+  assert.deepEqual(same.indicatorForecasts[0], launch.indicatorForecasts[0]);
+  assert.doesNotMatch(same.changes.join(' '), /Issued the 2026-12/);
+  const next = (at, previous, extra = [], status = 'live') =>
+    assess(monthlyInput(at, extra, status), { checkpointAt: at, previous });
+  const jan = next('2027-01-31T21:00:00.000Z', same, [future]);
+  const outcome = (edition, id = 'breadth-open') => edition.indicatorOutcomes.find((o) => o.id === id);
+  assert.equal(outcome(jan).status, 'Pending');
+  const failed = next('2027-02-01T14:30:00.000Z', jan, [future], 'snapshot');
+  assert.equal(outcome(failed).status, 'Pending');
+  const fresh = next('2027-02-02T14:30:00.000Z', failed, [future, unrelated]);
+  assert.equal(outcome(fresh).status, 'Scored');
+  assert.equal(outcome(fresh).observedValue, 134);
+  assert.equal(outcome(fresh).absoluteError, 1.5);
+  assert.equal(outcome(fresh).observationCount, 1);
+  assert.equal(outcome(fresh, 'breadth-closed').status, 'Unscored');
+  assert.equal(outcome(fresh, 'breadth-closed').observedValue, null);
+  assert.match(fresh.changes.join(' '), /an absolute error of 1.5/);
+  const revised = next('2027-02-03T14:30:00.000Z', fresh, [{ ...future, value: 200 }]);
+  assert.deepEqual(outcome(revised), outcome(fresh));
+  const missed = next('2027-02-10T14:30:00.000Z', jan, [future]);
+  assert.equal(outcome(missed).status, 'Unscored');
+  assert.match(outcome(missed).reason, /verification window/);
+});

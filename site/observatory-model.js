@@ -6,14 +6,27 @@ import {
   evidenceRecords,
   topicCoverage,
 } from './observatory-evidence.js';
-import { forecastMilestones, modelVersion, validateIndicators } from './observatory-forecast.js';
+import { forecastIndicators, forecastMilestones, modelVersion, validateIndicators } from './observatory-forecast.js';
 
 export { methodologyVersion, modelVersion };
 
-function changesSince(previous, milestones, observations, forecasts, events) {
-  if (!previous) return ['First checkpoint under this methodology. Earlier index readings use a different scale.'];
+function changesSince(previous, milestones, observations, forecasts, events, indicators) {
+  const published = indicators?.indicatorForecasts.filter((row) => row.status === 'Issued' &&
+    !previous?.indicatorForecasts?.some((prior) => prior.id === row.id && prior.issuedAt === row.issuedAt)) ?? [];
+  const resolved = indicators?.indicatorOutcomes.filter((row) => row.status !== 'Pending' &&
+    !previous?.indicatorOutcomes?.some((prior) => prior.id === row.id && prior.targetStart === row.targetStart &&
+      prior.status === row.status)) ?? [];
+  const predictionChanges = published.map((row) =>
+    'Issued the ' + row.targetStart.slice(0, 7) + ' prediction for ' + row.label.toLowerCase() +
+    ' at ' + row.centralValue + ' ' + row.unit + '.');
+  for (const row of resolved) {
+    const result = row.status === 'Scored' ? 'Observed ' + row.observedValue + ' ' + row.unit +
+      ', an absolute error of ' + row.absoluteError + ' ' + row.unit + '.' : row.reason;
+    predictionChanges.push(row.label + ', ' + row.targetStart.slice(0, 7) + ' forecast. ' + result);
+  }
+  if (!previous) return ['First checkpoint under this methodology. Earlier index readings use a different scale.', ...predictionChanges];
   if (previous.methodologyVersion !== methodologyVersion)
-    return ['The methodology changed. The prior checkpoint retains its original assessments.'];
+    return ['The methodology changed. The prior checkpoint retains its original assessments.', ...predictionChanges];
   const changes = milestones
     .filter((m) => m.change !== 'No change in verified criteria.')
     .map((m) => m.label + ' · ' + m.change);
@@ -67,6 +80,7 @@ function changesSince(previous, milestones, observations, forecasts, events) {
     );
   for (const f of forecasts)
     if (f.change !== 'Unchanged from the previous checkpoint.') changes.push(f.label + ' forecast · ' + f.change);
+  changes.push(...predictionChanges);
   return changes.length
     ? changes
     : ['The evidence readings, verified criteria and forecast destinations are unchanged.'];
@@ -74,7 +88,7 @@ function changesSince(previous, milestones, observations, forecasts, events) {
 
 export function buildObservatoryAssessment(
   payload,
-  { checkpointAt, validatedAt = payload?.checkedAt, previous = null } = {},
+  { checkpointAt, validatedAt = payload?.checkedAt, previous = null, includeIndicatorForecasts = true } = {},
 ) {
   if (!dated(checkpointAt) || !dated(validatedAt) || !dated(payload?.checkedAt))
     throw new Error('Valid checkpoint, source and validation times are required.');
@@ -106,6 +120,7 @@ export function buildObservatoryAssessment(
         affected.map((f) => f.label).join(', ') +
         '.';
   }
+  const indicators = includeIndicatorForecasts ? forecastIndicators(observations, previous, validatedAt, cutoff) : null;
   return {
     checkpointAt,
     validatedAt,
@@ -115,12 +130,13 @@ export function buildObservatoryAssessment(
     milestones,
     forecasts,
     observations,
+    ...indicators,
     organizations: assessOrganizations(observations, previous),
     oversight: assessOversight(observations),
     xFactors,
     modelValidation: validateIndicators(observations),
     topicCoverage: topicCoverage(observations),
-    changes: changesSince(previous, milestones, observations, forecasts, xFactors.events),
+    changes: changesSince(previous, milestones, observations, forecasts, xFactors.events, indicators),
   };
 }
 export const buildAssessment = buildObservatoryAssessment;

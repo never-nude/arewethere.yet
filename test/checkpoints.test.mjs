@@ -4,7 +4,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { checkpointForRun, checkpointWindow } from '../site/checkpoint-schedule.js';
-import { appendRecord, assertPublishedAncestry, nextRecord, readArchive } from '../scripts/checkpoint-archive.mjs';
+import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, nextRecord, readArchive } from '../scripts/checkpoint-archive.mjs';
 
 const iso = date => new Date(date).toISOString();
 const schedules = ['0 0 * * *','30 9 * * *','0 16 * * *'];
@@ -75,6 +75,56 @@ test('one commissioning edition survives static code pushes; official slots appe
   assert.equal(nextRecord(records,'2026-11-24T21:00:00.000Z'),null);
   assert.deepEqual(JSON.parse(await readFile(records[0].file,'utf8')),baseline);
   await assert.rejects(appendRecord(root,{...first,companion:{edited:true}}));
+});
+test('the explicit first measurement uses the original dispatch window and the actual capture time, exactly once', async t => {
+  const root = await temp(t);
+  const input = {event:'workflow_dispatch', enabled:'true', ref:'refs/heads/main',
+    createdAt:'2026-11-25T03:01:00Z', actor:'owner', runId:'1234'};
+  const request = firstMeasurementRequest(input);
+  const capturedAt = '2026-11-25T03:03:03.000Z';
+  assert.deepEqual(request, {type:'initial-measurement', label:'Launch test', requestedAt:iso(input.createdAt), actor:'owner', runId:'1234'});
+  for (const change of [{event:'push'}, {event:'schedule'}, {enabled:'false'}, {enabled:undefined}]) {
+    assert.equal(firstMeasurementRequest({...input, ...change}), null);
+  }
+  for (const change of [{ref:'refs/heads/preview'}, {createdAt:null}, {actor:''}, {runId:'x'}]) {
+    assert.throws(() => firstMeasurementRequest({...input, ...change}));
+  }
+  assert.throws(() => nextRecord([], null, request, capturedAt), /launch baseline/);
+  const baseline = makeRecord('2026-11-25T02:07:00.000Z', 'commissioning');
+  await appendRecord(root, baseline);
+  const initial = await readArchive(root);
+  assert.deepEqual(nextRecord(initial, null, request, capturedAt), {kind:'official', checkpointAt:null, trigger:request});
+  assert.throws(() => nextRecord(initial, null, request, '2026-11-25T03:00:00Z'), /outside/);
+  assert.throws(() => nextRecord(initial, null, request, prior), /outside/);
+  const record = makeRecord(capturedAt, 'official', initial[0].sha256);
+  record.assessment.trigger = request;
+  for (const modify of [
+    row => {row.assessment.validatedAt = prior;},
+    row => {row.assessment.checkpointAt = iso(input.createdAt);},
+    row => {row.assessment.trigger.requestedAt = prior;},
+    row => {row.assessment.trigger.type = 'unscheduled';},
+    row => {row.signals.metrics[0].status = 'snapshot';},
+  ]) {
+    const invalid = structuredClone(record);
+    modify(invalid);
+    await assert.rejects(appendRecord(root, invalid));
+  }
+  const another = makeRecord('2026-11-25T03:03:06.000Z', 'official', initial[0].sha256);
+  another.assessment.trigger = request;
+  const race = await Promise.allSettled([appendRecord(root, record), appendRecord(root, another)]);
+  assert.equal(race.filter(item => item.status === 'fulfilled').length, 1);
+  const rows = await readArchive(root);
+  assert.deepEqual(rows.map(row => row.kind), ['commissioning', 'official']);
+  assert.deepEqual(JSON.parse(await readFile(rows[0].file, 'utf8')), baseline);
+  assert.deepEqual(rows[1].trigger, request);
+  assert.equal(nextRecord(rows, null, request, prior), null);
+  assert.equal(nextRecord(rows, null, {...request, runId:'5678'}, prior), null);
+  await assert.rejects(appendRecord(root, another));
+  assert.deepEqual(nextRecord(rows, prior), {kind:'official', checkpointAt:prior});
+  await appendRecord(root, makeRecord(prior, 'official', rows[1].sha256));
+  const final = await readArchive(root);
+  assert.deepEqual(final.map(row => row.kind), ['commissioning', 'official', 'official']);
+  assert.equal(nextRecord(final, null, request, winter), null);
 });
 test('failed verification and incomplete cached sources leave the last validated record intact',async t=>{
   const root=await temp(t);

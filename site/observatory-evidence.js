@@ -128,7 +128,7 @@ export function evidenceRecords(payload, cutoff) {
         publicationDateBasis: publishedOn
           ? 'Dated report'
           : 'Version publication date unavailable for the rolling dataset',
-        retrievedAt: payload.checkedAt,
+        retrievedAt: metric.retrievedAt ?? payload.checkedAt,
         classification,
         limitations,
         intervalLabel: metric.intervalLabel ?? (benchmark ? '95% interval' : null),

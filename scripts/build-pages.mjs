@@ -4,16 +4,16 @@ import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getSignals } from '../src/signals.mjs';
+import { checkpointMetrics, getSignals } from '../src/signals.mjs';
 import { buildIndex } from '../site/index-model.js';
 import { summarizeScaleHistory } from '../site/front-scale.js';
-import { buildCompanionFeed } from '../site/companion-feed.js';
+import { buildCompanionFeed, observatoryCompanionReading } from '../site/companion-feed.js';
 import { checkResearchForecast } from '../site/research-forecast.js';
 import { buildObservatoryAssessment } from '../site/observatory-model.js';
 import { deriveField } from '../site/observatory-field-model.js';
 import { checkTimes, checkTimeZone, checkpointForRun, checkpointWindow } from '../site/checkpoint-schedule.js';
 import { loadCandidateQueue } from './candidate-observations.mjs';
-import { appendRecord, assertPublishedAncestry, readArchive, nextRecord } from './checkpoint-archive.mjs';
+import { appendRecord, assertPublishedAncestry, firstMeasurementRequest, readArchive, nextRecord } from './checkpoint-archive.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const archiveDir = path.resolve(process.env.OBSERVATORY_ARCHIVE_DIR ?? path.join(repo, '.observatory-archive'));
@@ -41,12 +41,7 @@ async function collect(previous) {
   ]);
   const pending = await loadCandidateQueue(process.env.OBSERVATORY_CANDIDATE_DIR,
     previous?.checkedAt ?? new Date(Date.parse(current.checkedAt) - 7 * 86400000).toISOString(), current.checkedAt);
-  const previousMetrics = new Map(previous?.metrics?.map((metric) => [metric.id, metric]));
-  const preserveMetrics = current.metrics.map((metric) => {
-    const prior = previousMetrics.get(metric.id);
-    if (metric.status === 'live' || prior?.value == null || (metric.asOf && prior.asOf <= metric.asOf)) return metric;
-    return { ...prior, status: 'snapshot' };
-  });
+  const preserveMetrics = checkpointMetrics(current, previous);
   const events = [...new Map([
     ...(previous?.events ?? []).map((event) => [event.url.replace(/\/$/, ''), event]),
     ...pending.events.map((event) => [event.url.replace(/\/$/, ''), event]),
@@ -113,7 +108,11 @@ assertPublishedAncestry(records, process.env.PUBLISHED_HEAD_SHA256);
 if (process.env.GITHUB_EVENT_NAME === 'schedule' && !scheduled && !records.length) {
   throw new Error('Expired or unrecognized scheduled run. No earlier checkpoint can be reconstructed.');
 }
-const plan = nextRecord(records, scheduled);
+const request = firstMeasurementRequest({
+  event: process.env.GITHUB_EVENT_NAME, enabled: process.env.OBSERVATORY_FIRST_MEASUREMENT, ref: process.env.GITHUB_REF,
+  createdAt: creation, actor: process.env.GITHUB_ACTOR, runId: process.env.GITHUB_RUN_ID,
+});
+const plan = nextRecord(records, scheduled, request);
 if (plan) {
   const latest = records.at(-1);
   const previous = latest ? JSON.parse(await readFile(latest.file, 'utf8')) : null;
@@ -122,13 +121,16 @@ if (plan) {
   const checkpointAt = plan.checkpointAt ?? signals.checkedAt;
   const validatedAt = new Date().toISOString();
   if (scheduled) assert.equal(checkpointWindow(validatedAt).previous, scheduled, 'Verification crossed into a later assessment window.');
-  const assessment = buildObservatoryAssessment(signals, { checkpointAt, validatedAt, previous: previous?.assessment ?? null });
+  const assessment = buildObservatoryAssessment(signals, {
+    checkpointAt, validatedAt, previous: previous?.assessment ?? null, includeIndicatorForecasts: plan.kind === 'official',
+  });
   assessment.kind = plan.kind;
+  if (plan.trigger) assessment.trigger = plan.trigger;
   assessment.field = deriveField(assessment);
   const sourceRevision = process.env.GITHUB_SHA || execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
   // Capture both kinds of output once. Republishing code never recomputes what a prior checkpoint believed.
   const companion = buildCompanionFeed(signals);
-  companion.assessment = { schemaVersion: 2, kind: plan.kind, checkpointAt, url: 'https://arewethereyet.now/data/observatory.json' };
+  companion.assessment = observatoryCompanionReading(assessment);
   companion.index.methodology = 'Legacy v1 index; retained for existing readers.';
   const archiveEntry = { schemaVersion: 2, kind: plan.kind, sourceRevision, previousSha256: latest?.sha256 ?? null,
     assessment, signals, companion };
@@ -140,7 +142,9 @@ if (plan) {
 const latest = records.at(-1);
 assert.ok(latest, 'No validated edition is available for publication.');
 const record = JSON.parse(await readFile(latest.file, 'utf8'));
-const publicRow = ({ checkpointAt, validatedAt, url, sha256 }) => ({ checkpointAt, validatedAt, url, sha256 });
+const publicRow = ({ checkpointAt, validatedAt, url, sha256, sourceRevision, trigger }) => ({
+  checkpointAt, validatedAt, url, sha256, sourceRevision, ...(trigger && { trigger }),
+});
 const commissioning = records.find(item => item.kind === 'commissioning');
 const repository = process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_REPOSITORY : null;
 const archiveRow = row => {

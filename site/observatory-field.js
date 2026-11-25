@@ -1,4 +1,5 @@
 import {deriveField, fieldAxes, pathwayKinds} from './observatory-field-model.js';
+import {editionLabel} from './checkpoint-schedule.js';
 import {createFieldRenderer} from './observatory-field-renderer.js';
 export {deriveField};
 
@@ -127,7 +128,7 @@ export function mountField(root,{assessment,history=[],loadAssessment,compact=fa
   root.append(key);
   const timebox=el('section',null,'of-history'),historyHead=el('h3','Checkpoint replay');timebox.append(historyHead);
   const choose=el('label',null,'of-picker');choose.append(el('span','Validated checkpoint'));archiveSelect=el('select');choose.append(archiveSelect);timebox.append(choose);
-  for(const [i,row] of records.entries()){const opt=el('option',(row.kind==='commissioning'?'Launch baseline · ':'')+dateText(when(row)));opt.value=String(i);archiveSelect.append(opt);}
+  for(const [i,row] of records.entries()){const opt=el('option',editionLabel(row)+' · '+dateText(when(row)));opt.value=String(i);archiveSelect.append(opt);}
   archiveSelect.addEventListener('change',()=>{stop();setFrame(Number(archiveSelect.value));});
   const hcontrols=el('div',null,'of-history-controls');
   prev=button('Previous',()=>{stop();setFrame(index-1);});next=button('Next',()=>{stop();setFrame(index+1);});
@@ -135,7 +136,7 @@ export function mountField(root,{assessment,history=[],loadAssessment,compact=fa
   compareBtn=button('Compare with previous',async()=>{
     stop();const stamp=request;
     compareText.textContent='Loading the preceding checkpoint…';
-    try{const prior=await read(index-1);if(!closed&&stamp===request)compareText.textContent='Since '+dateText(when(prior))+'. '+comparison(data,prior);}
+    try{const prior=await read(index-1);if(!closed&&stamp===request)compareText.textContent='Since '+editionLabel(prior)+' · '+dateText(when(prior))+'. '+comparison(data,prior);}
     catch{if(!closed&&stamp===request)compareText.textContent='The preceding checkpoint could not be loaded.';}
   });
   hcontrols.append(prev,next,play,compareBtn);timebox.append(hcontrols);

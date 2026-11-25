@@ -1,5 +1,5 @@
 const entries = [
-  ['ECI|Epoch Capabilities Index', 'Epoch Capabilities Index', 'Epoch AI combines results from many tests into a shared scale for comparing models. ECI is measured in points.'],
+  ['ECI|Epoch Capabilities Index', 'Epoch Capabilities Index', 'Epoch AI combines many tests into one scale. Higher scores indicate stronger overall test performance. The scale can go above 100, and its points are useful for comparing tested models.'],
   ['AGI|artificial general intelligence', 'Artificial general intelligence', 'Here, AI that can perform at least as well as skilled people across many kinds of unfamiliar work.'],
   ['ASI|artificial superintelligence', 'Artificial superintelligence', 'Here, AI that consistently beats leading human experts across many kinds of unfamiliar work. It also meets the AGI bar.'],
   ['RSI|recursive self-improvement', 'Recursive self-improvement', 'AI helps make a better successor, which in turn helps improve the next generation.'],

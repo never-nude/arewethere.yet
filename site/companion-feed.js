@@ -21,6 +21,25 @@ function isPublicLink(url) {
   }
 }
 
+export function observatoryCompanionReading(assessment) {
+  return {
+    schemaVersion: 2,
+    kind: assessment.kind,
+    checkpointAt: assessment.checkpointAt,
+    evidenceCutoff: assessment.evidenceCutoff,
+    methodologyVersion: assessment.methodologyVersion,
+    milestoneForecastVersion: assessment.modelVersion,
+    indicatorForecastVersion: assessment.indicatorForecastVersion ?? null,
+    ...(assessment.trigger && { trigger: assessment.trigger }),
+    url: 'https://arewethereyet.now/data/observatory.json',
+    dashboardUrl: 'https://arewethereyet.now/dashboard.html?assessment=' + encodeURIComponent(assessment.checkpointAt),
+    milestones: assessment.milestones.map(({ id, score, status, coverage }) => ({ id, score, status, coverage })),
+    milestoneForecasts: assessment.forecasts.map(({ id, status, centralDate }) => ({ id, status, centralDate })),
+    indicatorForecasts: assessment.indicatorForecasts ?? [],
+    indicatorOutcomes: assessment.indicatorOutcomes ?? [],
+  };
+}
+
 export function buildCompanionFeed(payload, index = buildIndex(payload)) {
   const byId = new Map(payload.metrics.map((metric) => [metric.id, metric]));
   const routeScores = scoreRoutes(index, {

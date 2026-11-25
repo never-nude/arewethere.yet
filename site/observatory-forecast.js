@@ -123,6 +123,217 @@ export function validateIndicators(observations) {
   });
 }
 
+const monthlyTargets = [
+  ...['Open', 'Closed'].map((access) => ({
+    id: 'breadth-' + access.toLowerCase(),
+    topic: 'breadth',
+    label: access + '-weight models on broad tests',
+    access: access + ' weights',
+    source: 'Epoch AI',
+    sourceUrl: 'https://epoch.ai/eci',
+    dataset: 'https://epoch.ai/data/eci_scores.csv',
+    nativeUnit: 'ECI',
+    unit: 'ECI points',
+    classification: 'Independent evaluation',
+    definition: 'The highest combined test score Epoch AI records for a' + (access === 'Open' ? 'n open' : ' closed') +
+      '-weight model released in the target month. A higher score means stronger performance across Epoch’s tests.',
+  })),
+  {
+    id: 'task-horizon', topic: 'horizon', label: 'Length of tasks AI can finish',
+    source: 'METR', sourceUrl: 'https://metr.org/time-horizons/', nativeUnit: 'h', unit: 'hours',
+    classification: 'Independent evaluation',
+    definition: 'The longest task duration at which a model released in the target month succeeds about half the time on METR’s comparable TH1.1/TH2 tests. Duration is measured in human expert working hours.',
+  },
+  {
+    id: 'training-compute', topic: 'compute', label: 'Computation used to train a model',
+    source: 'Epoch AI', sourceUrl: 'https://epoch.ai/data/ai-models',
+    dataset: 'https://epoch.ai/data/frontier_ai_models.csv', nativeUnit: 'FLOP', unit: 'FLOP',
+    classification: 'Independent estimate',
+    definition: 'The largest estimated number of mathematical operations used to train a model with a publication date in the target month in Epoch AI’s frontier model dataset.',
+  },
+];
+
+const monthIndex = (date) => Number(date.slice(0, 4)) * 12 + Number(date.slice(5, 7)) - 1;
+const monthDay = (index, day) => new Date(Date.UTC(Math.floor(index / 12), index % 12, day)).toISOString().slice(0, 10);
+
+export function indicatorObservations(observations, id) {
+  const target = monthlyTargets.find((series) => series.id === id);
+  if (!target) return [];
+  return observations.filter((o) =>
+    o.topic === target.topic && o.source === target.source && o.classification === target.classification &&
+    o.unit === target.nativeUnit && o.system && Number.isFinite(o.value) && dated(o.referenceOn) &&
+    (!target.access || o.weightAccess === target.access) && (!target.dataset || o.datasetUrl === target.dataset) &&
+    o.referenceDateBasis === (target.topic === 'compute' ? 'Model publication date' : 'Model release date'));
+}
+
+function monthlyPeaks(records, asOf) {
+  const months = new Map();
+  for (const row of records) {
+    if (row.referenceOn > asOf || (row.publishedOn && row.publishedOn > asOf)) continue;
+    const month = monthIndex(row.referenceOn);
+    const prior = months.get(month);
+    if (!prior || prior.value < row.value || (prior.value === row.value && row.referenceOn < prior.date))
+      months.set(month, { month, time: month * dayMs, date: row.referenceOn, value: row.value });
+  }
+  return [...months.values()].sort((a, b) => a.month - b.month);
+}
+
+function estimateMonth(training, family, targetMonth, target) {
+  const model = fit(training, family);
+  if (!model) return null;
+  const value = project(model, targetMonth * dayMs);
+  if (!Number.isFinite(value)) return null;
+  return target.nativeUnit === 'ECI' ? value : Math.max(0, value);
+}
+
+function matchedTrials(records, peaks, cutoff, targetMonth) {
+  if (!peaks.length) return [];
+  const trainingLead = targetMonth - peaks.at(-1).month;
+  const originLead = targetMonth - monthIndex(cutoff);
+  const day = Number(cutoff.slice(8, 10));
+  const trials = [];
+  for (const month of peaks) {
+    // The issue month's peak is still partial; it cannot serve as a historical outcome.
+    if (month.month >= monthIndex(cutoff)) continue;
+    const verificationStart = monthDay(month.month + 2, 1);
+    // Live archives will give an exact verification vintage. In retrospective
+    // tests use observations available by the start of verification, and exclude
+    // targets whose reporting window has not opened as of this edition.
+    if (verificationStart > cutoff) continue;
+    const outcome = monthlyPeaks(records.filter((r) => monthIndex(r.referenceOn) === month.month), verificationStart)[0];
+    if (!outcome) continue;
+    const origin = outcome.month - originLead;
+    const originDate = monthDay(origin, Math.min(day, Number(monthDay(origin + 1, 0).slice(8))));
+    const training = monthlyPeaks(records, originDate);
+    if (training.length < 4 || outcome.month - training.at(-1).month !== trainingLead) continue;
+    trials.push({ training, outcome, originDate, verificationStart });
+  }
+  return trials;
+}
+
+function methodErrors(trials, name, target) {
+  const errors = trials.map(({ training, outcome }) => {
+    const value = estimateMonth(training, name, outcome.month, target);
+    return value === null ? null : Math.abs(value - outcome.value);
+  });
+  return errors.every(Number.isFinite) ? errors : null;
+}
+
+function publishedValue(value, target) {
+  return target.nativeUnit === 'ECI' ? Math.round(value * 10) / 10 : rounded(value);
+}
+
+function issueIndicator(target, records, previous, issuedAt, evidenceCutoff) {
+  const cutoff = dated(evidenceCutoff);
+  const issueMonth = monthIndex(issuedAt);
+  const targetMonth = issueMonth + 1;
+  const targetStart = monthDay(targetMonth, 1);
+  const prior = previous?.indicatorForecasts?.find((f) => f.id === target.id);
+  // Later checks may repair a missing source. Once actually issued, the public
+  // forecast and its data cutoff stay fixed, including after source revisions.
+  if (prior?.status === 'Issued' && prior.targetStart === targetStart) return prior;
+  const lastIssued = prior?.status === 'Issued' ? prior :
+    previous?.indicatorOutcomes?.find((outcome) => outcome.id === target.id);
+  const peaks = monthlyPeaks(records, cutoff);
+  const latest = peaks.at(-1);
+  const trials = matchedTrials(records, peaks, cutoff, targetMonth);
+  const split = Math.floor(trials.length * 0.6);
+  const evaluation = trials.slice(split);
+  const firstHoldoutOrigin = evaluation[0]?.originDate ?? null;
+  // A tuning target can be in an earlier release month yet still await verification
+  // when the first held-out prediction would have been made.
+  const tuning = trials.slice(0, split).filter((trial) => trial.verificationStart <= firstHoldoutOrigin);
+  const base = {
+    id: target.id, label: target.label, status: 'Insufficient evidence', issuedAt: null, evidenceCutoff,
+    targetStart, targetEnd: monthDay(targetMonth + 1, 0), verifyOn: monthDay(targetMonth + 2, 1),
+    verifyThrough: monthDay(targetMonth + 2, 7), centralValue: null, unit: target.unit, range: null,
+    rangeNote: 'The band adds and subtracts the 90th percentile of absolute errors on later historical months. Its coverage on future releases is unknown.',
+    limitations: 'Historical tests reconstruct past release months from this source edition. Known publication dates restrict what each test can use. Unrecorded publication delays and later source revisions can change the result. Months without eligible models cannot be scored.',
+    model: null, definition: target.definition, source: target.source, sourceUrl: records[0]?.sourceUrl ?? target.sourceUrl,
+    reason: '', change: 'No monthly prediction issued.', previousValue: lastIssued?.centralValue ?? null,
+    previousTargetStart: lastIssued?.targetStart ?? null,
+    basis: { lastDate: latest?.date ?? null, lastValue: latest?.value ?? null, months: peaks.length,
+      originCount: trials.length, selectionCount: tuning.length,
+      lastSelectionVerifiedOn: tuning.at(-1)?.verificationStart ?? null, firstHoldoutOrigin,
+      holdoutCount: evaluation.length, holdoutMAE: null, baselineMAE: null },
+  };
+  if (!records.some((o) => o.sourceStatus === 'live') || issueMonth !== monthIndex(cutoff)) {
+    base.reason = 'A fresh source check in the issue month is required to issue a prediction.';
+    return base;
+  }
+  if (tuning.length < 4 || evaluation.length < 4) {
+    base.reason = 'Too few comparable past months to choose a method and test it on at least four later months at this forecast distance.';
+    return base;
+  }
+  const choices = families.map((name) => {
+    const errors = methodErrors(tuning, name, target);
+    return errors && { name, error: mean(errors) };
+  }).filter(Boolean).sort((a, b) => a.error - b.error);
+  const model = choices[0]?.name;
+  const holdout = model ? methodErrors(evaluation, model, target) : null;
+  const baseline = methodErrors(evaluation, 'Persistence', target);
+  const raw = model ? estimateMonth(peaks, model, targetMonth, target) : null;
+  if (!holdout || !baseline || raw === null) {
+    base.reason = 'The selected method could not produce finite estimates across the later test months and this issue.';
+    return base;
+  }
+  const centralValue = publishedValue(raw, target);
+  const spread = quantile(holdout, 0.9);
+  const low = centralValue - spread;
+  const holdoutMAE = rounded(mean(holdout)), baselineMAE = rounded(mean(baseline));
+  const reason = model === 'Persistence'
+    ? 'Carrying forward the latest observed monthly high had the smallest average error on the earlier comparison months.'
+    : 'This trend had the smallest average error on the earlier comparison months. ' +
+      (mean(holdout) < mean(baseline) ? 'It also improved on carrying the last value forward in the later tests.'
+        : 'Carrying the last value forward was at least as accurate in the later tests.');
+  return { ...base, status: 'Issued', issuedAt, centralValue, model, reason,
+    range: { low: publishedValue(target.nativeUnit === 'ECI' ? low : Math.max(0, low), target),
+      high: publishedValue(centralValue + spread, target) },
+    change: !lastIssued ? 'First prediction for this series.'
+      : 'New target month. The estimate uses the latest available source measurements.',
+    basis: { ...base.basis, holdoutMAE, baselineMAE } };
+}
+
+function pendingOutcome(forecast) {
+  const { id, label, issuedAt, targetStart, targetEnd, verifyOn, verifyThrough, centralValue, unit, range } = forecast;
+  return { id, label, issuedAt, targetStart, targetEnd, verifyOn, verifyThrough, centralValue, unit, range,
+    status: 'Pending', observedValue: null, absoluteError: null, resolvedAt: null, observationCount: 0,
+    reason: 'Awaiting the verification window.' };
+}
+
+function resolveOutcome(outcome, records, validatedAt, cutoff) {
+  if (outcome.status !== 'Pending' || validatedAt.slice(0, 10) < outcome.verifyOn) return outcome;
+  const day = validatedAt.slice(0, 10);
+  if (day > outcome.verifyThrough)
+    return { ...outcome, status: 'Unscored', resolvedAt: validatedAt,
+      reason: 'No qualifying live source check was archived during the verification window.' };
+  if (cutoff < outcome.verifyOn || !records.some((r) => r.sourceStatus === 'live')) return outcome;
+  const eligible = records.filter((r) => r.sourceStatus === 'live' && r.referenceOn >= outcome.targetStart &&
+    r.referenceOn <= outcome.targetEnd && (!r.publishedOn || r.publishedOn <= cutoff));
+  if (!eligible.length)
+    return { ...outcome, status: 'Unscored', resolvedAt: validatedAt,
+      reason: 'The live source contained no qualifying model for the target month at verification.' };
+  const best = eligible.reduce((winner, row) => row.value > winner.value ? row : winner);
+  return { ...outcome, status: 'Scored', observedValue: best.value,
+    absoluteError: rounded(Math.abs(best.value - outcome.centralValue)), observationCount: eligible.length,
+    observationId: best.id, sourceUrl: best.sourceUrl, resolvedAt: validatedAt,
+    reason: 'Highest eligible value in the first live source check during the verification window.' };
+}
+
+export function forecastIndicators(observations, previous, validatedAt, evidenceCutoff) {
+  const cutoff = dated(evidenceCutoff);
+  const records = new Map(monthlyTargets.map((t) => [t.id, indicatorObservations(observations, t.id)]));
+  const indicatorForecasts = monthlyTargets.map((t) => issueIndicator(t, records.get(t.id), previous, validatedAt, evidenceCutoff));
+  const previousIssues = (previous?.indicatorForecasts ?? []).filter((f) =>
+    f.status === 'Issued' && f.targetStart < indicatorForecasts[0].targetStart);
+  const history = new Map();
+  for (const row of [...previousIssues.map(pendingOutcome), ...(previous?.indicatorOutcomes ?? [])])
+    history.set(row.targetStart + '/' + row.id, row);
+  const indicatorOutcomes = [...history.values()].map((o) => resolveOutcome(o, records.get(o.id) ?? [], validatedAt, cutoff))
+    .sort((a, b) => b.targetStart.localeCompare(a.targetStart) || a.id.localeCompare(b.id));
+  return { indicatorForecastVersion: '1.0.0', indicatorForecasts, indicatorOutcomes };
+}
+
 // A trajectory is an editorial, independently sourced calibration from one
 // repeatable measurement to a particular criterion's acceptance rule. Ordinary
 // benchmarks lack that link. Gate all evidence on publication availability.

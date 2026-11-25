@@ -1,5 +1,5 @@
 import { renderTrends } from './observatory-trends.js';
-import { checkpointWindow } from './checkpoint-schedule.js';
+import { checkpointWindow, editionLabel } from './checkpoint-schedule.js';
 import { mountField } from './observatory-field.js';
 import { installBriefingGlossary } from './front-glossary.js';
 
@@ -7,6 +7,7 @@ const base = new URL('./', import.meta.url);
 const dashboard = document.body.dataset.view === 'dashboard';
 const byId = (id) => document.getElementById(id);
 const number = new Intl.NumberFormat('en', { maximumSignificantDigits: 3 });
+const predictionNumber = new Intl.NumberFormat('en', { maximumFractionDigits: 6 });
 const eastern = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
@@ -250,8 +251,7 @@ function renderMilestones(a) {
     }),
   );
 }
-function renderBrief(a) {
-  const examples = [];
+function measuredLead(a) {
   const tested = a.observations.filter(
     (x) => x.topic === 'reliability' && Number.isFinite(x.value) && x.publishedOn,
   );
@@ -261,20 +261,31 @@ function renderBrief(a) {
     .at(-1);
   const r = tested.filter((o) => o.publishedOn === latest).sort((a, b) => b.value - a.value)[0];
   const lead = byId('measured-lead');
-  if (r)
-    lead.replaceChildren(
-      el('strong', 'Measured capability'),
+  lead.hidden = !r;
+  if (!r) return;
+  lead.replaceChildren(
+      el('strong', 'Observed · reliability on complex tasks'),
       el(
         'span',
         'On METR’s selected tasks, ' +
           (r.system || 'the tested system') +
           ' has an estimated 80% success rate on work that takes an expert about ' +
           Number(r.value.toPrecision(2)) +
-          ' hours. ',
+          ' hours.' +
+          (Number.isFinite(r.low) && Number.isFinite(r.high)
+            ? ' The ' + (r.intervalLabel || 'reported interval') + ' is ' + number.format(r.low) + '–' + number.format(r.high) + ' hours. '
+            : ' '),
       ),
       link(r.source + ' · ' + date(r.publishedOn), r.sourceUrl),
     );
-  else lead.hidden = true;
+}
+function renderBrief(a) {
+  const unresolved = a.milestones.filter((m) => !Number.isFinite(m.score)).length;
+  const status = unresolved === a.milestones.length
+    ? 'All four milestones still have open criteria.'
+    : (a.milestones.length - unresolved) + ' of four milestones have enough independent evidence for a score.';
+  byId('brief-status').replaceChildren(link(status, '#milestone-progress'));
+  const examples = [];
   const gain = a.observations.find((o) => o.topic === 'research-acceleration' && Number.isFinite(o.value));
   if (gain)
     examples.push([
@@ -313,6 +324,97 @@ function renderBrief(a) {
     link('Inspect the evidence register', './dashboard.html#signals'),
   );
 }
+function predictionValue(value, unit) {
+  if (!Number.isFinite(value)) return 'Unavailable';
+  const formatted = Math.abs(value) >= 1e12 ? value.toExponential(2) : predictionNumber.format(value);
+  if (unit === 'h' || unit === 'hours') return formatted + (value === 1 ? ' hour' : ' hours');
+  if (unit === '%') return formatted + '%';
+  return formatted + (unit ? ' ' + unit : '');
+}
+function verificationWindow(f) {
+  return f.verifyThrough ? day.formatRange(new Date(f.verifyOn), new Date(f.verifyThrough)) : date(f.verifyOn);
+}
+function indicatorPredictions(a) {
+  const root = byId('indicator-forecasts');
+  const forecasts = a.indicatorForecasts;
+  root.replaceChildren();
+  const outcomeList = byId('indicator-outcomes');
+  outcomeList?.replaceChildren();
+  if (!forecasts?.length) {
+    root.append(el('p', 'This edition carries no benchmark predictions.', 'obs-sub'));
+    return;
+  }
+  const issued = forecasts.filter((f) => f.status === 'Issued' && Number.isFinite(f.centralValue));
+  if (dashboard) {
+    root.append(el('h3', 'Predictions for upcoming benchmark readings'),
+      el('p', 'Each prediction names a result to look for, a time window and a date to check the published evidence. A milestone date requires additional evidence about the system as a whole.', 'obs-sub'));
+    for (const f of [...issued, ...forecasts.filter((f) => !issued.includes(f))]) {
+      const item = el('article', null, 'obs-prediction');
+      item.id = 'prediction-' + f.id;
+      item.append(el('h4', f.label));
+      if (issued.includes(f)) {
+        item.append(el('p', period(f.targetStart) + ' estimate · ' + predictionValue(f.centralValue, f.unit), 'obs-prediction-value'));
+        if (f.range)
+          item.append(el('p', 'Historical error range · ' + predictionValue(f.range.low, f.unit) + ' to ' + predictionValue(f.range.high, f.unit)));
+        else item.append(small('There are too few comparable errors to give a range.'));
+      } else item.append(el('p', f.status, 'obs-prediction-value'));
+      item.append(el('p', f.definition), el('p', f.reason));
+      const criteria = el('div');
+      const b = f.basis;
+      if (b && Number.isFinite(b.lastValue))
+        criteria.append(el('p', 'Latest input · ' + predictionValue(b.lastValue, f.unit) + ' (' + date(b.lastDate) + ').'));
+      if (f.model) criteria.append(el('p', 'Model · ' + f.model));
+      if (b) {
+        criteria.append(el('p', b.months + ' months with measurements · ' + b.holdoutCount + ' later comparisons.'));
+        if (Number.isFinite(b.holdoutMAE) && Number.isFinite(b.baselineMAE))
+          criteria.append(el('p', 'Average size of past errors · ' + predictionValue(b.holdoutMAE, f.unit) + ' for this model and ' + predictionValue(b.baselineMAE, f.unit) + ' when repeating the last observation.'));
+      }
+      if (f.range && f.rangeNote) criteria.append(el('p', f.rangeNote));
+      if (f.limitations) criteria.append(el('p', f.limitations));
+      if (f.change) criteria.append(el('p', f.change));
+      if (f.sourceUrl) criteria.append(link(f.source || 'Source of the measurements', f.sourceUrl));
+      if (f.issuedAt) item.append(small('Issued ' + time(f.issuedAt) + ' · Target window ' + date(f.targetStart) + ' to ' + date(f.targetEnd) + ' · Verification window ' + verificationWindow(f)));
+      item.append(details('Source, method and uncertainty', criteria));
+      root.append(item);
+    }
+    if (issued.length || a.indicatorOutcomes?.length) outcomeList.append(el('h3', 'Prediction results'));
+    if (issued.length && !a.indicatorOutcomes?.length)
+      outcomeList.append(el('p', 'The first estimates await verification. The source review window is ' + verificationWindow(issued[0]) + '.'));
+    if (a.indicatorOutcomes?.length) {
+      for (const o of a.indicatorOutcomes) {
+        const body = el('div');
+        body.append(el('p', o.reason), small('Verification window · ' + verificationWindow(o)), el('p', 'Original prediction · ' + predictionValue(o.centralValue, o.unit)));
+        if (Number.isFinite(o.observedValue)) body.append(el('p', 'Published measurement · ' + predictionValue(o.observedValue, o.unit)));
+        if (Number.isFinite(o.absoluteError)) body.append(el('p', 'Size of the error · ' + predictionValue(o.absoluteError, o.unit)));
+        if (o.sourceUrl) body.append(link('Published result', o.sourceUrl));
+        if (o.resolvedAt) body.append(small('Reviewed ' + date(o.resolvedAt)));
+        outcomeList.append(details(o.label + ' · ' + period(o.targetStart) + ' · ' + o.status, body));
+      }
+    }
+    return;
+  }
+  if (!issued.length) root.append(el('p', 'No benchmark has enough comparable evidence for a new prediction.'));
+  else {
+    const lead = issued[0];
+    root.append(el('h3', 'What to watch in ' + period(lead.targetStart)));
+    const ul = el('ul');
+    const highlights = issued.slice(0, 2);
+    const epochPair = highlights.length === 2 && highlights.every((f) => ['breadth-open', 'breadth-closed'].includes(f.id));
+    if (epochPair)
+      root.append(el('p', 'If models are released that month, these are the highest combined test scores we expect Epoch AI to report for each group. Higher scores mean stronger performance across those tests.'));
+    for (const f of highlights) {
+      const li = el('li');
+      li.append(el('strong', f.label), ' · ' + predictionValue(f.centralValue, f.unit) +
+        (f.targetStart !== lead.targetStart ? ' in ' + period(f.targetStart) : ''));
+      if (!epochPair) li.append('. ' + f.definition);
+      if (f.range) li.append(small('Historical error range · ' + predictionNumber.format(f.range.low) + '–' + predictionValue(f.range.high, f.unit)));
+      else li.append(small('Too few comparable errors for a range.'));
+      ul.append(li);
+    }
+    root.append(ul, small('These estimates depend on a qualifying published result. Past errors give a sense of their uncertainty. Verification · ' + verificationWindow(lead) + '.'));
+  }
+  root.append(link('All benchmark predictions, sources and results', './dashboard.html#outlook'));
+}
 function forecastBody(f) {
   const div = el('div');
   const range = f.range
@@ -343,7 +445,8 @@ function updateClock() {
   if (f.status === 'Observed') target.textContent = 'First confirmed ' + date(f.centralDate);
   else if (!f.centralDate) target.textContent = 'Not reliably estimable';
   else {
-    const remaining = Date.parse(f.centralDate) - Date.now();
+    const asOf = selectedArchive ? Date.parse(assessment.checkpointAt) : Date.now();
+    const remaining = Date.parse(f.centralDate) - asOf;
     const months = Math.max(0, Math.round(remaining / (86400000 * 30.4375)));
     target.textContent =
       remaining <= 0
@@ -364,7 +467,7 @@ function clock(a) {
       'p',
       'The destination follows verified evidence for sustained AI-led acceleration. A new checkpoint can move it earlier or later.',
     ),
-    small((a.kind === 'commissioning' ? 'Baseline published ' : 'Last recalibration ') + time(a.checkpointAt)),
+    small(editionLabel(a) + ' · ' + time(a.checkpointAt)),
     forecastBody(f),
   );
   updateClock();
@@ -495,6 +598,25 @@ async function loadAssessment(row) {
   historical.set(row.sha256, record.assessment);
   return record.assessment;
 }
+function showChanges(a) {
+  const box = byId('changes');
+  if (a.kind === 'commissioning') {
+    box.replaceChildren(el('p', 'This launch baseline is the starting point for comparisons.'));
+    return;
+  }
+  const prior = [manifest.commissioning, ...manifest.archive]
+    .filter((row) => row && row.checkpointAt < a.checkpointAt)
+    .sort((x, y) => y.checkpointAt.localeCompare(x.checkpointAt))[0];
+  box.replaceChildren();
+  if (prior) {
+    const u = new URL('./dashboard.html', base);
+    u.searchParams.set('assessment', prior.checkpointAt);
+    const desc = el('p', 'Previous edition · ');
+    desc.append(link(editionLabel(prior) + ' · ' + time(prior.checkpointAt), u));
+    box.append(desc);
+  }
+  box.append(list(a.changes));
+}
 function archive(a) {
   const rows = [...(manifest.commissioning ? [manifest.commissioning] : []), ...manifest.archive].reverse(),
     root = byId('archive');
@@ -505,7 +627,7 @@ function archive(a) {
     u.hash = 'milestone-progress';
     const item = el('li');
     item.append(
-      link((r === manifest.commissioning ? 'Launch baseline · ' : '') + time(r.checkpointAt), u),
+      link(editionLabel(r) + ' · ' + time(r.checkpointAt), u),
       ' · ',
       link('Source record', new URL(r.url, base)),
     );
@@ -535,6 +657,9 @@ function archive(a) {
   if (selectedArchive) root.prepend(link('Return to the current assessment', './dashboard.html'));
 }
 function methodology(a) {
+  const row = [manifest.currentRecord, manifest.commissioning, ...manifest.archive].find(r => r?.checkpointAt === a.checkpointAt);
+  const ref = /^[a-f0-9]{40}$/i.test(row?.sourceRevision) ? row.sourceRevision : 'main';
+  const repository = 'https://github.com/never-nude/arewethere.yet/blob/' + ref + '/';
   byId('method').replaceChildren(
     el(
       'p',
@@ -546,32 +671,33 @@ function methodology(a) {
     ),
     el(
       'p',
-      'Assessments run every day at midnight, 9:30 a.m. and 4 p.m. Eastern. Delayed verification keeps the previous edition visible. Measurements, publication dates and retrieval times can differ. Archive records retain those distinctions.',
+      'The Launch test is the first official measurement, taken on demand. Regular assessments run every day at midnight, 9:30 a.m. and 4 p.m. Eastern. Delayed verification keeps the previous edition visible. Measurements, publication dates and retrieval times can differ. Archive records retain those distinctions.',
     ),
-    small('Method ' + a.methodologyVersion + ' · forecast model ' + a.modelVersion),
+    small('Milestone method ' + a.methodologyVersion + ' · milestone forecast model ' + a.modelVersion +
+      (a.indicatorForecastVersion ? ' · benchmark forecast model ' + a.indicatorForecastVersion : '')),
     link(
       'Read the complete methodology',
-      'https://github.com/never-nude/arewethere.yet/blob/main/site/observatory-methodology.md',
+      repository + 'site/observatory-methodology.md',
     ),
     ' · ',
-    link('Reproduce an assessment', 'https://github.com/never-nude/arewethere.yet/blob/main/README.md'),
+    link('Reproduce an assessment', repository + 'README.md'),
   );
 }
 function metadata() {
-  const window = checkpointWindow(new Date());
+  const window = checkpointWindow(selectedArchive ? assessment.checkpointAt : new Date());
   byId('next-check').textContent = 'Next scheduled · ' + time(window.next);
   if (!assessment) return;
   const historic = selectedArchive ? 'Archived · ' : '';
-  const baseText = assessment.kind === 'commissioning' ? 'Launch baseline · ' : 'Recalibrated · ';
+  const baseText = editionLabel(assessment) + ' · ';
   const stale = Date.parse(assessment.checkpointAt) < Date.parse(window.previous) && !selectedArchive;
   byId('edition').textContent =
     historic +
     baseText +
     time(assessment.checkpointAt) +
     (stale ? ' · Awaiting a newer validated assessment' : '');
-  if (!selectedArchive)
-    byId('next-check').textContent =
-      'Previous scheduled slot · ' + time(window.previous) + ' · Next · ' + time(window.next);
+  byId('next-check').textContent =
+    (selectedArchive ? 'Schedule at publication · ' : '') +
+    'Previous scheduled slot · ' + time(window.previous) + ' · Next · ' + time(window.next);
 }
 function linkedSection() {
   let id;
@@ -627,15 +753,9 @@ function paint(a) {
   metadata();
   renderMilestones(a);
   clock(a);
-  byId('changes').replaceChildren(
-    list(
-      a.kind === 'commissioning'
-        ? [
-            'This is the launch baseline. The next official assessment will compare newly verified evidence with this edition.',
-          ]
-        : a.changes,
-    ),
-  );
+  measuredLead(a);
+  indicatorPredictions(a);
+  showChanges(a);
   const field = byId('observatory-field');
   fieldInstance?.();
   fieldInstance = mountField(field, {
@@ -663,6 +783,14 @@ function paint(a) {
         ),
     );
   } else renderBrief(a);
+  if (selectedArchive) {
+    for (const anchor of document.querySelectorAll('.view-switch a, .obs-footer a, #assessment-list a, #indicator-forecasts a, #brief-evidence a, #observatory-field a')) {
+      const u = new URL(anchor.href, base);
+      if (u.origin !== base.origin || ![base.pathname, base.pathname + 'dashboard.html'].includes(u.pathname)) continue;
+      u.searchParams.set('assessment', a.checkpointAt);
+      anchor.href = u.href;
+    }
+  }
 }
 async function refresh() {
   if (requestInFlight || document.hidden) return;
@@ -680,6 +808,7 @@ async function refresh() {
       metadata();
       return;
     }
+    if (data.commissioning) data.commissioning.kind = 'commissioning';
     const selected = new URL(location.href).searchParams.get('assessment');
     const row = selected
       ? [data.commissioning, ...data.archive].filter(Boolean).find((x) => x.checkpointAt === selected)

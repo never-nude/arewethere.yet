@@ -16,8 +16,10 @@ if (record.previousSha256) {
 }
 const rebuilt = buildObservatoryAssessment(record.signals, {
   checkpointAt: record.assessment.checkpointAt, validatedAt: record.assessment.validatedAt, previous,
+  includeIndicatorForecasts: Object.hasOwn(record.assessment, 'indicatorForecasts'),
 });
 rebuilt.kind = record.kind;
+if (record.assessment.trigger) rebuilt.trigger = record.assessment.trigger;
 rebuilt.field = deriveField(rebuilt);
 assert.deepEqual(rebuilt, record.assessment, 'Replay differed. Use the archived source revision ' + record.sourceRevision + '.');
 console.log('Reproduced ' + record.assessment.checkpointAt + ' from archived observations and model inputs.');

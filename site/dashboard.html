@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
-  <meta name="description" content="Inspect AI milestone criteria, published evidence, forecast validation, the three-dimensional field and the checkpoint archive.">
+  <meta name="description" content="Explore AI milestone criteria, measured capabilities, dated benchmark predictions, forecast results and the assessment archive.">
   <title>Singularity Observatory · Full dashboard</title>
   <link rel="canonical" href="https://arewethereyet.now/dashboard.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
   <meta property="og:title" content="Singularity Observatory · Full dashboard">
-  <meta property="og:description" content="Inspect AI milestone criteria, published evidence, forecast validation, the three-dimensional field and the checkpoint archive.">
+  <meta property="og:description" content="Explore AI milestone criteria, measured capabilities, dated benchmark predictions, forecast results and the assessment archive.">
   <meta property="og:url" content="https://arewethereyet.now/dashboard.html">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -20,7 +20,7 @@
   <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Singularity Observatory · Full dashboard">
-  <meta name="twitter:description" content="Inspect AI milestone criteria, published evidence, forecast validation, the three-dimensional field and the checkpoint archive.">
+  <meta name="twitter:description" content="Explore AI milestone criteria, measured capabilities, dated benchmark predictions, forecast results and the assessment archive.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png?v=4">
@@ -47,15 +47,16 @@
       <p>Follow each assessment from the original observation to the conclusion.</p>
     </header>
     <div class="obs-schedule"><span id="edition" role="status">Loading the published assessment…</span><span id="next-check"></span></div>
-    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#forecasts">Forecasts</a><a href="#history">Archive</a></nav>
+    <nav class="obs-section-nav" aria-label="Dashboard sections"><a href="#milestone-progress">Assessments</a><a href="#atlas">3D field</a><a href="#signals">Evidence</a><a href="#outlook">Benchmark predictions</a><a href="#forecasts">Milestone forecasts</a><a href="#history">Archive</a></nav>
 
-    <section id="milestone-progress" class="obs-panel"><h2>Milestone assessments</h2><p class="obs-sub">A score counts independently tested criteria. An open question keeps the total indeterminate.</p><div id="assessment-list"></div></section>
+    <section id="milestone-progress" class="obs-panel"><h2>Milestone assessments</h2><p class="obs-sub">Each score shows the share of required criteria met. A score of 100 needs independent evidence for all of them in the same system or lineage. An unresolved criterion keeps the total open.</p><div id="assessment-list"></div></section>
+    <section id="outlook" class="obs-panel"><h2>Measurements and predictions</h2><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div><div id="indicator-outcomes"></div></section>
     <section id="atlas" class="obs-panel obs-field"><h2>Milestone field</h2><div id="observatory-field"></div></section>
     <div class="obs-bottom-grid"><section id="watchdog" class="obs-panel"><h2>What changed</h2><div id="changes"></div></section><section id="oversight" class="obs-panel"><h2>Human oversight and control</h2><div id="oversight-reading"></div></section></div>
     <section id="signals" class="obs-panel"><h2>Evidence register</h2><p class="obs-sub">Look up a measurement, the system tested and the limits of the finding. Release announcements earn no capability credit.</p><div id="register"></div></section>
-    <section id="trends" class="obs-panel"><h2>Measured trends</h2><p class="obs-sub">Compare benchmark results in their original units, by model release date.</p><div id="trend-chart"></div></section>
+    <section id="trends" class="obs-panel"><h2>Measured trends</h2><p class="obs-sub">Compare monthly measurements with the predictions available in this edition.</p><div id="trend-chart"></div></section>
     <section id="leaders" class="obs-panel"><h2>Organizations and systems</h2><p class="obs-sub">Each result belongs to a particular system or study. A collection of best scores can span several different systems.</p><div id="org-list"></div></section>
-    <section id="forecasts" class="obs-panel"><h2>Forecasts and uncertainty</h2><p class="obs-sub">An arrival date needs a measurable target, a comparable history and evidence linking the trend to the milestone.</p><div id="forecast-list"></div><details id="countdown" class="obs-clock"><summary>Reveal the singularity forecast</summary><div id="clock-reading"></div></details><details class="obs-detail"><summary>Forecast models and historical validation</summary><div id="validation"></div></details></section>
+    <section id="forecasts" class="obs-panel"><h2>Milestone arrival forecasts</h2><p class="obs-sub">An arrival date needs a measurable target, a comparable history and evidence linking the trend to the milestone.</p><div id="forecast-list"></div><details id="countdown" class="obs-clock"><summary>Reveal the singularity forecast</summary><div id="clock-reading"></div></details><details class="obs-detail"><summary>Forecast models and historical validation</summary><div id="validation"></div></details></section>
     <section id="x-factors" class="obs-panel"><h2>Disruptions, breakthroughs and external conditions</h2><div id="risk-register"></div></section>
     <section id="history" class="obs-panel"><h2>Assessment archive</h2><p class="obs-sub">Open an edition to inspect the evidence, decisions and forecasts as they were published.</p><div id="archive"></div></section>
     <section id="methodology" class="obs-panel"><h2>How the observatory works</h2><div id="method"></div></section>

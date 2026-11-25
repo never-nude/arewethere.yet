@@ -357,3 +357,36 @@
   font-size: 14px;
   color: var(--dim);
 }
+
+.obs-outlook-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(20px, 5vw, 72px);
+}
+#brief-status {
+  margin-block: 10px;
+}
+@media (max-width: 850px) {
+  .obs-outlook-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.obs-measured-lead:not(:empty) {
+  margin-top: 14px;
+}
+.obs-prediction {
+  margin-block: 12px;
+  padding-block: 12px 2px;
+  border-top: 1px solid var(--line);
+}
+.obs-prediction h4 {
+  font-size: 18px;
+}
+.obs-prediction .obs-prediction-value {
+  color: var(--teal);
+  font-weight: 600;
+}
+.obs-prediction p {
+  margin-block: 5px;
+  max-width: 80ch;
+}

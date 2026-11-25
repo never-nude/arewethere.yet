@@ -1,6 +1,6 @@
 # How the milestone observatory evaluates evidence
 
-**Evidence methodology 2.0.0 · Forecast model 1.0.0**
+**Evidence methodology 2.0.0 · Milestone forecast model 1.0.0 · Monthly indicator forecast model 1.0.0**
 
 The observatory asks what published evidence establishes about a particular system or successor lineage. These are working definitions. Researchers can reasonably choose other definitions, comparison groups or equivalence margins. The version and individual review rules travel with each checkpoint.
 
@@ -36,6 +36,20 @@ Additional sources include public independent evaluations, scientific publicatio
 Organization views group the recorded systems by the source's developer attribution, preserving joint attributions. The best benchmark reading has its own uncertainty interval. A laboratory research-productivity measurement applies to that laboratory. Oversight, strategic behavior and intervention remain a separate assessment with their own evaluation conditions.
 
 ## Forecasts and validation
+
+### What a monthly prediction means
+
+Each official edition can issue a prediction about models released in the **next full UTC calendar month**. One question is “What will be the highest Epoch Capabilities Index score among open-weight models released in December?” There is a separate question for closed-weight models. Open-weight models make their learned parameters available to download. Epoch combines many tests into a shared scale on which higher scores indicate stronger overall test performance. Scores can exceed 100. The result applies to models that Epoch tested in the named group and release month. [Epoch's guide to its index](https://epoch.ai/eci)
+
+The watch compares three ways to predict the monthly high. It can repeat the most recent observed monthly high, fit a straight-line trend, or fit a trend with a constant percentage change. A quiet month can yield a lower high, and an empty month supplies no value. To simulate making the prediction in earlier months, the model uses the same day of the month, the same time to the target month, and a matching gap since the latest comparable measurement. It respects documented publication dates. For rolling datasets such as Epoch’s, historical publication dates for individual rows are often unknown. Those comparisons use today’s available version of the data. Only the predictions preserved before the target month count as prospective tests.
+
+The earliest 60% of eligible historical comparisons are candidates for choosing the method. The watch excludes any of those results that would still be awaiting verification at the start of the later test. It chooses the method with the smallest average absolute error on the remaining early results. The final 40% measure its error independently of that choice. Each group needs at least four comparisons. The published band extends one historical error allowance on either side of the estimate, using the 90th percentile of the later absolute errors. The dashboard gives the number of comparisons, the average error in the original unit and the error from repeating the last reading. With a handful of comparisons, the band gives only a rough indication of uncertainty. Its future coverage is unknown.
+
+An official edition with fresh source data can issue one prediction per series and target month. That prediction stays fixed. The watch allows a full month after the target month for results to appear, then scores the first qualifying live source check in the first seven days of the following month. For December releases, the verification window is **February 1–7 UTC**. If the source lists eligible releases, the archive records the highest eligible value and the absolute difference from the prediction. If the source lists none, or no qualifying check succeeds that week, the result is marked unscored. Later dataset revisions leave that published outcome intact.
+
+The **Launch test** is the owner-requested first official reading after the commissioning baseline. It records the time the watch actually checked its sources. The daily recalibrations that follow are at midnight, 9:30 a.m. and 4 p.m. in New York.
+
+### Historical comparisons and milestone arrival dates
 
 For the measured indicator series, the engine compares three families: persistence at the last observed value, linear change per calendar day, and log-linear change where values are positive. It uses the strongest observation on each date and then the highest value in each observed calendar month. Data-free months stay empty. A monthly peak can fall in a subsequent month. METR's 50% and 80% task horizons have different meanings and separate models.
 

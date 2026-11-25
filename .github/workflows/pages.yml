@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      first_measurement:
+        description: 'Launch test — take the first official measurement now. If an official edition already exists, republish it.'
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '0 0 * * *'
       timezone: 'America/New_York'
@@ -39,8 +45,8 @@ jobs:
         run: bash scripts/prepare-archive.sh
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Identify the original scheduled run
-        if: github.event_name == 'schedule'
+      - name: Identify the original measurement request
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.first_measurement)
         run: |
           created=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .created_at)
           echo "OBSERVATORY_RUN_CREATED_AT=$created" >> "$GITHUB_ENV"
@@ -57,6 +63,7 @@ jobs:
         env:
           PREVIOUS_SIGNALS_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/data/signals.json
           OBSERVATORY_CRON: ${{ github.event.schedule }}
+          OBSERVATORY_FIRST_MEASUREMENT: ${{ github.event_name == 'workflow_dispatch' && inputs.first_measurement && 'true' || 'false' }}
       - name: Persist new immutable records before publishing
         run: bash scripts/persist-archive.sh
         env:
