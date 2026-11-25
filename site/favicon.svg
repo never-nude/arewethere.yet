@@ -1,14 +1,58 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <title>Singularity Watch</title>
-  <rect width="64" height="64" rx="14" fill="#201a32"/>
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <g stroke="#d1c2ff" stroke-width="3.5">
-      <ellipse cx="32" cy="11.5" rx="19.5" ry="4"/>
-      <path d="M12.8 12.5c2.4 6.4 7.5 10.7 14.4 14.4m24-14.4c-2.4 6.4-7.5 10.7-14.4 14.4"/>
-      <path d="M12.8 51.5c2.4-6.4 7.5-10.7 14.4-14.4m24 14.4c-2.4-6.4-7.5-10.7-14.4-14.4"/>
-      <ellipse cx="32" cy="52.5" rx="19.5" ry="4"/>
+  <desc>Pale sand passes through a violet hourglass into colorful geometric grains.</desc>
+  <defs>
+    <path id="bowl" d="M13 9h38c-.55 8.9-4.4 14.4-12.8 19.25C35.1 30 34.7 31 34.7 32s.4 2 3.5 3.75C46.6 40.6 50.45 46.1 51 55H13c.55-8.9 4.4-14.4 12.8-19.25C28.9 34 29.3 33 29.3 32s-.4-2-3.5-3.75C17.4 23.4 13.55 17.9 13 9Z"/>
+    <clipPath id="inside"><use href="#bowl"/></clipPath>
+    <path id="sand-bed" d="M13 16.5c6.4-1.2 12.1-.25 18.7.25 5.9.45 12.3.01 19.4-1v3.8L35 31l-3 1.2-3-1.2-16-11.7Z"/>
+    <pattern id="sand" patternUnits="userSpaceOnUse" width="1.6" height="1.8">
+      <circle cx=".42" cy=".45" r=".21" fill="#897a73"/>
+      <circle cx="1.22" cy="1.35" r=".21" fill="#897a73"/>
+    </pattern>
+    <g id="glass">
+      <use href="#bowl" fill="#372c49"/>
+      <g clip-path="url(#inside)">
+        <use href="#sand-bed" fill="#f3e7ce"/>
+        <use href="#sand-bed" fill="url(#sand)" class="detail"/>
+        <path d="M13 16.5c6.4-1.2 12.1-.25 18.7.25 5.9.45 12.3.01 19.4-1" fill="none" stroke="#fff5df" stroke-width=".7"/>
+        <path d="M13 54q9.9-4.9 16.4-8.7c3.2-1.5 5.7-1.1 8.4.6q6.4 4 13.2 6.5V57H13Z" fill="#655672"/>
+        <g>
+          <!-- Larger shapes give the lower chamber its color even at tab size. -->
+          <path d="m18 49 4-2.1 3.2 2.9-.45 4.5-4.9.65-2.3-2.9Z" fill="#70cfea"/>
+          <path d="m26.15 49.6 2.6-5.7 4.1 5.3Z" fill="#ffbc75"/>
+          <circle cx="34.5" cy="47" r="3.45" fill="#ee90bd"/>
+          <path d="m37.6 50.8 4-3.5 4 3.4-4 3.7Z" fill="#9d9af7"/>
+          <path d="m25 52 4.2-2.1 3.8 2.6-.8 3.6h-6.7Z" fill="#a4e4c4"/>
+          <circle cx="46.6" cy="54.1" r="2.9" fill="#f5ad77"/>
+          <circle cx="34.5" cy="47" r="1.15" fill="#482d4a"/>
+        </g>
+        <g class="detail">
+          <path d="m18 49 3.55 2.05L22 46.9Zm3.55 2.05 2.9 3.25.75-4.5Z" fill="#a7edee"/>
+          <path d="m30.45 45.9-2.5 2.4m3.6-1.15-2.05 1.95" stroke="#af683c" stroke-width=".44"/>
+          <path d="m39.15 49.55 3.2 3.6m-1.92-4.62 3.16 3.53" stroke="#504f83" stroke-width=".55"/>
+          <path d="m26 55.8 3.2-5.9 3.8 2.6-2.7.45Z" fill="#6bbfa5"/>
+          <path d="m32.8 52.7 4.3-1.2 1.8 2.7-3.1 1.4Z" fill="#f6cc72"/>
+          <path d="m15.1 53.35 1.7-2.15 2.1 2.25-1.65 1.9Z" fill="#ea9ebf"/>
+          <circle cx="37.85" cy="48.3" r=".72" fill="#dfb8ff"/>
+          <circle cx="31.7" cy="42.75" r=".74" fill="#8be1c8"/>
+          <circle cx="36.9" cy="55.5" r=".47" fill="#fff0ba"/>
+          <path d="m22.4 46.05 1.25-1.32 1.26 1.32-1.26 1.2Z" fill="#a99bf0"/>
+        </g>
+        <!-- Three falling grains connect the two chambers. -->
+        <path d="M32 29.8v3.5" fill="none" stroke="#fff0ce" stroke-width="1.45" stroke-linecap="round"/>
+        <circle cx="32" cy="36.4" r="1.05" fill="#f6d599"/>
+        <path d="m32.8 38.75 1.3 1.25-1.15 1.4-1.35-1.12Z" fill="#86e1c6"/>
+      </g>
+      <use href="#bowl" fill="none" stroke="#d0bdf0" stroke-width="2.35" stroke-linejoin="round"/>
+      <path class="detail" d="M16.5 11.8q.3 2.25 1.15 4.05m2.3 28.3q-1.55 2.02-2.22 3.95" fill="none" stroke="#eee5ff" stroke-width=".58" stroke-linecap="round"/>
+      <g fill="#dfccf5">
+        <rect x="10" y="6" width="44" height="4.35" rx="2.17"/>
+        <rect x="10" y="53.65" width="44" height="4.35" rx="2.17"/>
+      </g>
+      <path class="detail" d="M13 7.18h38M13 54.85h38" stroke="#f3e8ff" stroke-width=".58" stroke-linecap="round"/>
     </g>
-    <path d="M20.5 21q11.5 4 23 0m-23 22q11.5-4 23 0" stroke="#a998ee" stroke-width="2.4"/>
-  </g>
-  <circle cx="32" cy="32" r="4.7" fill="#82f3cf"/>
+  </defs>
+  <style>@media (max-width: 40px) { .detail { display: none; } }</style>
+  <rect width="64" height="64" rx="13" fill="#231d32"/>
+  <use href="#glass"/>
 </svg>
