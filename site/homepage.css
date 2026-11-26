@@ -1,0 +1,94 @@
+.homepage {
+  --ink: var(--chalk);
+  --dim: var(--haze);
+  --line: var(--rule);
+}
+.homepage .top .wrap { flex-wrap: wrap; gap: 4px 20px; padding-block: 6px; }
+.homepage .view-switch a,
+.homepage site-language-menu select { min-height: 44px; }
+.homepage .hero-main, .homepage .hero-side { min-width: 0; }
+.homepage .big[data-kind='summary'] {
+  max-width: 16ch;
+  font-size: clamp(34px, 5vw, 68px);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.home-range {
+  max-width: 46ch;
+  margin-top: 12px;
+  color: var(--haze);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.home-countdown {
+  max-width: 32rem;
+  container-type: inline-size;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-block-start: 1px solid var(--edge);
+}
+.home-countdown > p:first-child { color: var(--haze); font-size: 15px; font-weight: 550; }
+.home-time-parts {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-block: 7px;
+}
+.home-time-parts > span {
+  min-width: 0;
+  padding-inline: 8px;
+  border-inline-start: 1px solid var(--edge);
+  line-height: 1.15;
+}
+.home-time-parts > span:first-child { border: 0; padding-inline-start: 0; }
+.home-time-parts b {
+  display: block;
+  font-size: clamp(22px, 2.2vw, 32px);
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.home-time-parts span span {
+  display: block;
+  margin-top: 3px;
+  color: var(--haze);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.home-clock-note { color: var(--mist); font-size: 13px; line-height: 1.45; }
+.home-guide-links, .home-section-link { margin-top: 10px; font-size: 15px; }
+.home-guide-links { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.home-guide-links a,
+.home-section-link a,
+.homepage .term-guide-more,
+.homepage :is(.meaning, .fine, figcaption) a {
+  display: inline-block;
+  max-width: 100%;
+  min-height: 24px;
+  align-content: center;
+}
+#field[hidden] + .home-section-link { display: none; }
+.homepage .term-list dd { color: var(--haze); }
+.homepage button.glossary-term {
+  min-width: 24px;
+  min-height: 24px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  vertical-align: baseline;
+}
+@media (max-width: 640px) {
+  .homepage .hero { padding-top: 18px; }
+  .homepage .hero .big[data-kind='year'] { font-size: clamp(90px, 29vw, 140px); }
+}
+@container (max-width: 420px) {
+  .home-time-parts > span { padding-inline: 3px; }
+  .home-time-parts > span:last-child { padding-inline-end: 0; }
+  :root:not(:lang(en)) .home-time-parts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 0; }
+  :root:not(:lang(en)) .home-time-parts > span:nth-child(4) { border: 0; padding-inline-start: 0; }
+}
+@container (max-width: 335px) {
+  .home-time-parts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 0; }
+  .home-time-parts > span:nth-child(4) { border: 0; padding-inline-start: 0; }
+}

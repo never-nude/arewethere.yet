@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFile, readdir, writeFile} from 'node:fs/promises';
+import {buildClock} from '../site/clock-model.js';
 import {selectOutlook} from '../site/observatory-acceleration.js';
 import {singularityReference} from '../site/observatory-reference.js';
 
@@ -19,14 +20,26 @@ function replaceSlot(html, name, content) {
   return html.replace(slot, () => content);
 }
 
+// Keep the published year in the same elements that the live clock updates.
+function homeReading(forecast, headline) {
+  const kind = !forecast ? 'summary' : forecast.year === null ? 'long' : 'year';
+  return `<p class="big" id="big" data-kind="${kind}">${htmlText(forecast?.text ?? headline)}</p>
+          <p class="call" id="call"${forecast ? '' : ' hidden'}><span class="key-pin is-experts" aria-hidden="true"></span><span><b>Reference scenario</b><span id="big-away">${forecast?.away ? ', ' + htmlText(forecast.away) : ''}</span></span></p>
+          <p class="also" id="also"${forecast?.faster ? '' : ' hidden'}><span class="key-mark" aria-hidden="true"></span><span><b id="also-year">${htmlText(forecast?.faster?.text ?? '')}</b> if recent acceleration continues</span></p>`;
+}
+
 function publishForecast(html, page, feed) {
   const {assessment} = feed;
   const {outlook, bulletin} = selectOutlook(assessment, feed);
   const {headline, range} = singularityReference(assessment, outlook);
   const summary = [headline + '.', range].filter(Boolean).join(' ');
-  const forecast = page === 'dashboard.html' ? htmlText(summary) :
-    '<p class="obs-clock-state">' + htmlText(headline) + '</p>' + (range ? '<p>' + htmlText(range) + '</p>' : '');
-  html = replaceSlot(html, 'published-forecast', forecast);
+  if (page === 'index.html') {
+    const {forecast} = buildClock(feed, Date.parse(assessment.checkpointAt));
+    html = replaceSlot(html, 'published-forecast', homeReading(forecast, headline));
+    html = replaceSlot(html, 'published-range', htmlText(range));
+  } else {
+    html = replaceSlot(html, 'published-forecast', htmlText(summary));
+  }
   const edition = assessment.checkpointAt;
   html = replaceSlot(html, 'edition-time', 'Evidence edition · <time datetime="' + htmlText(edition) + '">' +
     editionTime.format(new Date(edition)) + '</time>');
@@ -67,7 +80,18 @@ async function assetVersion(target, files, recordHash) {
 export async function createPageRenderer(target, feed) {
   const files = await readdir(target, {recursive: true});
   const {stamp, imports} = await assetVersion(target, files, feed.currentRecord.sha256);
+  // The standalone clock owns the interaction markup. Inline those same sections
+  // at publication so both routes work with one set of controls and listeners.
+  const clock = await readFile(new URL('clock.html', target), 'utf8');
+  const sections = new Map([...clock.matchAll(/<section\b[^>]*\bid="([^"]+)"[^>]*>[\s\S]*?<\/section>/g)]
+    .map(([section, id]) => [id, section]));
   return (page, html) => {
+    if (page === 'index.html') {
+      html = html.replace(/<!-- clock-section ([a-z-]+) -->/g, (_, id) => {
+        assert.ok(sections.has(id), 'Missing clock section: ' + id);
+        return sections.get(id);
+      });
+    }
     if (['index.html', 'dashboard.html'].includes(page)) html = publishForecast(html, page, feed);
     html = html.replace(/(<(?:link|script)\b[^>]*?\s(?:href|src)=["'])([^"']+)(["'])/gi,
       (tag, start, url, end) => {
