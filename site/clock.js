@@ -1,4 +1,4 @@
-// The visual front page at /clock. It reads the same published feed as the rest
+// The visual edition shared by the homepage and /clock reads the same feed as the rest
 // of the site, redraws after each scheduled check and once an hour in between.
 import {
   approxWhen, buildClock, dayMonthYear, dials, futures, monthYear, namedLabs, plainHours, rangeWhen, whatIfQuestions,
@@ -28,6 +28,7 @@ const editionTime = new Intl.DateTimeFormat('en-US', {
 const checkTime = new Intl.DateTimeFormat('en-US', {timeZone: checkTimeZone, hour: 'numeric', minute: '2-digit', timeZoneName: 'short'});
 const numberWords = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 
+let afterEdition;
 let view = null, chart = null, tip = null, current = null;
 let firstDraw = true, ladderSeen = false, drawnWidth = 0, loadedAt = 0, timer = 0;
 let turned = whatIfStart(), asked = null, gauge = null;
@@ -664,10 +665,12 @@ async function load() {
   try {
     const response = await fetch(feedUrl, {cache: 'no-cache'});
     if (!response.ok) throw new Error('The published assessment answered ' + response.status + '.');
-    view = buildClock(await response.json(), Date.now());
+    const feed = await response.json();
+    view = buildClock(feed, Date.now());
     loadedAt = Date.now();
     byId('notice').hidden = true;
     render();
+    afterEdition?.(feed, view);
   } catch (error) {
     console.error(error);
     // A failed refresh keeps the last good picture on screen.
@@ -682,13 +685,19 @@ async function load() {
   }
 }
 
-wireLadder();
-wireWhatIf();
-wireField();
-wireStops();
-wireDoubling();
-load();
-setInterval(renderStamp, 30000);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && Date.now() - loadedAt > 30 * 60000) load();
-});
+export function startClock(onEdition) {
+  afterEdition = onEdition;
+  wireLadder();
+  wireWhatIf();
+  wireField();
+  wireStops();
+  wireDoubling();
+  load();
+  setInterval(renderStamp, 30000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - loadedAt > 30 * 60000) load();
+  });
+}
+
+// The homepage starts this reader after resolving links to earlier editions.
+if (!document.body.classList.contains('homepage')) startClock();

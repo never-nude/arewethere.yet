@@ -25,8 +25,12 @@ test('both published headers and metadata reflect a verified bulletin for this c
   for (const page of ['index.html', 'dashboard.html']) {
     const template = await readFile(new URL(page, site), 'utf8');
     const html = render(page, template);
-    const body = html.slice(html.indexOf('<main'), html.indexOf('id="milestone-progress"'));
-    assert.match(body, /Singularity reference year 2062/);
+    const heroEnd = page === 'index.html' ? html.indexOf('id="ladder"') : html.indexOf('id="milestone-progress"');
+    const body = html.slice(html.indexOf('<main'), heroEnd);
+    if (page === 'index.html') {
+      assert.match(body, /id="big" data-kind="year">2062<\/p>/);
+      assert.match(body, /<b>Reference scenario<\/b>/);
+    } else assert.match(body, /Singularity reference year 2062/);
     assert.match(body, /Scenario range 2040–2095/);
     assert.match(body, /extends beyond 2100/);
     assert.ok(body.includes('<time datetime="' + checkpointAt + '">Nov 25, 2026, 9:30 AM EST</time>'));
@@ -41,7 +45,21 @@ test('both published headers and metadata reflect a verified bulletin for this c
     assert.equal(dataset.dateModified, bulletin.issuedAt);
   }
   const stale = await createPageRenderer(site, {...feed, supplementalPaceOutlook: {...bulletin, basedOnSha256: 'b'.repeat(64)}});
-  assert.match(stale('index.html', await readFile(new URL('index.html', site), 'utf8')), /Singularity reference year 2050/);
+  assert.match(stale('index.html', await readFile(new URL('index.html', site), 'utf8')), /id="big" data-kind="year">2050<\/p>/);
+});
+
+test('the visual homepage includes the shared sections in reading order and preserves its own navigation', async () => {
+  const render = await createPageRenderer(site, feed);
+  const html = render('index.html', await readFile(new URL('index.html', site), 'utf8'));
+  assert.deepEqual([...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map(match => match[1]),
+    ['countdown', 'ladder', 'stops', 'whatif', 'pace', 'field', 'work', 'definitions', 'about']);
+  assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
+  assert.ok(html.includes('<link rel="canonical" href="https://arewethereyet.now/">'));
+  assert.ok(html.includes('href="./dashboard.html#model-catalog"'));
+  assert.ok(html.includes('href="./dashboard.html#calculations"'));
+  assert.ok(html.includes('<site-language-menu>'));
+  assert.ok(html.includes('id="whatif-base"'));
+  assert.ok(!html.includes('<!-- clock-section'));
 });
 
 test('all page asset URLs and transitive module requests resolve to the same build stamp', async () => {

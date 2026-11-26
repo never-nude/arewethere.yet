@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#100e1a">
-  <title>The Singularity Observatory</title>
-  <meta name="description" content="How far away are AGI, recursive self-improvement, superintelligence and the singularity? See the estimated years, evidence and assumptions.">
+  <title>Singularity Watch · The singularity forecast</title>
+  <meta name="description" content="Follow measured changes in AI, compare four milestone forecasts, and see how different assumptions affect the timeline.">
   <link rel="canonical" href="https://arewethereyet.now/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
-  <meta property="og:title" content="The Singularity Observatory">
-  <meta property="og:description" content="How far away are AGI, recursive self-improvement, superintelligence and the singularity? See the estimated years, evidence and assumptions.">
+  <meta property="og:title" content="Singularity Watch · The singularity forecast">
+  <meta property="og:description" content="Follow measured changes in AI, compare four milestone forecasts, and see how different assumptions affect the timeline.">
   <meta property="og:url" content="https://arewethereyet.now/">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -19,61 +19,62 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The Singularity Observatory">
-  <meta name="twitter:description" content="How far away are AGI, recursive self-improvement, superintelligence and the singularity? See the estimated years, evidence and assumptions.">
+  <meta name="twitter:title" content="Singularity Watch · The singularity forecast">
+  <meta name="twitter:description" content="Follow measured changes in AI, compare four milestone forecasts, and see how different assumptions affect the timeline.">
   <meta name="twitter:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta name="twitter:image:alt" content="Are we there yet? A violet hourglass holds pale sand above a cascade of colorful geometric grains. Singularity Watch.">
   <link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=4">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/watch-icon.png?v=4">
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/watch-touch.png?v=4">
   <link rel="preload" href="./assets/geist.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./clock.css">
   <link rel="stylesheet" href="./view-switch.css">
   <link rel="stylesheet" href="./language-menu.css">
   <link rel="stylesheet" href="./glossary.css">
   <link rel="stylesheet" href="./observatory-terms.css">
-  <link rel="stylesheet" href="./observatory.css">
-  <link rel="stylesheet" href="./observatory-field.css">
-  <link rel="stylesheet" href="./observatory-charts.css">
-  <link rel="stylesheet" href="./observatory-investment.css">
-  <link rel="stylesheet" href="./observatory-calculations.css">
-  <link rel="stylesheet" href="./observatory-acceleration.css">
+  <link rel="stylesheet" href="./homepage.css">
   <script type="module" src="./language-menu.js"></script>
-  <script type="module" src="./observatory-ui.js"></script>
+  <script type="module" src="./homepage.js"></script>
 </head>
-<body class="observatory" data-view="brief">
-  <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="topbar"><div class="obs-wrap obs-header">
-    <a href="./" class="wordmark"><img src="./favicon.svg?v=4" height="30" width="30" alt=""> Singularity Watch</a>
+<body class="homepage">
+  <a class="skip" href="#main">Skip to main content</a>
+  <header class="top"><div class="wrap">
+    <a href="./" class="mark"><img src="./favicon.svg?v=4" height="28" width="28" alt=""> Singularity Watch</a>
     <div class="page-tools"><nav class="view-switch" aria-label="Site views"><a href="./" aria-current="page">At a glance</a><a href="./dashboard.html">Full dashboard</a></nav><site-language-menu></site-language-menu></div>
   </div></header>
-  <main id="main" class="obs-wrap" tabindex="-1">
-    <section id="countdown" class="obs-hero" aria-labelledby="projection-title">
-      <h1 id="projection-title">Projected singularity:</h1>
-      <div id="clock-reading"><!-- published-forecast --><p>Read the <a href="./data/observatory.json">published forecast</a>.</p><!-- /published-forecast --></div>
-      <div class="obs-schedule"><span id="edition" role="status"><!-- edition-time -->Published assessment<!-- /edition-time --></span><span id="next-check"></span></div>
+  <main id="main" class="wrap" tabindex="-1">
+    <section id="countdown" class="hero" aria-labelledby="answer">
+      <div class="hero-main">
+        <p class="status" id="status" hidden>Are we there yet? <b id="reply"></b></p>
+        <h1 id="answer">When might the singularity arrive?</h1>
+        <div class="forecast" id="forecast" data-stop="singularity">
+          <!-- published-forecast --><p>Read the <a href="./data/observatory.json">published forecast</a>.</p><!-- /published-forecast -->
+        </div>
+        <p class="home-range" id="home-range"><!-- published-range --><!-- /published-range --></p>
+      </div>
+      <div class="hero-side">
+        <p class="meaning" id="meaning">Here, the singularity means AI helps build better successors and that cycle keeps speeding up technological progress beyond the lab. The reference year uses the Watch’s central assumptions. <span id="meaning-count">It is one of <a href="#definitions" id="meaning-link">four milestones</a> tracked here.</span></p>
+        <p class="stamp" id="stamp"><!-- edition-time -->Published assessment<!-- /edition-time --></p>
+        <div id="home-countdown" class="home-countdown" hidden>
+          <p>Countdown to the reference year</p>
+          <div class="home-time-parts" role="timer" aria-label="Time until the reference date" aria-live="off"></div>
+          <p class="home-clock-note">The clock uses July 1 at 00:00 <bdi translate="no">UTC</bdi> as the midpoint of the forecast year.</p>
+        </div>
+        <nav class="home-guide-links" aria-label="Understand the forecast"><a href="./dashboard.html#calculations">How the forecast is calculated</a> <a href="#definitions">Term definitions</a></nav>
+      </div>
+      <p class="notice" id="notice" role="status" hidden></p>
+      <noscript><p class="notice">The interactive charts use JavaScript. You can read the <a href="./data/observatory.json">published measurements</a> or visit the <a href="./dashboard.html#history">assessment archive</a>.</p></noscript>
     </section>
-
-    <section id="milestone-progress" class="obs-panel obs-milestones-brief" aria-labelledby="milestone-heading">
-      <div class="term-heading"><h2 id="milestone-heading">Milestone progress</h2><a href="#definitions">Term definitions</a></div>
-      <p id="arrival-intro" class="obs-sub"></p>
-      <div id="assessment-list"></div>
-      <details class="obs-detail obs-reading-note">
-        <summary>How to read the evidence and the years</summary>
-        <p>Each marker stands for one condition the Watch requires. Independent findings for the same system or its successors can confirm or rule out a condition. Once every condition has a finding, the evidence score is the share met, expressed out of 100. An unresolved condition keeps the total open.</p>
-        <p>Superintelligence includes the abilities required for <bdi translate="no">AGI</bdi>. A specialist system could improve its successor before it reaches <bdi translate="no">AGI</bdi>. For a singularity, that feedback would also have to speed up technological progress more broadly.</p>
-        <p id="arrival-note" class="obs-small"></p>
-      </details>
-    </section>
-
-    <section id="acceleration" class="obs-panel" aria-label="Measured pace of AI" hidden></section>
-    <section id="metric-charts" aria-label="Measured AI capabilities"></section>
-    <section id="model-investment" aria-label="Model costs and investment"></section>
-    <section id="calculations" class="obs-panel"><h2>Explore the milestone forecasts</h2><div id="calculation-visual"></div></section>
-    <section id="atlas" class="obs-panel obs-field"><h2>How the milestones connect</h2><div id="observatory-field"></div></section>
-    <section id="definitions" class="obs-panel term-guide term-guide-brief" aria-labelledby="definitions-heading" tabindex="-1" data-glossary-exclude>
+    <!-- clock-section ladder -->
+    <!-- clock-section stops -->
+    <!-- clock-section whatif -->
+    <!-- clock-section pace -->
+    <!-- clock-section field -->
+    <p class="home-section-link"><a href="./dashboard.html#model-catalog">Search the full model rankings</a></p>
+    <!-- clock-section work -->
+    <section id="definitions" class="band term-guide" aria-labelledby="definitions-heading" tabindex="-1" data-glossary-exclude>
       <h2 id="definitions-heading">What the terms mean</h2>
-      <p class="obs-sub">General intelligence describes an ability. The other four terms name the milestones this Watch tracks.</p>
+      <p class="detail">General intelligence describes an ability. The other four terms name the milestones this Watch tracks.</p>
       <dl class="term-list">
         <div id="term-general-intelligence">
           <dt>General intelligence</dt>
@@ -98,16 +99,9 @@
       </dl>
       <a class="term-guide-more" href="./dashboard.html#definitions">Examples and what would count as evidence</a>
     </section>
-    <section class="obs-panel obs-edition-extras">
-      <h2>More from this edition</h2>
-      <details id="watchdog" class="obs-detail"><summary>What changed since the last check</summary><div id="changes"></div></details>
-      <details id="outlook" class="obs-detail"><summary>Upcoming benchmark predictions</summary><p id="measured-lead" class="obs-measured-lead"></p><div id="indicator-forecasts"></div></details>
-      <details id="signals" class="obs-detail"><summary>Additional evidence and sources</summary><div id="brief-evidence"></div></details>
-    </section>
-    <noscript><p>JavaScript displays the measurements and interactive field. <a href="./data/observatory.json">Read the published assessment as JSON</a>.</p></noscript>
   </main>
-  <footer class="obs-wrap obs-footer">
-    <section id="about" aria-labelledby="about-heading">
+  <footer class="foot">
+    <section class="wrap" id="about" aria-labelledby="about-heading">
       <h2 id="about-heading">About Singularity Watch</h2>
       <p>How fast is AI changing, and what does that mean for people? We follow published measurements, show how they shape our forecasts, and explain where the evidence is still thin.</p>
       <nav aria-label="About Singularity Watch">

@@ -295,6 +295,7 @@ function labeledSelect(label, options) {
 
 function modelCatalog(assessment) {
   const details = element('details', 'mc-details mc-catalog');
+  details.id = 'model-catalog';
   const summary = element('summary');
   const queryLabel = element('label', '', 'Find a model or developer');
   const query = element('input');
