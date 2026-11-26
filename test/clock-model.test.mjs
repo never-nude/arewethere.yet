@@ -4,7 +4,7 @@ import test from 'node:test';
 import {ladderRows} from '../site/clock-charts.js';
 import {
   approxWhen, buildClock, computeShare, dials, futures, namedLabs, plainHours, rangeWhen, readWhatIf, shiftPhrase, spanPhrase,
-  whatIfQuestions, whatIfStart, whatIfTime, whatIfView, whatIfYear, yearsAway,
+  taskPhrase, whatIfQuestions, whatIfShown, whatIfStart, whatIfTime, whatIfView, whatIfYear, yearsAway,
 } from '../site/clock-model.js';
 import {gaugeShare, gaugeTop} from '../site/clock-visuals.js';
 import {fitPace} from '../site/observatory-pace-fit.js';
@@ -38,6 +38,16 @@ test('job lengths read as a person would say them', () => {
   assert.equal(plainHours(4.58955), '4.6 hours');
   assert.equal(plainHours(40.27), '40 hours');
   assert.equal(plainHours(2000), '2,000 hours');
+  // A headline counts the hours, and names the familiar unit only where a length fills one.
+  assert.equal(taskPhrase(0.1185), '7-minute tasks');
+  assert.equal(taskPhrase(1.2), 'one-hour tasks');
+  assert.equal(taskPhrase(3.009), '3-hour tasks');
+  assert.equal(taskPhrase(40.27), '40-hour tasks');
+  assert.equal(taskPhrase(8.4, true), 'an 8-hour work day');
+  assert.equal(taskPhrase(40.27, true), 'a 40-hour work week');
+  assert.equal(taskPhrase(100, true), '100-hour tasks');
+  assert.equal(taskPhrase(167, true), 'a 167-hour work month');
+  assert.equal(taskPhrase(2000, true), 'a 2,000-hour work year');
 });
 
 test('a projected date names a month when near and a part of the year when far', () => {
@@ -78,8 +88,8 @@ test('the ladder repeats the pace model’s own trend and tested lead', () => {
   assert.ok(ladder.domain.reach >= workYear.when && ladder.domain.high > 2000 && ladder.domain.low < 0.1185);
   assert.match(ladder.summary, /grew from 7 minutes in May 2024 to 40 hours in September 2026\. If the pace holds, it reaches a work month around Jun 2027\./);
 
-  assert.deepEqual(lead, {now: 'a full work week', then: '3 hours', when: 'A year earlier'});
-  assert.equal(pace.answer, 'Job length doubles about every 111 days.');
+  assert.deepEqual(lead, {claim: 'AI went from 3-hour tasks to a 40-hour work week in a year.'});
+  assert.equal(pace.answer, 'Task length doubles about every 111 days.');
   assert.equal(pace.detail, 'That is roughly 10 times longer every year, and the pace has held for more than two years.');
   assert.deepEqual(pace.moments.map(moment => [moment.system, moment.when, moment.text]), [
     ['GPT-4o', 'May 2024', '7 minutes'], ['GPT-5', 'Aug 2025', '3 hours'], ['GPT-6 Astra', 'Sep 2026', '40 hours'],
@@ -93,6 +103,47 @@ test('the ladder repeats the pace model’s own trend and tested lead', () => {
     ['Around Jun 2027', 'A work month', '167 hours', 'If the pace holds, beyond the tested range', 'Feb to Oct 2027'],
     ['Around mid-2028', 'A work year', '2,000 hours', 'If the pace holds, beyond the tested range', 'Oct 2027 to Mar 2029'],
   ]);
+});
+
+test('the first chart’s headline states what was measured and over how long', () => {
+  const series = bulletin.outlook.pace.series.find(row => row.id === 'horizon50');
+  const claim = points => {
+    const short = structuredClone(bulletin);
+    short.outlook.pace.series = [{...series, points, publishedEstimate: undefined}];
+    return buildClock({...feed, supplementalPaceOutlook: short}, now).lead.claim;
+  };
+  // With a year of results behind the record, the comparison is a year wide.
+  assert.equal(claim(series.points.slice(0, 5)), 'AI went from 35-minute tasks to 6-hour tasks in a year.');
+  // A shorter record counts its own months and never claims a year it does not have.
+  assert.equal(claim(series.points.slice(0, 2)), 'AI went from 7-minute tasks to 35-minute tasks in seven months.');
+  // When the first result is still the best, there is no climb to report.
+  const flat = series.points.slice(0, 3).map((point, index) => index ? point : {...point, value: 50});
+  assert.equal(claim(flat), 'The best AI can now take on 50-hour tasks.');
+});
+
+test('the page opens with the published reference year and puts the faster path beneath it', () => {
+  const view = buildClock(feed, now);
+  assert.deepEqual(view.forecast, {
+    stop: 'singularity', year: 2062, text: '2062', away: 'about 36 years away', faster: {year: 2045, text: '2045'},
+  });
+  // Each scenario keeps one name wherever it appears, and it is the feed's own.
+  assert.equal(futures.find(item => item.id === 'reference').name, 'Reference scenario');
+  assert.equal(futures.find(item => item.id === 'speedup').name, 'Recent acceleration continues');
+
+  const outlook = change => {
+    const next = structuredClone(bulletin);
+    change(next.outlook.milestones.find(row => row.id === 'singularity'), next.outlook.pace.milestones.find(row => row.id === 'singularity'));
+    return buildClock({...feed, supplementalPaceOutlook: next}, now).forecast;
+  };
+  // A reference past the horizon says so and counts no years.
+  const far = outlook(row => { row.centralYear = null; row.scenarios.find(item => /^Reference/.test(item.label)).year = null; });
+  assert.deepEqual([far.year, far.text, far.away, far.faster.year], [null, 'After 2100', null, 2045]);
+  // A faster path that gives the same year is not shown twice.
+  const same = outlook((row, pace) => { pace.accelerationYear = 2062; row.scenarios.find(item => /acceleration/i.test(item.label)).year = 2062; });
+  assert.equal(same.faster, null);
+  // Once the singularity is observed there is no forecast left to make.
+  assert.equal(outlook(row => { row.status = 'Observed'; }), null);
+  assert.equal(buildClock({assessment: {checkpointAt, forecasts: [], observations: []}, currentRecord: {checkpointAt}}, now).forecast, null);
 });
 
 test('a crossing date that has passed is reported as due and never as a forecast', () => {
@@ -172,7 +223,10 @@ test('the field counts every scored model, the labs behind them and who has held
   // In the year to late November 2026: three new top scores, two of them a change of lab.
   assert.equal(field.records, 3);
   assert.equal(field.handovers, 2);
-  assert.equal(field.answer, '5 labs. The top score fell three times in a year.');
+  // The sentence runs the same way as the chart: the top score goes up.
+  assert.equal(field.answer, '5 labs. Models set a new top score three times in a year.');
+  const stale = buildClock({...feed, assessment: {...feed.assessment, observations}}, Date.parse('2028-01-01T00:00:00Z')).field;
+  assert.equal(stale.answer, '5 labs. No model has set a new top score in a year.');
   assert.ok(field.domain.low < 90 && field.domain.high > 126 && field.domain.to > now);
   assert.deepEqual([...namedLabs], ['OpenAI', 'Anthropic', 'Google']);
 });
@@ -304,6 +358,10 @@ test('every what-if question names real dials and stops, and the gauge covers th
       assert.notEqual(index, dials.find(dial => dial.id === id).start, question.id + ' moves ' + id);
     }
   }
+  // The questions shown outright cover a slower road, a faster one and a pause.
+  const [slower, faster, paused] = whatIfQuestions.slice(0, whatIfShown).map(question => readWhatIf({...whatIfStart(), ...question.set}));
+  assert.equal(whatIfShown, 3);
+  assert.ok(slower.speed < 1 && faster.speed > 1 && paused.speed === 1 && paused.pauseYears > 0);
   const most = Object.fromEntries(dials.map(dial => [dial.id, dial.stops.length - 1]));
   assert.equal(readWhatIf({...most, pause: 0}).speed, gaugeTop);
   assert.equal(gaugeShare(0), 0);

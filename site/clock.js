@@ -2,7 +2,7 @@
 // of the site, redraws after each scheduled check and once an hour in between.
 import {
   approxWhen, buildClock, dayMonthYear, dials, futures, monthYear, namedLabs, plainHours, rangeWhen, whatIfQuestions,
-  whatIfStart, whatIfView, yearsAway,
+  whatIfShown, whatIfStart, whatIfView,
 } from './clock-model.js';
 import {drawField, drawLadder, fieldRows, ladderRows} from './clock-charts.js';
 import {dialIcon, drawGauge, drawSquares} from './clock-visuals.js';
@@ -29,18 +29,34 @@ const checkTime = new Intl.DateTimeFormat('en-US', {timeZone: checkTimeZone, hou
 const numberWords = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 
 let view = null, chart = null, tip = null, current = null;
-let firstDraw = true, drawnWidth = 0, loadedAt = 0, timer = 0;
+let firstDraw = true, ladderSeen = false, drawnWidth = 0, loadedAt = 0, timer = 0;
 let turned = whatIfStart(), asked = null, gauge = null;
 let fieldChart = null, fieldTip = null, fieldAt = null, fieldWidth = 0, litLab = null, openOnly = false;
 let future = 'reference', age = null, stopsKey = '';
 let doubled = 0;
 
+// The first screen. The published reference year is the answer, and the year the
+// faster path gives sits beneath it. With no forecast to show, the page falls
+// back to the question it is named for.
 function renderHero() {
-  byId('reply').textContent = view.arrived ? 'We are.' : 'Not yet.';
-  const lead = view.lead;
-  if (!lead) return;
-  byId('lead').textContent = (view.arrived ? 'The' : 'But the') + ' best AI can now pull off a job that takes a person ' + lead.now +
-    ', about half the time.' + (lead.then ? ' ' + lead.when + ', its limit was ' + lead.then + '.' : '');
+  const forecast = view.forecast, has = Boolean(forecast), big = byId('big');
+  const verdict = view.arrived ? 'We are.' : 'Not yet.';
+  byId('reply').textContent = verdict;
+  byId('status').hidden = !has;
+  byId('answer').textContent = has ? 'When might the singularity arrive?' : 'Are we there yet?';
+  big.textContent = has ? forecast.text : verdict;
+  big.dataset.kind = !has ? 'words' : forecast.year === null ? 'long' : 'year';
+  byId('call').hidden = !has;
+  byId('big-away').textContent = forecast?.away ? ', ' + forecast.away : '';
+  byId('also').hidden = !forecast?.faster;
+  if (forecast?.faster) byId('also-year').textContent = forecast.faster.text;
+  byId('meaning').hidden = !has;
+  // The count of milestones comes from the feed, as it does further down the page.
+  const tracked = view.stops.filter(stop => stop.reference !== null || stop.low !== null).length;
+  byId('meaning-count').hidden = tracked < 2;
+  byId('meaning-link').textContent = (numberWords[tracked] ?? String(tracked)).toLowerCase() + ' milestones';
+  byId('forecast').hidden = false;
+  renderStamp();
 }
 
 function describe(item) {
@@ -86,14 +102,17 @@ function hideTip() {
 }
 
 function renderLadder() {
-  const figure = byId('ladder'), host = byId('ladder-chart');
-  if (!view.ladder) { figure.hidden = true; return; }
-  figure.hidden = false;
+  const box = byId('ladder'), host = byId('ladder-chart');
+  if (!view.ladder) { box.hidden = true; return; }
+  box.hidden = false;
+  byId('claim').textContent = view.lead?.claim ?? '';
   const width = Math.round(host.clientWidth);
   if (!width) return;
   const now = Date.now();
   current = null;
   chart = drawLadder(host, view.ladder, {width, now, animate: firstDraw});
+  // The climb draws itself once, and holds until the chart is on screen to do it.
+  if (firstDraw && !ladderSeen) host.firstElementChild.classList.add('is-waiting');
   firstDraw = false;
   drawnWidth = width;
   host.style.minHeight = chart.height + 'px';
@@ -135,6 +154,14 @@ function wireLadder() {
     hideTip();
     renderLadder();
   }).observe(host);
+  if (!('IntersectionObserver' in window)) { ladderSeen = true; return; }
+  const watch = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    ladderSeen = true;
+    host.querySelector('.is-waiting')?.classList.remove('is-waiting');
+    watch.disconnect();
+  }, {threshold: 0.35});
+  watch.observe(host);
 }
 
 // The field of every scored model. Pointing reaches the nearest dot in either
@@ -258,42 +285,23 @@ function renderStamp() {
     const next = Date.parse(checkpointWindow(new Date(now)).next);
     if (Number.isFinite(next)) parts.push('Next check ' + checkTime.format(next) + ', in ' + wait(next - now) + '.');
   } catch { /* An unreadable schedule leaves the last check standing alone. */ }
-  byId('stamp').textContent = parts.join(' ');
-}
-
-function renderArrival() {
-  const box = byId('arrival'), stop = view.arrival;
-  if (!stop || view.arrived || (stop.reference === null && stop.pace === null && stop.low === null)) { box.hidden = true; return; }
-  const answers = [];
-  if (stop.pace !== null) answers.push({kind: 'pace', year: stop.pace, text: String(stop.pace), how: 'if today’s speed-up lasts'});
-  answers.push(stop.reference !== null
-    ? {kind: 'experts', year: stop.reference, text: String(stop.reference), how: 'on experts’ middle guess'}
-    : {kind: 'experts', year: Infinity, text: 'After ' + view.horizonYear, how: 'on experts’ middle guess'});
-  byId('eta').replaceChildren(...answers.sort((a, b) => a.year - b.year).map(answer => {
-    const line = el('li'), pin = el('span', 'key-pin is-' + answer.kind), how = el('span', 'how');
-    line.dataset.stop = stop.id;
-    pin.setAttribute('aria-hidden', 'true');
-    // The countdown, in the only unit a forecast this loose can honestly carry.
-    const away = yearsAway(answer.year, view.nowYear);
-    if (away) how.append(el('span', 'away', away), ' ');
-    how.append(answer.how);
-    line.append(pin, el('b', '', answer.text), how);
-    return line;
-  }));
-  box.hidden = false;
-  renderStamp();
+  byId('stamp').replaceChildren(...parts.map(text => el('span', '', text)));
 }
 
 // The what-if panel. Its arithmetic lives in clock-model.js. This only moves
 // the dials and reports what they add up to.
 function wireWhatIf() {
-  byId('asks').replaceChildren(...whatIfQuestions.map(question => {
+  const chips = whatIfQuestions.map(question => {
     const button = el('button', 'chip', question.ask);
     button.type = 'button';
     button.dataset.ask = question.id;
     return button;
-  }));
-  byId('asks').addEventListener('click', event => {
+  });
+  // A few questions lead. The rest open on request.
+  byId('asks').replaceChildren(...chips.slice(0, whatIfShown));
+  byId('asks-more').replaceChildren(...chips.slice(whatIfShown));
+  byId('asks-more-box').hidden = chips.length <= whatIfShown;
+  byId('presets').addEventListener('click', event => {
     const question = whatIfQuestions.find(row => row.id === event.target.closest('[data-ask]')?.dataset.ask);
     if (!question) return;
     turned = {...whatIfStart(), ...question.set};
@@ -331,7 +339,8 @@ function wireWhatIf() {
 }
 
 // A marker on a short road from now to a far year. The hollow one stays on the
-// published date and the solid one follows the dials.
+// published date and the solid one follows the dials, so the published forecast
+// is never out of sight while someone experiments.
 function placeRoad(id, from, to, base, moved) {
   const road = byId(id), share = time => Math.min(1, Math.max(0, (time - from) / (to - from)));
   road.style.setProperty('--base', share(base).toFixed(4));
@@ -352,23 +361,25 @@ function renderWhatIf() {
     row.dataset.held = String(out.reading.limitedBy.includes(dial.id));
     row.dataset.moved = String(turned[dial.id] !== dial.start);
   }
-  for (const button of byId('asks').children) button.setAttribute('aria-pressed', String(button.dataset.ask === asked));
+  for (const button of byId('presets').querySelectorAll('[data-ask]')) button.setAttribute('aria-pressed', String(button.dataset.ask === asked));
   gauge.set(speed);
   byId('whatif-speed').textContent = Math.round(speed * 100) + '%';
 
   const yearStart = Date.UTC(view.nowYear, 0, 1), horizon = Date.UTC(view.horizonYear, 0, 1);
   const arrival = out.arrival, midYear = year => Date.UTC(year, 6, 1);
   byId('whatif-year').textContent = arrival.year === null ? 'Never' : arrival.beyond ? 'After ' + view.horizonYear : String(arrival.year);
-  byId('whatif-year-shift').textContent = arrival.beyond ? 'not this century' : arrival.shift;
+  byId('whatif-year-shift').textContent = arrival.year === null ? 'on this road' : arrival.beyond ? 'not this century' : arrival.shift;
+  byId('whatif-base').textContent = String(arrival.base);
   placeRoad('road-arrival', yearStart, horizon, midYear(arrival.base), arrival.year === null ? null : midYear(arrival.year));
 
-  const next = out.next, nextBox = byId('whatif-next-box');
-  nextBox.hidden = !next;
+  const next = out.next;
+  byId('whatif-next-box').hidden = byId('road-next-box').hidden = !next;
   if (next) {
     const reach = now + 6 * 365.25 * 86400000;
-    byId('whatif-next-name').textContent = 'Next stop, ' + next.name.toLowerCase();
+    byId('whatif-next-name').textContent = 'Tasks as long as ' + next.name.toLowerCase();
     byId('whatif-next').textContent = next.when === null ? 'Never' : approxWhen(next.when, now);
-    byId('whatif-next-shift').textContent = next.shift;
+    byId('whatif-next-shift').textContent = next.when === null ? 'on this road' : next.shift;
+    byId('whatif-next-base').textContent = approxWhen(next.base, now);
     placeRoad('road-next', now, reach, next.base, next.when);
     byId('road-next-end').textContent = String(new Date(reach).getUTCFullYear());
   }
@@ -419,9 +430,9 @@ function renderDoubling() {
   });
   const now = Date.now(), when = doubled ? 'By ' + approxWhen(step.time, now) : 'Today';
   byId('double-read').replaceChildren(el('b', '', when + ': about ' + plainHours(step.hours) + '.'), ' That is ' + step.text + '.');
-  grid.setAttribute('aria-label', when + ', the longest job would be about ' + plainHours(step.hours) + ', ' + step.text + ': ' +
+  grid.setAttribute('aria-label', when + ', the longest task would be about ' + plainHours(step.hours) + ', ' + step.text + ': ' +
     step.squares + (step.squares === 1 ? ' square.' : ' squares.'));
-  byId('double-note').textContent = 'Each square is one job as long as today’s limit. Every press adds ' + plan.days +
+  byId('double-note').textContent = 'Each square is one task as long as today’s limit. Every press adds ' + plan.days +
     ' days, and each one leans harder on the pace holding.';
   byId('double-go').disabled = doubled >= last;
   byId('double-back').disabled = doubled === 0;
@@ -439,12 +450,13 @@ function wireDoubling() {
   replay.addEventListener('click', () => {
     if (!view?.ladder) return;
     hideTip();
+    ladderSeen = true;
     firstDraw = true;
     renderLadder();
   });
 }
 
-// The four moments. The rows are built once for each edition. Picking a future
+// The four milestones. The rows are built once for each edition. Picking a future
 // or setting an age only slides the markers, so the movement can be seen.
 function wireStops() {
   byId('futures').replaceChildren(...futures.map(item => {
@@ -539,13 +551,13 @@ function renderStops() {
     axis.append(labels);
     byId('stops-chart').replaceChildren(...rows, axis);
     const shown = futures.filter(item => item.id !== 'never' && stops.some(stop => Number.isInteger(stop.paths[item.id])));
-    byId('stops-head').replaceChildren(el('th', '', 'Moment'), ...shown.map(item => el('th', '', item.name)));
+    byId('stops-head').replaceChildren(el('th', '', 'Milestone'), ...shown.map(item => el('th', '', item.name)));
     for (const cell of byId('stops-head').children) cell.scope = 'col';
     byId('stops-rows').replaceChildren(...stops.map(stop => cells([stop.name, ...shown.map(item => stop.paths[item.id] ?? 'After ' + view.horizonYear)])));
   }
 
   const decades = stops.every(stop => stop.low !== null && (stop.high ?? to) - stop.low >= 20);
-  byId('stops-answer').textContent = (numberWords[stops.length] ?? stops.length) + ' big moment' + (stops.length === 1 ? '' : 's') +
+  byId('stops-answer').textContent = (numberWords[stops.length] ?? stops.length) + ' milestone' + (stops.length === 1 ? '' : 's') +
     '. For each one, the guesses ' + (decades ? 'span decades.' : 'differ widely.');
   const never = stops.filter(stop => stop.never).length;
   byId('stops-note').textContent = never === stops.length ? 'For each of them, one scenario never arrives this century.'
@@ -630,11 +642,10 @@ function renderWork() {
 function render() {
   renderHero();
   renderLadder();
-  renderArrival();
+  renderStops();
   renderWhatIf();
   renderPace();
   renderField();
-  renderStops();
   renderWork();
 }
 

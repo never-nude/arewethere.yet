@@ -7,12 +7,12 @@
   <meta name="theme-color" content="#100e1a">
   <meta name="robots" content="noindex">
   <title>Are we there yet? · Singularity Watch</title>
-  <meta name="description" content="Not yet. See how far AI has come, how fast it is moving and when the big moments might arrive, in pictures you can explore and dials you can turn.">
+  <meta name="description" content="When might the singularity arrive? See the forecast, how far AI has come and the four milestones on the way, then turn the dials to see what could change it.">
   <link rel="canonical" href="https://arewethereyet.now/clock">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Singularity Watch">
   <meta property="og:title" content="Are we there yet?">
-  <meta property="og:description" content="Not yet. See how far AI has come, how fast it is moving and when the big moments might arrive, in pictures you can explore and dials you can turn.">
+  <meta property="og:description" content="When might the singularity arrive? See the forecast, how far AI has come and the four milestones on the way, then turn the dials to see what could change it.">
   <meta property="og:url" content="https://arewethereyet.now/clock">
   <meta property="og:image" content="https://arewethereyet.now/assets/singularity-watch-card.png?v=4">
   <meta property="og:image:type" content="image/png">
@@ -36,15 +36,29 @@
 
   <main id="main" class="wrap" tabindex="-1">
     <section class="hero" aria-labelledby="answer">
-      <div class="hero-head">
-        <h1 id="answer"><span class="ask">Are we there yet?</span> <span class="reply" id="reply">Not yet.</span></h1>
-        <p class="lead" id="lead">Here is how far AI has come, how fast it is moving and when the big moments might arrive.</p>
+      <div class="hero-main">
+        <p class="status" id="status">Are we there yet? <b id="reply">Not yet.</b></p>
+        <h1 id="answer">When might the singularity arrive?</h1>
+        <div class="forecast" id="forecast" data-stop="singularity" hidden>
+          <p class="big" id="big"></p>
+          <p class="call" id="call"><span class="key-pin is-experts" aria-hidden="true"></span><span><b>Reference scenario</b><span id="big-away"></span></span></p>
+          <p class="also" id="also" hidden><span class="key-mark" aria-hidden="true"></span><span><b id="also-year"></b> if recent acceleration continues</span></p>
+        </div>
+      </div>
+      <div class="hero-side">
+        <p class="meaning" id="meaning" hidden>The singularity is the point where AI builds better AI and progress speeds up everywhere. <span id="meaning-count">It is one of <a href="#stops" id="meaning-link">four milestones</a> tracked here.</span> The reference scenario is anchored to surveys of AI experts.</p>
+        <p class="stamp" id="stamp"></p>
       </div>
       <p class="notice" id="notice" role="status" hidden></p>
       <noscript><p class="notice">The pictures on this page are drawn from live data and need JavaScript. The <a href="./dashboard.html">full dashboard</a> lists every figure.</p></noscript>
+    </section>
 
-      <figure class="ladder" id="ladder" hidden>
-        <div class="chart" id="ladder-chart" tabindex="0" role="group" aria-roledescription="chart" aria-label="The longest job the best AI can finish on its own" aria-describedby="ladder-help"></div>
+    <section class="band far" id="ladder" aria-labelledby="ladder-q" hidden>
+      <h2 id="ladder-q">How far have we come?</h2>
+      <p class="answer" id="claim"></p>
+      <p class="detail">These are computer tasks, measured by how long a human expert needs to finish them. The AI succeeds at a task of that length about half the time, so this marks the edge of what it can do, not what it does reliably.</p>
+      <figure class="ladder">
+        <div class="chart" id="ladder-chart" tabindex="0" role="group" aria-roledescription="chart" aria-label="The longest task the best AI can finish on its own" aria-describedby="ladder-help"></div>
         <p class="sr" id="ladder-help">Use the left and right arrow keys to step through the measurements.</p>
         <p class="sr" id="ladder-live" aria-live="polite"></p>
         <ul class="legend" aria-label="How to read the chart">
@@ -53,23 +67,45 @@
           <li><svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><rect class="key-wash" x="1" y="1" width="32" height="10" rx="2"/></svg>If it speeds up or slows</li>
         </ul>
         <p class="replay"><button type="button" class="reset" id="replay" hidden>Play the climb again</button></p>
-        <figcaption>Each dot is the best AI of its month, tested on real computer jobs by METR, an independent lab. Finishing a job means succeeding about half the time. The dashes carry the same pace forward and fade where that guess has never been tested.</figcaption>
+        <figcaption>Each dot is the best AI of its month, as tested by METR, an independent lab. The dashes carry the same pace forward and fade where that guess has never been tested.</figcaption>
         <details class="numbers">
           <summary>See the numbers</summary>
           <div class="table-wrap"><table>
-            <thead><tr><th scope="col">When</th><th scope="col">What</th><th scope="col">Longest job</th><th scope="col">Basis</th><th scope="col">If it speeds up or slows</th></tr></thead>
+            <thead><tr><th scope="col">When</th><th scope="col">What</th><th scope="col">Longest task</th><th scope="col">Basis</th><th scope="col">If it speeds up or slows</th></tr></thead>
             <tbody id="ladder-rows"></tbody>
           </table></div>
         </details>
       </figure>
+    </section>
 
-      <div class="arrival" id="arrival" hidden>
-        <h2 id="arrival-q">So when do we arrive?</h2>
-        <ul class="eta" id="eta"></ul>
-        <p class="aside">Arriving means the singularity: AI building better AI until all of technology speeds up. Finishing long jobs is one stop on the way, not the destination.</p>
-        <p class="onward"><a href="#whatif">See what could change it</a></p>
-        <p class="stamp" id="stamp"></p>
-      </div>
+    <section class="band stops" id="stops" aria-labelledby="stops-q" hidden>
+      <h2 id="stops-q">What are we counting down to?</h2>
+      <p class="answer" id="stops-answer"></p>
+      <figure>
+        <div class="pick">
+          <p class="pick-title" id="futures-title">Pick a future</p>
+          <div class="asks" id="futures" role="group" aria-labelledby="futures-title"></div>
+          <div class="age">
+            <label for="age">How old are you now?</label>
+            <output id="age-out" for="age">Slide to set</output>
+            <input type="range" id="age" min="5" max="95" step="1" value="35">
+          </div>
+        </div>
+        <div class="stops-chart" id="stops-chart"></div>
+        <ul class="legend" aria-label="How to read the chart">
+          <li><span class="key-pin is-experts" aria-hidden="true"></span>The future you picked</li>
+          <li><span class="key-mark" aria-hidden="true"></span>The other published scenarios</li>
+          <li><span class="key-span" aria-hidden="true"></span>Earliest to latest</li>
+        </ul>
+        <figcaption id="stops-note"></figcaption>
+        <details class="numbers">
+          <summary>See the numbers</summary>
+          <div class="table-wrap"><table>
+            <thead><tr id="stops-head"></tr></thead>
+            <tbody id="stops-rows"></tbody>
+          </table></div>
+        </details>
+      </figure>
     </section>
 
     <section class="band whatif" id="whatif" aria-labelledby="whatif-q" hidden>
@@ -77,39 +113,46 @@
       <p class="answer">Turn the dials and see.</p>
       <div class="console">
         <div class="console-out">
-          <p class="console-tag">A what-if, not the forecast</p>
-          <div class="gauge" id="gauge"></div>
-          <div class="readout">
-            <p class="speed"><b id="whatif-speed">100%</b> <span>of today’s speed</span></p>
-            <dl class="dates">
-              <div data-stop="singularity"><dt>Arrival, on experts’ middle guess</dt><dd><b id="whatif-year"></b> <span id="whatif-year-shift"></span></dd></div>
-              <div id="whatif-next-box"><dt id="whatif-next-name">Next stop</dt><dd><b id="whatif-next"></b> <span id="whatif-next-shift"></span></dd></div>
-            </dl>
+          <div class="result" data-stop="singularity">
+            <p class="result-name">Your scenario</p>
+            <p class="result-yours"><b id="whatif-year"></b><span class="sr">, </span><span id="whatif-year-shift"></span></p>
+            <p class="result-base">Published reference: <b id="whatif-base"></b></p>
           </div>
-          <div class="roads" aria-hidden="true">
-            <div class="road-box" data-stop="singularity">
-              <p class="road-name">The road to arrival</p>
-              <div class="road" id="road-arrival"><i class="road-base"></i><i class="road-pin"></i></div>
-              <p class="road-ends"><span>Now</span><span id="road-arrival-end"></span></p>
-            </div>
-            <div class="road-box">
-              <p class="road-name">The road to the next stop</p>
-              <div class="road" id="road-next"><i class="road-base"></i><i class="road-pin"></i></div>
-              <p class="road-ends"><span>Now</span><span id="road-next-end"></span></p>
-            </div>
+          <div class="meter">
+            <div class="gauge" id="gauge"></div>
+            <p class="speed"><b id="whatif-speed">100%</b> <span>of today’s speed</span></p>
+          </div>
+          <div class="road-box" data-stop="singularity" aria-hidden="true">
+            <div class="road" id="road-arrival"><i class="road-base"></i><i class="road-pin"></i></div>
+            <p class="road-ends"><span>Now</span><span id="road-arrival-end"></span></p>
+          </div>
+          <div class="result is-next" id="whatif-next-box">
+            <p class="result-name" id="whatif-next-name">The next task length</p>
+            <p class="result-yours"><b id="whatif-next"></b><span class="sr">, </span><span id="whatif-next-shift"></span></p>
+            <p class="result-base">At today’s pace: <b id="whatif-next-base"></b></p>
+          </div>
+          <div class="road-box" id="road-next-box" aria-hidden="true">
+            <div class="road" id="road-next"><i class="road-base"></i><i class="road-pin"></i></div>
+            <p class="road-ends"><span>Now</span><span id="road-next-end"></span></p>
           </div>
           <p class="whatif-why" id="whatif-why" role="status"></p>
         </div>
         <div class="console-in">
           <div class="asks-head">
             <p class="asks-title" id="asks-title">What if…</p>
-            <button type="button" class="reset" id="whatif-reset">Back to today’s course</button>
+            <button type="button" class="reset" id="whatif-reset">Reset the dials</button>
           </div>
-          <div class="asks" id="asks" role="group" aria-labelledby="asks-title"></div>
+          <div id="presets">
+            <div class="asks" id="asks" role="group" aria-labelledby="asks-title"></div>
+            <details class="numbers more-asks" id="asks-more-box">
+              <summary>More scenarios</summary>
+              <div class="asks" id="asks-more" role="group" aria-label="More what-if scenarios"></div>
+            </details>
+          </div>
           <div class="dials" id="dials"></div>
         </div>
       </div>
-      <p class="fine">A thought experiment, not part of the forecast. It assumes computing power grows only as fast as its scarcest ingredient, that about three quarters of progress comes from computing power and a quarter from better methods, and that the time left stretches or shrinks with the speed. The split follows <a href="https://epoch.ai/blog/algorithmic-progress-in-language-models">Epoch AI’s estimate</a>. The link between computing power and job length follows <a href="https://arxiv.org/abs/2511.19492">Whitfill, Snodin and Becker</a>.</p>
+      <p class="fine">A thought experiment, not part of the forecast. It assumes computing power grows only as fast as its scarcest ingredient, that about three quarters of progress comes from computing power and a quarter from better methods, and that the time left stretches or shrinks with the speed. The split follows <a href="https://epoch.ai/blog/algorithmic-progress-in-language-models">Epoch AI’s estimate</a>. The link between computing power and task length follows <a href="https://arxiv.org/abs/2511.19492">Whitfill, Snodin and Becker</a>.</p>
     </section>
 
     <section class="band pace" id="pace" aria-labelledby="pace-q" hidden>
@@ -153,36 +196,6 @@
           <div class="table-wrap"><table>
             <thead><tr><th scope="col">When</th><th scope="col">Model</th><th scope="col">Lab</th><th scope="col">Score</th></tr></thead>
             <tbody id="field-rows"></tbody>
-          </table></div>
-        </details>
-      </figure>
-    </section>
-
-    <section class="band stops" id="stops" aria-labelledby="stops-q" hidden>
-      <h2 id="stops-q">What are the stops along the way?</h2>
-      <p class="answer" id="stops-answer"></p>
-      <figure>
-        <div class="pick">
-          <p class="pick-title" id="futures-title">Pick a future</p>
-          <div class="asks" id="futures" role="group" aria-labelledby="futures-title"></div>
-          <div class="age">
-            <label for="age">How old are you now?</label>
-            <output id="age-out" for="age">Slide to set</output>
-            <input type="range" id="age" min="5" max="95" step="1" value="35">
-          </div>
-        </div>
-        <div class="stops-chart" id="stops-chart"></div>
-        <ul class="legend" aria-label="How to read the chart">
-          <li><span class="key-pin is-experts" aria-hidden="true"></span>The future you picked</li>
-          <li><span class="key-mark" aria-hidden="true"></span>The other published scenarios</li>
-          <li><span class="key-span" aria-hidden="true"></span>Earliest to latest</li>
-        </ul>
-        <figcaption id="stops-note"></figcaption>
-        <details class="numbers">
-          <summary>See the numbers</summary>
-          <div class="table-wrap"><table>
-            <thead><tr id="stops-head"></tr></thead>
-            <tbody id="stops-rows"></tbody>
           </table></div>
         </details>
       </figure>
