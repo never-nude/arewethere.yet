@@ -11,7 +11,7 @@ const dayMs = 86400000;
 const yearMs = 365.25 * dayMs;
 const monthDays = 30.4375;
 
-// Job lengths a reader already knows. A work month is a twelfth of a work year.
+// Task lengths a reader already knows. A work month is a twelfth of a work year.
 export const rungs = Object.freeze([
   {hours: 0.1, name: 'A few minutes'},
   {hours: 1, name: 'An hour'},
@@ -29,7 +29,7 @@ const halves = value => tenth.format(Math.round(value * 2) / 2);
 const counts = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const count = value => counts[value] ?? String(value);
 
-// The length of a job as it would be said aloud in a sentence.
+// The length of a task as it would be said aloud in a sentence.
 export function spanPhrase(hours) {
   if (!(hours > 0)) return 'an unknown length';
   if (hours < 50 / 60) return whole.format(Math.max(1, Math.round(hours * 60))) + ' minutes';
@@ -43,6 +43,18 @@ export function spanPhrase(hours) {
   if (hours < 1700) return whole.format(hours / 167) + ' work months';
   if (hours < 2400) return 'a full work year';
   return halves(hours / 2000) + ' work years';
+}
+
+// The same length as a headline names it. A length that fills a familiar unit
+// can carry the unit's name, as in "a 40-hour work week".
+export function taskPhrase(hours, named = false) {
+  if (!(hours > 0)) return 'tasks of unknown length';
+  if (hours < 50 / 60) return whole.format(Math.max(1, Math.round(hours * 60))) + '-minute tasks';
+  if (hours < 1.5) return 'one-hour tasks';
+  const size = whole.format(hours);
+  const unit = hours >= 7 && hours < 10 ? 'day' : hours >= 34 && hours < 48 ? 'week'
+    : hours >= 140 && hours < 200 ? 'month' : hours >= 1700 && hours < 2400 ? 'year' : null;
+  return named && unit ? (size === '8' ? 'an ' : 'a ') + size + '-hour work ' + unit : size + '-hour tasks';
 }
 
 // The same length as a chart label.
@@ -162,7 +174,7 @@ function buildLadder(series, now) {
   const top = stops.at(-1);
   const reach = Math.min(Math.max(top.when ?? now + 1.5 * yearMs, now + 0.5 * yearMs), now + 6 * yearMs);
   const next = stops.find(stop => stop.status === 'next');
-  let summary = 'The longest job the best AI can finish on its own grew from ' + plainHours(first.hours) + ' in ' +
+  let summary = 'The longest task the best AI can finish on its own grew from ' + plainHours(first.hours) + ' in ' +
     monthLong.format(first.time) + ' to ' + plainHours(record.hours) + ' in ' + monthLong.format(record.time) + '.';
   if (next?.due) summary += ' The pace says ' + next.name.toLowerCase() + ' is due, and no measurement has reached it yet.';
   else if (next?.when) summary += ' If the pace holds, it reaches ' + next.name.toLowerCase() + ' around ' + approxWhen(next.when, now) + '.';
@@ -175,14 +187,18 @@ function buildLadder(series, now) {
   };
 }
 
+// The headline over the first chart. It states what was measured and over how
+// long. A record with nothing shorter behind it gets a plain statement of where
+// things stand.
 function buildLead(ladder) {
   const {points, record} = ladder;
   const earlier = points.filter(point => point.time <= record.time - yearMs);
   const prior = earlier.length ? highest(earlier) : points[0] === record ? null : points[0];
+  if (!prior || taskPhrase(prior.hours) === taskPhrase(record.hours)) return {claim: 'The best AI can now take on ' + taskPhrase(record.hours, true) + '.'};
+  const months = Math.max(1, Math.round((record.time - prior.time) / (monthDays * dayMs)));
   return {
-    now: spanPhrase(record.hours),
-    then: prior ? spanPhrase(prior.hours) : null,
-    when: earlier.length ? 'A year earlier' : prior ? 'In ' + monthLong.format(prior.time) : null,
+    claim: 'AI went from ' + taskPhrase(prior.hours) + ' to ' + taskPhrase(record.hours, true) + ' in ' +
+      (earlier.length ? 'a year' : count(months) + (months === 1 ? ' month' : ' months')) + '.',
   };
 }
 
@@ -202,7 +218,7 @@ function buildPace(ladder) {
     : count(Math.max(1, Math.round(held * 12))) + ' months';
   return {
     doublingDays: Math.round(trend.doublingDays),
-    answer: 'Job length doubles about every ' + whole.format(trend.doublingDays) + ' days.',
+    answer: 'Task length doubles about every ' + whole.format(trend.doublingDays) + ' days.',
     detail: 'That is roughly ' + (perYear >= 9.5 ? whole : tenth).format(perYear) + ' times longer every year' + (trend.supported
       ? ', and the pace has held for ' + span + '.'
       : '. Later results have yet to confirm that the pace is steady.'),
@@ -234,8 +250,8 @@ const plainStops = {
 // The published scenarios, under names a reader can choose between.
 export const futures = Object.freeze([
   {id: 'faster', name: 'Fastest case', match: /^faster/i},
-  {id: 'speedup', name: 'Today’s speed-up lasts', match: /acceleration/i},
-  {id: 'reference', name: 'Experts’ middle guess', match: /^reference/i},
+  {id: 'speedup', name: 'Recent acceleration continues', match: /acceleration/i},
+  {id: 'reference', name: 'Reference scenario', match: /^reference/i},
   {id: 'slower', name: 'Slowest case', match: /^slower/i},
   {id: 'never', name: 'It never comes', match: /never|stalled/i},
 ]);
@@ -316,7 +332,7 @@ function buildField(assessment, now) {
   const often = lately.length === 1 ? 'once' : lately.length === 2 ? 'twice' : count(lately.length) + ' times';
   return {
     points, frontier, labs, leader: frontier.at(-1),
-    answer: labs.length + ' labs. ' + (lately.length ? 'The top score fell ' + often + ' in a year.' : 'No one has beaten the top score in a year.'),
+    answer: labs.length + ' labs. ' + (lately.length ? 'Models set a new top score ' + often + ' in a year.' : 'No model has set a new top score in a year.'),
     records: lately.length,
     // How often the top score passed from one lab to another in the past year.
     handovers: lately.filter(point => frontier[frontier.indexOf(point) - 1]?.lab !== point.lab && frontier.indexOf(point) > 0).length,
@@ -379,7 +395,7 @@ function buildWork(outlook) {
 // Rule two: progress blends computing power with better methods. Ho and
 // colleagues attribute 60–95% of language-model gains to scale and the rest to
 // methods. Three quarters is the rounded midpoint. Whitfill, Snodin and Becker
-// find job length has grown in step with computing power.
+// find task length has grown in step with computing power.
 export const computeShare = 0.75;
 const growth = Object.freeze([
   {value: 0, label: 'Stops'}, {value: 0.5, label: 'Half pace'}, {value: 1, label: 'Today’s pace'},
@@ -398,11 +414,15 @@ export const dials = Object.freeze([
 ]);
 
 // Each question moves the dials it names and leaves the rest on today's course.
+// The first few are shown outright: one that slows things, one that speeds them
+// up and one that stops the clock for a while. The rest wait behind a disclosure.
+export const whatIfShown = 3;
 export const whatIfQuestions = Object.freeze([
   {id: 'fewer-minerals', ask: 'fewer rare minerals are mined?', set: {chips: 1}},
+  {id: 'double-build', ask: 'data centres go up twice as fast?', set: {build: 4, chips: 4, money: 4, power: 4}},
+  {id: 'pause', ask: 'governments pause it for two years?', set: {pause: 2}},
   {id: 'more-minerals', ask: 'more rare minerals are mined?', set: {chips: 4}},
   {id: 'no-build', ask: 'data centres stop going up?', set: {build: 0}},
-  {id: 'double-build', ask: 'data centres go up twice as fast?', set: {build: 4, chips: 4, money: 4, power: 4}},
   {id: 'factories', ask: 'the main chip factories go offline?', set: {chips: 0}},
   {id: 'grid', ask: 'the power grid can’t keep up?', set: {power: 1}},
   {id: 'clean-power', ask: 'cheap clean power arrives?', set: {power: 4}},
@@ -410,7 +430,6 @@ export const whatIfQuestions = Object.freeze([
   {id: 'boom', ask: 'investors double their bets?', set: {money: 4}},
   {id: 'self', ask: 'AI starts doing its own research?', set: {self: 2}},
   {id: 'dry', ask: 'the new ideas run out?', set: {ideas: 0}},
-  {id: 'pause', ask: 'governments pause it for two years?', set: {pause: 2}},
   {id: 'long-pause', ask: 'an accident brings a five-year halt?', set: {pause: 3}},
   {id: 'all', ask: 'everything speeds up at once?', set: {build: 4, chips: 4, money: 4, power: 4, ideas: 4, self: 2}},
 ]);
@@ -492,6 +511,20 @@ export function whatIfView(view, state, now) {
   };
 }
 
+// What the page opens with: the published reference year for the singularity,
+// and beneath it the year the faster path gives. The two answer different
+// questions, so only the reference is the headline.
+function buildForecast(arrival, arrived, horizonYear, nowYear) {
+  if (!arrival || arrived || (arrival.reference === null && arrival.pace === null && arrival.low === null)) return null;
+  return {
+    stop: arrival.id,
+    year: arrival.reference,
+    text: arrival.reference !== null ? String(arrival.reference) : 'After ' + horizonYear,
+    away: yearsAway(arrival.reference, nowYear),
+    faster: arrival.pace !== null ? {year: arrival.pace, text: String(arrival.pace)} : null,
+  };
+}
+
 export function buildClock(feed, now = Date.now()) {
   const assessment = feed?.assessment;
   if (!assessment) throw new Error('The published assessment is missing.');
@@ -500,16 +533,18 @@ export function buildClock(feed, now = Date.now()) {
   const stops = buildStops(outlook, assessment);
   const arrival = stops.find(stop => stop.id === 'singularity') ?? null;
   const horizonYear = Number.isInteger(outlook?.horizonYear) ? outlook.horizonYear : 2100;
+  const nowYear = new Date(now).getUTCFullYear();
+  const arrived = Boolean(arrival?.observed) ||
+    (assessment.forecasts ?? []).some(row => row.id === 'singularity' && row.status === 'Observed');
   return {
-    arrived: Boolean(arrival?.observed) ||
-      (assessment.forecasts ?? []).some(row => row.id === 'singularity' && row.status === 'Observed'),
+    arrived,
+    forecast: buildForecast(arrival, arrived, horizonYear, nowYear),
     edition: Number.isFinite(Date.parse(assessment.checkpointAt)) ? assessment.checkpointAt : null,
     lead: ladder ? buildLead(ladder) : null,
     ladder,
     pace: ladder ? buildPace(ladder) : null,
     doubling: ladder ? buildDoubling(ladder, now) : null,
-    arrival, stops, horizonYear,
-    nowYear: new Date(now).getUTCFullYear(),
+    arrival, stops, horizonYear, nowYear,
     work: buildWork(outlook),
     field: buildField(assessment, now),
   };
